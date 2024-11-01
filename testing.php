@@ -1,6 +1,6 @@
 <?php
 // Database configuration
-$servername = "localhost"; 
+$servername = "server11"; 
 $username = "euro_admin";
 $password = "TsH.X$T@R(HT";
 $dbname = "euro_form_submissions_db";
