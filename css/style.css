@@ -4077,3 +4077,9 @@ section>.container, section>.container-fluid {
   margin-right: 20%;
   margin-bottom: 50px;
 }
+
+.theme-inner-banner .overlay h1 {
+  font-size: 45px;
+  color: #fff;
+  text-transform: uppercase;
+}
