@@ -193,11 +193,12 @@
 
             // Add an event listener to capture the phone number with the country code on form submission
             document.getElementById("contact-form").addEventListener("submit", function(event) {
-                // Get the full number with the country code
-                const fullPhoneNumber = phoneInput.getNumber();
+                // Get the country code and the full phone number without the country code
+                const countryCode = phoneInput.getSelectedCountryData().dialCode;
+                const phoneNumber = phoneInputField.value;
 
-                // Update the phone input's value with the full number
-                phoneInputField.value = fullPhoneNumber;
+                // Combine country code and phone number and update the input value
+                phoneInputField.value = `+${countryCode}${phoneNumber}`;
             });
         });
     </script>
