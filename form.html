@@ -198,7 +198,7 @@
                 const phoneNumber = phoneInputField.value;
 
                 // Combine country code and phone number and update the input value
-                phoneInputField.value = `+${countryCode}${phoneNumber}`;
+                phoneInputField.value = phoneInput.getNumber();
             });
         });
     </script>
