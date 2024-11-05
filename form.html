@@ -198,9 +198,11 @@
             document.getElementById("contact-form").addEventListener("submit", function(event) {
                 const countryData = phoneInput.getSelectedCountryData();
                 const dialCode = countryData.dialCode;
+                const phoneNumber = phoneInput.getNumber();
 
                 // Set the phone input's value to the full international number with country code
-                phoneInputField.value = `+${dialCode} ${phoneInput.getNumber()}`;
+                const formattedPhoneNumber = `+${dialCode} ${phoneNumber}`;
+                phoneInputField.value = formattedPhoneNumber;
 
                 // Log the value to the console for inspection
                 console.log("Formatted phone number:", phoneInputField.value);
