@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form with CAPTCHA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+    <style>
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="email"], input[type="tel"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 5px; /* Reduced margin to fit error message */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .phone-input {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .phone-input input[type="tel"] {
+            flex: 1;
+        }
+        .services {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .captcha {
+            margin-bottom: 20px;
+        }
+        .captcha-box {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            font-size: 20px;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #002c5f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        /* Style validation error messages */
+        label.error {
+            color: red;
+            font-size: 12px; /* Smaller font size */
+            display: block;
+            margin-top: 2px; /* Position error messages closer */
+        }
+        .error {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <form id="contact-form" action="submit.php" method="POST">
+        <h2>Contact Us</h2>
+        
+        <!-- Name Fields -->
+        <div style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label for="first-name">First Name *</label>
+                <input style="width: 90%;" type="text" id="first-name" name="first-name" placeholder="First Name" required>
+            </div>
+            <div style="flex: 1;">
+                <label for="last-name">Last Name *</label>
+                <input type="text" id="last-name" name="last-name" placeholder="Last Name" required>
+            </div>
+        </div>
+        
+        <!-- Phone Field with intl-tel-input -->
+        <label for="phone">Phone *</label>
+        <div class="phone-input">
+            <input type="tel" id="phone" name="phone" required>
+        </div>
+    
+        <!-- Email Field -->
+        <label for="email">Email *</label>
+        <input type="email" id="email" name="email" required>
+    
+        <!-- Services Checkboxes -->
+        <label>Services</label>
+        <div class="services">
+            <label><input type="checkbox" name="services" value="IT Services"> IT Services</label>
+            <label><input type="checkbox" name="services" value="Trainings"> Trainings</label>
+            <label><input type="checkbox" name="services" value="Study Abroad"> Study Abroad</label>
+        </div>
+    
+        <!-- Message Textarea -->
+        <textarea name="message" rows="4" placeholder="Enter your message..."></textarea>
+    
+        <!-- CAPTCHA Section -->
+        <div class="captcha">
+            <label for="captcha-input">Verification Code *</label>
+            <input type="text" id="captcha-input" name="captcha-input" placeholder="Enter the text in the box below" required>
+            <div class="captcha-box" id="captcha-image"></div>
+            <button type="button" onclick="generateCaptcha()">Refresh</button>
+        </div>
+    
+        <!-- Submit Button -->
+        <button type="submit">Submit</button>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+
+    <script>
+        let captchaCode = "";
+
+        function generateCaptcha() {
+            captchaCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            document.getElementById("captcha-image").textContent = captchaCode;
+        }
+
+        window.onload = generateCaptcha;
+
+        function validateCaptcha() {
+            const userCaptchaInput = document.getElementById("captcha-input").value;
+            return userCaptchaInput === captchaCode;
+        }
+
+        $(document).ready(function() {
+            $("#contact-form").validate({
+                rules: {
+                    "first-name": "required",
+                    "last-name": "required",
+                    phone: "required",
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    "captcha-input": {
+                        required: true,
+                        captchaCheck: true
+                    }
+                },
+                messages: {
+                    "first-name": "Please enter your first name",
+                    "last-name": "Please enter your last name",
+                    phone: "Please enter your phone number",
+                    email: {
+                        required: "Please enter your email",
+                        email: "Please enter a valid email address"
+                    },
+                    "captcha-input": "Please enter the correct verification code"
+                },
+                submitHandler: function(form) {
+                    if (!validateCaptcha()) {
+                        alert("Incorrect CAPTCHA. Please try again.");
+                        generateCaptcha();
+                        return false;
+                    }
+                    form.submit();
+                }
+            });
+
+            $.validator.addMethod("captchaCheck", function(value, element) {
+                return value === captchaCode;
+            }, "Incorrect CAPTCHA. Please try again.");
+
+            const phoneInputField = document.querySelector("#phone");
+            const phoneInput = window.intlTelInput(phoneInputField, {
+                initialCountry: "auto",
+                geoIpLookup: function(callback) {
+                    fetch('https://ipinfo.io/json')
+                        .then(response => response.json())
+                        .then(data => callback(data.country));
+                },
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+            });
+        });
+    </script>
+</body>
+</html>

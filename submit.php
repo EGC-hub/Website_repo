@@ -3,7 +3,7 @@
 $servername = "localhost";
 $username = "euro_admin";
 $password = "euroglobal123";
-$dbname = "euro_form_submissions_db";
+$dbname = "euro_contact_form_db";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -14,18 +14,27 @@ if ($conn->connect_error) {
 }
 
 // Get form data
-$name = $_POST['name'];
+$first_name = $_POST['first-name'];
+$last_name = $_POST['last-name'];
+$phone = $_POST['phone'];
 $email = $_POST['email'];
+$services = isset($_POST['services']) ? implode(", ", $_POST['services']) : '';
 $message = $_POST['message'];
 
-// Insert data into table
-$sql = "INSERT INTO submissions (name, email, message) VALUES ('$name', '$email', '$message')";
+// Insert data into database
+$sql = "INSERT INTO contact_form_submissions (first_name, last_name, phone, email, services, message) 
+        VALUES (?, ?, ?, ?, ?, ?)";
 
-if ($conn->query($sql) === TRUE) {
-    echo "New record created successfully";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ssssss", $first_name, $last_name, $phone, $email, $services, $message);
+
+if ($stmt->execute()) {
+    echo "Form submitted successfully!";
 } else {
-    echo "Error: " . $sql . "<br>" . $conn->error;
+    echo "Error: " . $stmt->error;
 }
 
+// Close connections
+$stmt->close();
 $conn->close();
 ?>
