@@ -190,12 +190,14 @@
                 },
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
             });
-            document.getElementById("contact-form").addEventListener("submit", function(event) {
-            // Get the full number with the country code
-            const fullPhoneNumber = phoneInput.getNumber();
 
-            // Update the phone input's value with the full number
-            phoneInputField.value = fullPhoneNumber;
+            // Add an event listener to capture the phone number with the country code on form submission
+            document.getElementById("contact-form").addEventListener("submit", function(event) {
+                // Get the full number with the country code
+                const fullPhoneNumber = phoneInput.getNumber();
+
+                // Update the phone input's value with the full number
+                phoneInputField.value = fullPhoneNumber;
             });
         });
     </script>
