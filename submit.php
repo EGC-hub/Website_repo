@@ -18,7 +18,7 @@ $first_name = $_POST['first-name'];
 $last_name = $_POST['last-name'];
 $phone = $_POST['phone'];
 $email = $_POST['email'];
-$services = isset($_POST['services']) ? implode(", ", $_POST['services']) : '';
+$services = isset($_POST['services']) ? (is_array($_POST['services']) ? implode(", ", $_POST['services']) : $_POST['services']) : '';
 $message = $_POST['message'];
 
 // Insert data into database
