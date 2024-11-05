@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Form with CAPTCHA</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.6.1/build/css/intlTelInput.css">
     <style>
         form {
             max-width: 600px;
@@ -124,7 +124,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.6.1/build/js/intlTelInput.min.js"></script>
 
     <script>
         let captchaCode = "";
@@ -179,7 +179,10 @@
             $.validator.addMethod("captchaCheck", function(value, element) {
                 return value === captchaCode;
             }, "Incorrect CAPTCHA. Please try again.");
+        });
 
+        $(document).ready(function() {
+            // Initialize intl-tel-input with auto country detection
             const phoneInputField = document.querySelector("#phone");
             const phoneInput = window.intlTelInput(phoneInputField, {
                 initialCountry: "auto",
@@ -188,19 +191,16 @@
                         .then(response => response.json())
                         .then(data => callback(data.country));
                 },
-                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.6.1/build/js/utils.js"
             });
 
-            // Add an event listener to capture the phone number with the country code on form submission
+            // On form submission, update the phone input to include the full international format number
             document.getElementById("contact-form").addEventListener("submit", function(event) {
-                // Get the country code and the full phone number without the country code
-                const countryCode = phoneInput.getSelectedCountryData().dialCode;
-                const phoneNumber = phoneInputField.value;
-
-                // Combine country code and phone number and update the input value
-                phoneInputField.value = phoneInput.getNumber();
+                // Set the phone input's value to the full international number with country code
+                phoneInputField.value = phoneInput.getNumber(intlTelInputUtils.numberFormat.E164);
             });
         });
+
     </script>
 </body>
 </html>
