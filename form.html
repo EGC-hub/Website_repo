@@ -187,17 +187,31 @@
             const phoneInput = window.intlTelInput(phoneInputField, {
                 initialCountry: "auto",
                 geoIpLookup: function(callback) {
-                    fetch('https://ipinfo.io/json')
-                        .then(response => response.json())
-                        .then(data => callback(data.country));
+                fetch('https://ipinfo.io/json')
+                    .then(response => response.json())
+                    .then(data => callback(data.country));
                 },
                 utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.6.1/build/js/utils.js"
             });
 
-            // On form submission, update the phone input to include the full international format number
+            // Create a hidden input field for the international code
+            const hiddenCodeInput = document.createElement('input');
+            hiddenCodeInput.type = 'hidden';
+            hiddenCodeInput.name = 'phone_code'; // Adjust the name as needed for your database
+
+            // Add the hidden input field to the form
+            document.getElementById('contact-form').appendChild(hiddenCodeInput);
+
+            // On form submission, update both phone number and hidden code fields
             document.getElementById("contact-form").addEventListener("submit", function(event) {
+                // Get the international dialing code
+                const dialCode = phoneInput.getDialCode();
+
                 // Set the phone input's value to the full international number with country code
                 phoneInputField.value = phoneInput.getNumber(intlTelInputUtils.numberFormat.E164);
+
+                // Update the hidden input field with the dialing code
+                hiddenCodeInput.value = dialCode;
             });
         });
 
