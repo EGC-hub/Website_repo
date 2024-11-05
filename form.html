@@ -179,9 +179,7 @@
             $.validator.addMethod("captchaCheck", function(value, element) {
                 return value === captchaCode;
             }, "Incorrect CAPTCHA. Please try again.");
-        });
 
-        $(document).ready(function() {
             // Initialize intl-tel-input with auto country detection
             const phoneInputField = document.querySelector("#phone");
             const phoneInput = window.intlTelInput(phoneInputField, {
