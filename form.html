@@ -201,6 +201,9 @@
 
                 // Set the phone input's value to the full international number with country code
                 phoneInputField.value = `+${dialCode} ${phoneInput.getNumber()}`;
+
+                // Log the value to the console for inspection
+                console.log("Formatted phone number:", phoneInputField.value);
             });
         });
 
