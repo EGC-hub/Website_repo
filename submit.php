@@ -29,7 +29,9 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("ssssss", $first_name, $last_name, $phone, $email, $services, $message);
 
 if ($stmt->execute()) {
-    echo "Form submitted successfully!";
+     // Redirect to thank you page
+     header("Location: thankyou.html");
+     exit();
 } else {
     echo "Error: " . $stmt->error;
 }
