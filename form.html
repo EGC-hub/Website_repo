@@ -93,6 +93,7 @@
         <label for="phone">Phone *</label>
         <div class="phone-input">
             <input type="hidden" id="country" name="country">
+            <input type="hidden" id="dialCode" name="dialCode">
             <input type="tel" id="phone" name="phone" required>
         </div>
     
@@ -194,16 +195,19 @@
             });
 
 
-            // Listen for country change event to update the hidden field
+            // Listen for country change event to update hidden fields
             phoneInputField.addEventListener("countrychange", function() {
-                // Update hidden input with the selected country code (iso2)
-                document.querySelector("#country").value = phoneInput.getSelectedCountryData().iso2;
+                // Get the selected country data
+                const countryData = phoneInput.getSelectedCountryData();
+                
+                // Update hidden inputs with ISO country code and dial code
+                document.querySelector("#country").value = countryData.iso2;
+                document.querySelector("#dialCode").value = countryData.dialCode;
             });
 
-            // Capture full phone number (with country code) before form submission
+            // Capture full phone number on form submission
             document.getElementById("contact-form").addEventListener("submit", function(event) {
                 const fullPhoneNumber = phoneInput.getNumber();
-                // Update the phone input field with the full phone number
                 phoneInputField.value = fullPhoneNumber;
             });
         });
