@@ -196,14 +196,14 @@
 
 
             // Listen for country change event to update hidden fields
-            phoneInputField.addEventListener("countrychange", function() {
-                // Get the selected country data
-                const countryData = phoneInput.getSelectedCountryData();
+            // phoneInputField.addEventListener("countrychange", function() {
+            //     // Get the selected country data
+            //     const countryData = phoneInput.getSelectedCountryData();
                 
-                // Update hidden inputs with ISO country code and dial code
-                document.querySelector("#country").value = countryData.iso2;
-                document.querySelector("#dialCode").value = countryData.dialCode;
-            });
+            //     // Update hidden inputs with ISO country code and dial code
+            //     document.querySelector("#country").value = countryData.iso2;
+            //     document.querySelector("#dialCode").value = countryData.dialCode;
+            // });
 
             // Capture full phone number on form submission
             document.getElementById("contact-form").addEventListener("submit", function(event) {

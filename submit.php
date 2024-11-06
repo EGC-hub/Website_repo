@@ -17,18 +17,18 @@ if ($conn->connect_error) {
 $first_name = $_POST['first-name'];
 $last_name = $_POST['last-name'];
 $phone = $_POST['phone'];
-$country = $_POST['country']; 
-$dialCode = $_POST['dialCode']; 
+// $country = $_POST['country']; 
+// $dialCode = $_POST['dialCode']; 
 $email = $_POST['email'];
 $services = isset($_POST['services']) ? implode(", ", $_POST['services']) : '';
 $message = $_POST['message'];
 
 // Insert data into database
-$sql = "INSERT INTO contact_form_submissions (first_name, last_name, phone, country, dial_code, email, services, message) 
+$sql = "INSERT INTO contact_form_submissions (first_name, last_name, phone, email, services, message) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ssssssss", $first_name, $last_name, $phone, $country, $dial_code, $email, $services, $message);
+$stmt->bind_param("ssssss", $first_name, $last_name, $phone, $email, $services, $message);
 
 if ($stmt->execute()) {
      // Redirect to thank you page
