@@ -28,7 +28,7 @@ $sql = "INSERT INTO contact_form_submissions (first_name, last_name, phone, coun
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ssssss", $first_name, $last_name, $phone, $country, $dial_code, $email, $services, $message);
+$stmt->bind_param("ssssssss", $first_name, $last_name, $phone, $country, $dial_code, $email, $services, $message);
 
 if ($stmt->execute()) {
      // Redirect to thank you page
