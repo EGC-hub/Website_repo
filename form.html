@@ -92,6 +92,7 @@
         <!-- Phone Field with intl-tel-input -->
         <label for="phone">Phone *</label>
         <div class="phone-input">
+            <input type="hidden" id="country" name="country">
             <input type="tel" id="phone" name="phone" required>
         </div>
     
@@ -180,32 +181,30 @@
                 return value === captchaCode;
             }, "Incorrect CAPTCHA. Please try again.");
 
-            // Initialize intl-tel-input with auto country detection
+            // Initialize intl-tel-input with UAE as the initial country
             const phoneInputField = document.querySelector("#phone");
             const phoneInput = window.intlTelInput(phoneInputField, {
-                initialCountry: "auto",
-                geoIpLookup:   
-            function(callback)   
-            {
-                fetch('https://ipinfo.io/json')
-                    .then(response => response.json())
-                    .then(data => callback(data.country));
+                initialCountry: "ae", // Set to UAE
+                geoIpLookup: function(callback) {
+                    fetch('https://ipinfo.io/json')
+                        .then(response => response.json())
+                        .then(data => callback(data.country));
                 },
                 utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.6.1/build/js/utils.js"
             });
 
-            // On form submission, update the phone input with the full international number
+
+            // Listen for country change event to update the hidden field
+            phoneInputField.addEventListener("countrychange", function() {
+                // Update hidden input with the selected country code (iso2)
+                document.querySelector("#country").value = phoneInput.getSelectedCountryData().iso2;
+            });
+
+            // Capture full phone number (with country code) before form submission
             document.getElementById("contact-form").addEventListener("submit", function(event) {
-                const countryData = phoneInput.getSelectedCountryData();
-                const dialCode = countryData.dialCode;
-                const phoneNumber = phoneInput.getNumber();
-
-                // Set the phone input's value to the full international number with country code
-                const formattedPhoneNumber = `+${dialCode} ${phoneNumber}`;
-                phoneInputField.value = formattedPhoneNumber;
-
-                // Log the value to the console for inspection
-                console.log("Formatted phone number:", phoneInputField.value);
+                const fullPhoneNumber = phoneInput.getNumber();
+                // Update the phone input field with the full phone number
+                phoneInputField.value = fullPhoneNumber;
             });
         });
 
