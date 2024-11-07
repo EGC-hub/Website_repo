@@ -182,34 +182,35 @@
                 return value === captchaCode;
             }, "Incorrect CAPTCHA. Please try again.");
 
-            // Initialize intl-tel-input with UAE as the initial country
+            // Initialize intl-tel-input with UAE as the default country
             const phoneInputField = document.querySelector("#phone");
+            const countryInputField = document.querySelector("#country");
+            const dialCodeInputField = document.querySelector("#dialCode");
+
             const phoneInput = window.intlTelInput(phoneInputField, {
-                initialCountry: "ae", // Set to UAE
+                initialCountry: "ae", // Set to UAE by default
                 geoIpLookup: function(callback) {
                     fetch('https://ipinfo.io/json')
                         .then(response => response.json())
-                        .then(data => callback(data.country));
+                        .then(data => callback(data.country))
+                        .catch(() => callback("ae"));
                 },
                 utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.6.1/build/js/utils.js"
             });
 
-
-            // Listen for country change event to update hidden fields
-            phoneInputField.addEventListener("countrychange", function() {
-                // Get the selected country data
+            // Set default country and dial code initially
+            const setCountryData = () => {
                 const countryData = phoneInput.getSelectedCountryData();
-                
-                // Update hidden inputs with ISO country code and dial code
-                document.querySelector("#country").value = countryData.iso2;
-                document.querySelector("#dialCode").value = countryData.dialCode;
-            });
+                countryInputField.value = countryData.iso2;
+                dialCodeInputField.value = countryData.dialCode;
+            };
 
-            // Capture full phone number on form submission
-            document.getElementById("contact-form").addEventListener("submit", function(event) {
-                const fullPhoneNumber = phoneInput.getNumber();
-                phoneInputField.value = fullPhoneNumber;
-            });
+            // Set initial values on page load
+            setCountryData();
+
+            // Update country and dial code values when user changes country
+            phoneInputField.addEventListener("countrychange", setCountryData
+            );
         });
 
     </script>
