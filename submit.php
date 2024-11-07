@@ -18,22 +18,29 @@ $first_name = $_POST['first-name'];
 $last_name = $_POST['last-name'];
 $phone = $_POST['phone'];
 $country = $_POST['country']; 
-$dialCode = $_POST['dialCode']; 
+$dial_code = $_POST['dialCode']; 
 $email = $_POST['email'];
 $services = isset($_POST['services']) ? implode(", ", $_POST['services']) : '';
 $message = $_POST['message'];
 
-// Insert data into database
+// Prepare and bind SQL statement
 $sql = "INSERT INTO contact_form_submissions (first_name, last_name, phone, country, dial_code, email, services, message) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
 $stmt = $conn->prepare($sql);
+
+// Check if preparation is successful
+if (!$stmt) {
+    die("Preparation failed: " . $conn->error);
+}
+
+// Bind parameters
 $stmt->bind_param("ssssssss", $first_name, $last_name, $phone, $country, $dial_code, $email, $services, $message);
 
+// Execute the statement and check if it is successful
 if ($stmt->execute()) {
-     // Redirect to thank you page
-     header("Location: thankyou.html");
-     exit();
+    // Redirect to thank you page
+    header("Location: thankyou.html");
+    exit();
 } else {
     echo "Error: " . $stmt->error;
 }
