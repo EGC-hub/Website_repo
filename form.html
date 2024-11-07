@@ -202,7 +202,7 @@
             const setCountryData = () => {
                 const countryData = phoneInput.getSelectedCountryData();
                 countryInputField.value = countryData.name;
-                dialCodeInputField.value = countryData.dialCode;
+                dialCodeInputField.value = `+${countryData.dialCode}`;
             };
 
             // Set initial values on page load
