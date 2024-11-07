@@ -118,6 +118,7 @@
             <input type="text" id="captcha-input" name="captcha-input" placeholder="Enter the text in the box below" required>
             <div class="captcha-box" id="captcha-image"></div>
             <button type="button" onclick="generateCaptcha()">Refresh</button>
+            <button type="button" onclick="clearForm()">Clear</button>
         </div>
     
         <!-- Submit Button -->
@@ -129,6 +130,24 @@
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.6.1/build/js/intlTelInput.min.js"></script>
 
     <script>
+        function clearForm() {
+            // Reset the form
+            document.getElementById("contact-form").reset();
+
+            // Reinitialize intl-tel-input to default country
+            const phoneInputField = document.querySelector("#phone");
+            const phoneInput = window.intlTelInput(phoneInputField, {
+                initialCountry: "ae", // Set to UAE or other default
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.6.1/build/js/utils.js"
+            });
+
+            // Reset country and dial code inputs
+            const countryInput = document.querySelector("#country");
+            const dialCodeInput = document.querySelector("#dialCode");
+
+            countryInput.value = phoneInput.getSelectedCountryData().name;
+            dialCodeInput.value = `+${phoneInput.getSelectedCountryData().dialCode}`;
+        }
         let captchaCode = "";
 
         function generateCaptcha() {
