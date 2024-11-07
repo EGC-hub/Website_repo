@@ -201,7 +201,7 @@
             // Set default country and dial code initially
             const setCountryData = () => {
                 const countryData = phoneInput.getSelectedCountryData();
-                countryInputField.value = countryData.iso2;
+                countryInputField.value = countryData.name;
                 dialCodeInputField.value = countryData.dialCode;
             };
 
