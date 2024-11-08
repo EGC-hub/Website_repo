@@ -37,6 +37,25 @@
             flex-direction: column;
             margin-bottom: 15px;
         }
+        .captcha-container {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Adjust spacing between input and button as desired */
+        }
+
+        .refresh-button {
+            padding: 8px 12px;
+            font-size: 14px;
+            color: white;
+            background-color: #002c5f;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .refresh-button:hover {
+            background-color: #004080;
+        }
         .captcha {
             margin-bottom: 20px;
         }
@@ -115,11 +134,13 @@
         <!-- CAPTCHA Section -->
         <div class="captcha">
             <label for="captcha-input">Verification Code *</label>
-            <input type="text" id="captcha-input" name="captcha-input" placeholder="Enter the text in the box below" required>
+            <div class="captcha-container">
+                <input type="text" id="captcha-input" name="captcha-input" placeholder="Enter the text in the box below" required>
+                <button type="button" onclick="generateCaptcha()">Refresh</button>
+            </div>
             <div class="captcha-box" id="captcha-image"></div>
-            <button type="button" onclick="generateCaptcha()">Refresh</button>
         </div>
-    
+            
         <!-- Submit Button -->
         <button type="submit">Submit</button>
         <button type="button" onclick="clearForm()">Clear Form</button>
