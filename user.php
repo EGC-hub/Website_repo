@@ -10,7 +10,7 @@ $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 
 // Check connection
 if ($conn->connect_error) {
-    die("Connection failed: ". $conn->connect_error):
+    die("Connection failed: ". $conn->connect_error);
     // Alternatively, you can redirect to an error page or display a friendly error message
     // header("Location: error-page.php";
     // exit;
