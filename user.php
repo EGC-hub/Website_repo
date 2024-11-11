@@ -21,7 +21,7 @@ $newUsername = 'admin';
 $newPassword = password_hash('euroglobal123', PASSWORD_DEFAULT);
 
 // Hash the new password using password_hash()
-$newHash = password_hash($newPassword, PASSWORD_DEFAULT;)
+$newHash = password_hash($newPassword, PASSWORD_DEFAULT);
 
 // Insert the new user details into the database
 $query = "INSERT INTO users (username, password, role) VALUES ('admin', '$newHash', 'admin')";
