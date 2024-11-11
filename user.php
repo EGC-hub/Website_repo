@@ -1,9 +1,9 @@
 <?php
 // Configuration
-$dbHost = 'your_host';
-$dbUsername = 'your_database_username';
-$dbPassword = 'your_database_password';
-$dbName = 'your_database_name';
+$dbHost = 'localhost';
+$dbUsername = 'euro_admin';
+$dbPassword = 'euroglobal123';
+$dbName = 'euro_login_system';
 
 // Establish database connection
 $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
