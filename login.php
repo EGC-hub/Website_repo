@@ -1,9 +1,9 @@
 <?php
 // Configuration
-$servername = "localhost";
-$username = "euro_admin";
-$password = "euroglobal123";
-$dbname = "euro_login_system";
+$dbHost = 'localhost';
+$dbUsername = 'euro_admin';
+$dbPassword = 'euroglobal123';
+$dbName = 'euro_login_system';
 
 // Establish database connection
 $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['role'] = $user['role'];
 
             // Redirect to the dashboard or relevant page
-            header("location: thankyou.html");
+            header("location: dashboard.php");
             exit;
         } else {
             // Password is incorrect
