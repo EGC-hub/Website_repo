@@ -6,40 +6,53 @@ $password = "euroglobal123";
 $dbname = "euro_login_system";
 
 // Establish database connection
-$conn = mysqli_connect($dbHost, $dbUsername, $dbPassword, $dbName);
+$conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 
 // Check connection
-if (!$conn) {
-    die("Connection failed: ". mysqli_connect_error());
+if ($conn->connect_error) {
+    die("Connection failed: ". $conn->connect_error);
 }
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-    // Query to fetch user data
-    $query = "SELECT * FROM users WHERE username = '$username'";
-    $result = mysqli_query($conn, $query);
+    // Prepare the SQL query
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username =?");
+    $stmt->bind_param("s", $username);
 
-    if (mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
-        // Assuming passwords are hashed using password_hash() during registration
-        if (password_verify($password, $row['password'])) {
-            // Login successful, start session and redirect
+    // Execute the query
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Fetch the user data
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        // Verify the password
+        if (password_verify($password, $user['password'])) {
+            // Password is correct, start a new session
             session_start();
             $_SESSION['loggedin'] = true;
             $_SESSION['username'] = $username;
-            $_SESSION['role'] = $row['role'];
-            header("location: thankyou.html"); // Redirect to dashboard or relevant page
+            $_SESSION['role'] = $user['role'];
+
+            // Redirect to the dashboard or relevant page
+            header("location: dashboard.php");
             exit;
         } else {
+            // Password is incorrect
             $error = "Incorrect password.";
         }
     } else {
+        // Username not found
         $error = "Username not found.";
     }
-    mysqli_close($conn);
+
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
 }
 
 // Display error if any
@@ -47,4 +60,3 @@ if (isset($error)) {
     echo '<script>alert("'. $error. '");</script>';
 }
 ?>
-<!-- For testing purposes, you can temporarily include the login form here or keep it in login.html and adjust the action attribute accordingly -->
