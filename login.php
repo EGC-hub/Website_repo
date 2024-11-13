@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['role'] = $user['role'];
 
             // Redirect to the dashboard or relevant page
-            header("location: thankyou.html");
+            header("location: data-display.php");
             exit;
         } else {
             // Password is incorrect
