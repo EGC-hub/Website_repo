@@ -31,7 +31,7 @@ $_SESSION['last_activity'] = time();
 $dbHost = 'localhost';
 $dbUsername = 'euro_admin';
 $dbPassword = 'euroglobal123';
-$dbName = 'euro_login_system';
+$dbName = 'euro_contact_form_db';
 
 // Establish database connection
 $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
