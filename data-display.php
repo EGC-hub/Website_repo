@@ -14,7 +14,7 @@
         
         .table-container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1250px;
             margin: 0 auto;
             background-color: #fff;
             padding: 20px;
