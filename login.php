@@ -13,13 +13,16 @@ if ($conn->connect_error) {
     die("Connection failed: ". $conn->connect_error);
 }
 
+// Start session
+session_start();
+
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
     // Prepare the SQL query
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username =?");
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
 
     // Execute the query
@@ -33,13 +36,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Verify the password
         if (password_verify($password, $user['password'])) {
             // Password is correct, start a new session
-            session_start();
+            session_regenerate_id(true); // Regenerate session ID for security
             $_SESSION['loggedin'] = true;
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $user['role'];
 
-            // Redirect to the dashboard or relevant page
-            header("location: data-display.php");
+            // Redirect to the data display page
+            header("Location: data-display.php");
             exit;
         } else {
             // Password is incorrect
