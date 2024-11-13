@@ -38,9 +38,13 @@
         }
 
         th, td {
+            width: auto;
             padding: 10px;
-            text-align: center;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+            background-color: #ffffff; /* Ensure each cell has a white background */
         }
+
 
         th {
             background-color: #002c5f;
@@ -56,6 +60,11 @@
             color: #888;
             padding: 20px;
         }
+
+        .container {
+            width: 100%;
+        }
+
     </style>
 </head>
 <body>
