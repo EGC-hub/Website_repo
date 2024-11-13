@@ -8,7 +8,7 @@ session_start();
 // Check if the user is not logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     // Redirect to login page if not logged in
-    header("Location: login.php");
+    header("Location: portal-login.html");
     exit;
 }
 
