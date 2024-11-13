@@ -73,47 +73,47 @@
     <h2>Data Records</h2>
 
     <?php
-    // Start session
-    session_start();
+        // Start session
+        session_start();
 
-    // Check if the user is not logged in
-    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-        // Redirect to login page if not logged in
-        header("Location: login.php");
-        exit;
-    }
+        // Check if the user is not logged in
+        if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+            // Redirect to login page if not logged in
+            header("Location: login.php");
+            exit;
+        }
 
-    // Session timeout (Optional)
-    $timeout_duration = 1800; // 30 minutes in seconds
+        // Session timeout (Optional)
+        $timeout_duration = 1800; // 30 minutes in seconds
 
-    // Check if 'last_activity' is set and if it has exceeded the timeout
-    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
-        // If the session is expired, destroy it and redirect to login page
-        session_unset();
-        session_destroy();
-        header("Location: login.php");
-        exit;
-    }
+        // Check if 'last_activity' is set and if it has exceeded the timeout
+        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
+            // If the session is expired, destroy it and redirect to login page
+            session_unset();
+            session_destroy();
+            header("Location: login.php");
+            exit;
+        }
 
-    // Update last activity time
-    $_SESSION['last_activity'] = time();
+        // Update last activity time
+        $_SESSION['last_activity'] = time();
 
-    // Configuration for database
-    $dbHost = 'localhost';
-    $dbUsername = 'euro_admin';
-    $dbPassword = 'euroglobal123';
-    $dbName = 'euro_login_system';
+        // Configuration for database
+        $dbHost = 'localhost';
+        $dbUsername = 'euro_admin';
+        $dbPassword = 'euroglobal123';
+        $dbName = 'euro_login_system';
 
-    // Establish database connection
-    $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
+        // Establish database connection
+        $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: ". $conn->connect_error);
-    }
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: ". $conn->connect_error);
+        }
 
-    // Your existing data-display code should go here
-    ?>
+        // Your existing data-display code should go here
+        ?>
 
 </div>
 
