@@ -1,62 +1,62 @@
-    <?php
-    // Configuration
-    $dbHost = 'localhost';
-    $dbUsername = 'euro_admin';
-    $dbPassword = 'euroglobal123';
-    $dbName = 'euro_login_system';
+<?php
+// Configuration
+$dbHost = 'localhost';
+$dbUsername = 'euro_admin';
+$dbPassword = 'euroglobal123';
+$dbName = 'euro_login_system';
 
-    // Establish database connection
-    $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
+// Establish database connection
+$conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: ". $conn->connect_error);
-    }
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: ". $conn->connect_error);
+}
 
-    // Handle form submission
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $username = $_POST['username'];
-        $password = $_POST['password'];
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-        // Prepare the SQL query
-        $stmt = $conn->prepare("SELECT * FROM users WHERE username =?");
-        $stmt->bind_param("s", $username);
+    // Prepare the SQL query
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username =?");
+    $stmt->bind_param("s", $username);
 
-        // Execute the query
-        $stmt->execute();
-        $result = $stmt->get_result();
+    // Execute the query
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-        // Fetch the user data
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
+    // Fetch the user data
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
 
-            // Verify the password
-            if (password_verify($password, $user['password'])) {
-                // Password is correct, start a new session
-                session_start();
-                $_SESSION['loggedin'] = true;
-                $_SESSION['username'] = $username;
-                $_SESSION['role'] = $user['role'];
+        // Verify the password
+        if (password_verify($password, $user['password'])) {
+            // Password is correct, start a new session
+            session_start();
+            $_SESSION['loggedin'] = true;
+            $_SESSION['username'] = $username;
+            $_SESSION['role'] = $user['role'];
 
-                // Redirect to the dashboard or relevant page
-                header("location: data-display.php");
-                exit;
-            } else {
-                // Password is incorrect
-                $error = "Incorrect password.";
-            }
+            // Redirect to the dashboard or relevant page
+            header("location: data-display.php");
+            exit;
         } else {
-            // Username not found
-            $error = "Username not found.";
+            // Password is incorrect
+            $error = "Incorrect password.";
         }
-
-        // Close the statement and connection
-        $stmt->close();
-        $conn->close();
+    } else {
+        // Username not found
+        $error = "Username not found.";
     }
 
-    // Display error if any
-    if (isset($error)) {
-        echo '<script>alert("'. $error. '");</script>';
-    }
-    ?>
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
+}
+
+// Display error if any
+if (isset($error)) {
+    echo '<script>alert("'. $error. '");</script>';
+}
+?>
