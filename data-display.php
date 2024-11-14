@@ -116,7 +116,7 @@ if ($conn->connect_error) {
 
     <?php
     // Example of fetching data from the database (replace with your actual query)
-    $sql = "SELECT id, first_name, last_name, phone, country, dial_code, email, services, message FROM contact_form_submissions";
+    $sql = "SELECT id, first_name, last_name, phone, country, dial_code, email, services, message FROM contact_form_submissions ORDER BY id DESC";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
