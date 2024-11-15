@@ -8,7 +8,7 @@ session_start();
 // Check if the user is not logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     // Redirect to login page if not logged in
-    header("Location: login.php");
+    header("Location: portal-login.html");
     exit;
 }
 
@@ -20,7 +20,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
     // If the session is expired, destroy it and redirect to login page
     session_unset();
     session_destroy();
-    header("Location: login.php");
+    header("Location: portal-login.html");
     exit;
 }
 
