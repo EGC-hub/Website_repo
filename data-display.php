@@ -143,9 +143,9 @@ if ($conn->connect_error) {
         echo '<th>ID</th>';
         echo '<th>First Name</th>';
         echo '<th>Last Name</th>';
+        echo '<th>Dial Code</th>';
         echo '<th>Phone</th>';
         echo '<th>Country</th>';
-        echo '<th>Dial Code</th>';
         echo '<th>Email</th>';
         echo '<th>Services</th>';
         echo '<th>Message</th>';
