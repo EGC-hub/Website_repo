@@ -147,6 +147,7 @@ if ($conn->connect_error) {
         echo '<th>Phone</th>';
         echo '<th>Country</th>';
         echo '<th>Email</th>';
+        echo '<th>Submitted At</th>';
         echo '<th>Services</th>';
         echo '<th>Message</th>';
         echo '</tr>';
@@ -163,6 +164,7 @@ if ($conn->connect_error) {
             echo '<td>' . htmlspecialchars($row['phone'] ?? '') . '</td>';
             echo '<td>' . htmlspecialchars($row['country'] ?? '') . '</td>';
             echo '<td>' . htmlspecialchars($row['email'] ?? '') . '</td>';
+            echo '<td>' . htmlspecialchars($row['submitted_at'] ?? '') . '</td>';
             echo '<td>' . htmlspecialchars($row['services'] ?? '') . '</td>';
             echo '<td>' . htmlspecialchars($row['message'] ?? '') . '</td>';
             echo '</tr>';
