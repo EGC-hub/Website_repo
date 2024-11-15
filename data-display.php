@@ -154,7 +154,7 @@ if ($conn->connect_error) {
         // Loop through and display data rows
         while ($row = $result->fetch_assoc()) {
             echo '<tr>';
-            echo '<td>' . htmlspecialchars($row['id'] ?? '') . '</td>';
+            echo '<td>'. htmlspecialchars($counter) .'</td>';
             echo '<td>' . htmlspecialchars($row['first_name'] ?? '') . '</td>';
             echo '<td>' . htmlspecialchars($row['last_name'] ?? '') . '</td>';
             echo '<td>' . htmlspecialchars($row['dial_code'] ?? '') . '</td>';
