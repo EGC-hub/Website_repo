@@ -134,7 +134,7 @@ if ($conn->connect_error) {
 
     <?php
     // Query to fetch data in descending order based on 'id'
-    $query = "SELECT * FROM your_table_name ORDER BY id DESC"; // Replace 'your_table_name' with the actual table name
+    $query = "SELECT * FROM contact_form_submissions ORDER BY id DESC"; // Replace 'your_table_name' with the actual table name
     $result = $conn->query($query);
 
     if ($result && $result->num_rows > 0) {
