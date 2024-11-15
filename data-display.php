@@ -8,7 +8,7 @@ session_start();
 // Check if the user is not logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     // Redirect to login page if not logged in
-    header("Location: portal-login.html");
+    header("Location: login.php");
     exit;
 }
 
@@ -20,7 +20,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
     // If the session is expired, destroy it and redirect to login page
     session_unset();
     session_destroy();
-    header("Location: portal-login.html");
+    header("Location: login.php");
     exit;
 }
 
@@ -31,7 +31,7 @@ $_SESSION['last_activity'] = time();
 $dbHost = 'localhost';
 $dbUsername = 'euro_admin';
 $dbPassword = 'euroglobal123';
-$dbName = 'euro_contact_form_db';
+$dbName = 'euro_login_system';
 
 // Establish database connection
 $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
@@ -70,6 +70,19 @@ if ($conn->connect_error) {
             text-align: center;
             color: #333;
             margin-bottom: 20px;
+        }
+
+        .logout-button {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .logout-button a {
+            background-color: #002c5f;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
         }
 
         table {
@@ -112,36 +125,53 @@ if ($conn->connect_error) {
 <body>
 
 <div class="table-container">
+    <!-- Logout Button -->
+    <div class="logout-button">
+        <a href="logout.php">Log Out</a>
+    </div>
+
     <h2>Data Records</h2>
 
     <?php
-    // Example of fetching data from the database (replace with your actual query)
-    $sql = "SELECT id, first_name, last_name, phone, country, dial_code, email, services, message FROM contact_form_submissions ORDER BY id DESC";
-    $result = $conn->query($sql);
+    // Query to fetch data in descending order based on 'id'
+    $query = "SELECT * FROM your_table_name ORDER BY id DESC"; // Replace 'your_table_name' with the actual table name
+    $result = $conn->query($query);
 
-    if ($result->num_rows > 0) {
-        echo "<table>";
-        echo "<tr><th>Id</th><th>First Name</th><th>Last Name</th><th>Phone</th><th>Country</th><th>Dial Code</th><th>Email</th><th>Services</th><th>Message</th></tr>";
+    if ($result && $result->num_rows > 0) {
+        echo '<table>';
+        echo '<tr>';
+        echo '<th>ID</th>';
+        echo '<th>First Name</th>';
+        echo '<th>Last Name</th>';
+        echo '<th>Phone</th>';
+        echo '<th>Country</th>';
+        echo '<th>Dial Code</th>';
+        echo '<th>Email</th>';
+        echo '<th>Services</th>';
+        echo '<th>Message</th>';
+        echo '</tr>';
 
-        // Fetch and display each row
-        while($row = $result->fetch_assoc()) {
-            echo "<tr>";
-            echo "<td>" . htmlspecialchars($row["id"] ?? '') . "</td>";
-            echo "<td>" . htmlspecialchars($row["first_name"] ?? '') . "</td>";
-            echo "<td>" . htmlspecialchars($row["last_name"] ?? '') . "</td>";
-            echo "<td>" . htmlspecialchars($row["phone"] ?? '') . "</td>";
-            echo "<td>" . htmlspecialchars($row["country"] ?? '') . "</td>";
-            echo "<td>" . htmlspecialchars($row["dial_code"] ?? '') . "</td>";
-            echo "<td>" . htmlspecialchars($row["email"] ?? '') . "</td>";
-            echo "<td>" . htmlspecialchars($row["services"] ?? '') . "</td>";
-            echo "<td>" . htmlspecialchars($row["message"] ?? '') . "</td>";
-            echo "</tr>";
+        // Loop through and display data rows
+        while ($row = $result->fetch_assoc()) {
+            echo '<tr>';
+            echo '<td>' . htmlspecialchars($row['id']) . '</td>';
+            echo '<td>' . htmlspecialchars($row['first_name']) . '</td>';
+            echo '<td>' . htmlspecialchars($row['last_name']) . '</td>';
+            echo '<td>' . htmlspecialchars($row['phone']) . '</td>';
+            echo '<td>' . htmlspecialchars($row['country']) . '</td>';
+            echo '<td>' . htmlspecialchars($row['dial_code']) . '</td>';
+            echo '<td>' . htmlspecialchars($row['email']) . '</td>';
+            echo '<td>' . htmlspecialchars($row['services']) . '</td>';
+            echo '<td>' . htmlspecialchars($row['message']) . '</td>';
+            echo '</tr>';
         }
-        echo "</table>";
+
+        echo '</table>';
     } else {
-        echo "<p class='no-data'>No records found.</p>";
+        // Display a message if no data is found
+        echo '<p class="no-data">No data found.</p>';
     }
-    
+
     // Free result set
     $result->free();
 
