@@ -154,15 +154,15 @@ if ($conn->connect_error) {
         // Loop through and display data rows
         while ($row = $result->fetch_assoc()) {
             echo '<tr>';
-            echo '<td>' . htmlspecialchars($row['id']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['first_name']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['last_name']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['phone']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['country']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['dial_code']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['email']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['services']) . '</td>';
-            echo '<td>' . htmlspecialchars($row['message']) . '</td>';
+            echo '<td>' . htmlspecialchars($row['id'] ?? '') . '</td>';
+            echo '<td>' . htmlspecialchars($row['first_name'] ?? '') . '</td>';
+            echo '<td>' . htmlspecialchars($row['last_name'] ?? '') . '</td>';
+            echo '<td>' . htmlspecialchars($row['phone'] ?? '') . '</td>';
+            echo '<td>' . htmlspecialchars($row['country'] ?? '') . '</td>';
+            echo '<td>' . htmlspecialchars($row['dial_code'] ?? '') . '</td>';
+            echo '<td>' . htmlspecialchars($row['email'] ?? '') . '</td>';
+            echo '<td>' . htmlspecialchars($row['services'] ?? '') . '</td>';
+            echo '<td>' . htmlspecialchars($row['message'] ?? '') . '</td>';
             echo '</tr>';
         }
 
