@@ -151,6 +151,8 @@ if ($conn->connect_error) {
         echo '<th>Message</th>';
         echo '</tr>';
 
+        $counter = 1;
+
         // Loop through and display data rows
         while ($row = $result->fetch_assoc()) {
             echo '<tr>';
@@ -164,6 +166,8 @@ if ($conn->connect_error) {
             echo '<td>' . htmlspecialchars($row['services'] ?? '') . '</td>';
             echo '<td>' . htmlspecialchars($row['message'] ?? '') . '</td>';
             echo '</tr>';
+
+            $counter++;
         }
 
         echo '</table>';
