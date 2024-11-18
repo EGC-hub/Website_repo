@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $updateStmt->bind_param("ss", $hashedPassword, $username);
 
             if ($updateStmt->execute()) {
-                header("Location: portal-login.php?reset=success");
+                header("Location: portal-login.html?reset=success");
                 exit;
             } else {
                 $message = "Error updating password. Please try again.";
