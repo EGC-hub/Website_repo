@@ -1,7 +1,4 @@
 <?php
-// Start the session
-session_start();
-
 // Database configuration
 $dbHost = 'localhost';
 $dbUsername = 'euro_admin';
@@ -13,58 +10,58 @@ $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 
 // Check connection
 if ($conn->connect_error) {
-    die("Connection failed: ". $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
 }
-
-// Initialize variables
-$message = "";
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = trim($_POST['username']);
-    $newPassword = trim($_POST['new_password']);
-    $confirmPassword = trim($_POST['confirm_password']);
+    $username = $_POST['username'];
+    $newPassword = $_POST['new_password'];
 
-    // Check if username is empty
-    if (empty($username)) {
-        $message = "Please enter your username.";
-    } elseif (empty($newPassword) || empty($confirmPassword)) {
-        $message = "Please fill out all password fields.";
-    } elseif ($newPassword !== $confirmPassword) {
-        $message = "Passwords do not match.";
-    } else {
-        // Check if the username exists in the database
-        $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    // Fetch the current hashed password from the database for the given username
+    $stmt = $conn->prepare("SELECT password FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        $currentHashedPassword = $user['password'];
 
-        if ($result->num_rows > 0) {
-            // Username exists, proceed to update the password
-            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        // Verify that the new password is different from the current one
+        if (password_verify($newPassword, $currentHashedPassword)) {
+            // If the new password matches the old one, show an error message
+            echo "<script>alert('The new password cannot be the same as the previous password.'); window.location.href = 'reset-password.php';</script>";
+            exit;
+        } else {
+            // Hash the new password
+            $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
+            // Update the password in the database
             $updateStmt = $conn->prepare("UPDATE users SET password = ? WHERE username = ?");
-            $updateStmt->bind_param("ss", $hashedPassword, $username);
+            $updateStmt->bind_param("ss", $newHashedPassword, $username);
 
             if ($updateStmt->execute()) {
-                header("Location: portal-login.html?reset=success");
+                // Redirect to the login page with success parameter
+                header("Location: login.html?reset=success");
                 exit;
             } else {
-                $message = "Error updating password. Please try again.";
+                echo "Error updating password: " . $conn->error;
             }
 
+            // Close the update statement
             $updateStmt->close();
-        } else {
-            $message = "Username not found.";
         }
-
-        $stmt->close();
+    } else {
+        echo "<script>alert('Username not found.'); window.location.href = 'reset-password.php';</script>";
     }
-}
 
-// Close database connection
-$conn->close();
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
