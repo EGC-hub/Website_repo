@@ -104,5 +104,17 @@
             <p class="forgot-pwd">Forgot <a href="reset-password.php">Password?</a></p>
         </form>
     </div>
+    <script>
+        // Function to get query parameter by name
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Check if 'reset' parameter is set to 'success'
+        if (getQueryParam('reset') === 'success') {
+            alert("Password has been reset successfully. Please log in with your new password.");
+        }
+    </script>
 </body>
 </html>
