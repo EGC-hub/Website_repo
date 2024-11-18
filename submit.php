@@ -17,13 +17,41 @@ if ($conn->connect_error) {
 $first_name = $_POST['first-name'];
 $last_name = $_POST['last-name'];
 $phone = $_POST['phone'];
-$country = $_POST['country']; 
-$dial_code = $_POST['dialCode']; 
+$country = $_POST['country'];
+$dial_code = $_POST['dialCode'];
 $email = $_POST['email'];
 $services = isset($_POST['services']) ? implode(", ", $_POST['services']) : '';
 $message = $_POST['message'];
 
-// Prepare and bind SQL statement
+// Check for duplicate records (based on phone and email)
+$checkQuery = "SELECT * FROM contact_form_submissions WHERE phone = ? AND email = ?";
+$checkStmt = $conn->prepare($checkQuery);
+
+// Check if preparation is successful
+if (!$checkStmt) {
+    die("Preparation failed: " . $conn->error);
+}
+
+// Bind parameters and execute
+$checkStmt->bind_param("ss", $phone, $email);
+$checkStmt->execute();
+$checkResult = $checkStmt->get_result();
+
+// If a duplicate is found, show an alert and go back to the form page
+if ($checkResult->num_rows > 0) {
+    echo "<script>
+            alert('A record already exists with the same email address and phone number.');
+            window.history.back(); // Redirect back to the form page
+          </script>";
+    $checkStmt->close();
+    $conn->close();
+    exit();
+}
+
+// If no duplicate is found, proceed with the insertion
+$checkStmt->close();
+
+// Prepare and bind SQL statement for insertion
 $sql = "INSERT INTO contact_form_submissions (first_name, last_name, phone, country, dial_code, email, services, message) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 $stmt = $conn->prepare($sql);
@@ -39,8 +67,10 @@ $stmt->bind_param("ssssssss", $first_name, $last_name, $phone, $country, $dial_c
 // Execute the statement and check if it is successful
 if ($stmt->execute()) {
     // Redirect to thank you page
-    header("Location: thankyou.html");
-    exit();
+    echo "<script>
+            alert('Form submitted successfully!');
+            window.location.href = 'thankyou.html'; // Redirect to 'Thank You' page
+          </script>";
 } else {
     echo "Error: " . $stmt->error;
 }
