@@ -46,7 +46,7 @@
                 exit;
             } else {
                 // Password is incorrect
-                $error = "Incorrect password.";
+                echo "<script>alert('Incorrect Password'); window.location.href = 'portal-login.html';</script>";
             }
         } else {
             // Username not found
