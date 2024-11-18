@@ -41,7 +41,7 @@ $checkResult = $checkStmt->get_result();
 if ($checkResult->num_rows > 0) {
     echo "<script>
             alert('A record already exists with the same email address and phone number.');
-            window.history.back(); // Redirect back to the form page
+            window.location.href= 'form.html'; // Redirect back to the form page
           </script>";
     $checkStmt->close();
     $conn->close();
