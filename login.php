@@ -42,11 +42,12 @@
                 $_SESSION['role'] = $user['role'];
 
                 // Redirect to the data display page
-                header("Location: portal-login.html");
+                header("Location: data-display.php");
                 exit;
             } else {
                 // Password is incorrect
-                $error = "Incorrect password.";
+                header("Location: portal-login.html");
+                exit;
             }
         } else {
             // Username not found
