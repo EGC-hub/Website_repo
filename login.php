@@ -46,8 +46,7 @@
                 exit;
             } else {
                 // Password is incorrect
-                header("Location: portal-login.html");
-                exit;
+                $error = "Incorrect password.";
             }
         } else {
             // Username not found
@@ -63,4 +62,4 @@
     if (isset($error)) {
         echo '<script>alert("'. $error. '");</script>';
     }
-?>
+    ?>
