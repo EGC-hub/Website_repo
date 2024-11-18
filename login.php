@@ -46,11 +46,11 @@
                 exit;
             } else {
                 // Password is incorrect
-                echo "<script>alert('Incorrect Password'); window.location.href = 'portal-login.html';</script>";
+                echo "<script>alert('Incorrect password.'); window.location.href = 'portal-login.html';</script>";
             }
         } else {
             // Username not found
-            $error = "Username not found.";
+            echo "<script>alert('Username not found.'); window.location.href = 'portal-login.html';</script>";
         }
 
         // Close the statement and connection
