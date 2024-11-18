@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($updateStmt->execute()) {
                 // Redirect to the login page with success parameter
-                header("Location: login.html?reset=success");
+                header("Location: portal-login.html?reset=success");
                 exit;
             } else {
                 echo "Error updating password: " . $conn->error;
