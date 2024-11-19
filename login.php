@@ -42,7 +42,7 @@
                 $_SESSION['role'] = $user['role'];
 
                 // Redirect to the data display page
-                header("Location: data-display.php");
+                header("Location: welcome.php");
                 exit;
             } else {
                 // Password is incorrect
