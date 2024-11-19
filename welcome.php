@@ -13,12 +13,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $username = $_SESSION['username'];
 
 // Optional: Session timeout settings
-$timeout_duration = 600; // 30 minutes in seconds
+$timeout_duration = 1800; // 30 minutes in seconds
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
     // If the session is expired, destroy it and redirect to login page
     session_unset();
     session_destroy();
-    header("Location: login.php");
+    header("Location: portal-login.html");
     exit;
 }
 
@@ -77,6 +77,24 @@ $_SESSION['last_activity'] = time();
         .btn:hover {
             background-color: #004080;
         }
+
+        .logout-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            background-color: #ff4d4d;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background-color: #ff1a1a;
+        }
     </style>
 </head>
 <body>
@@ -88,6 +106,8 @@ $_SESSION['last_activity'] = time();
             <a href="data-display.php" class="btn">Data Display</a>
             <a href="tasks.php" class="btn">Tasks</a>
         </div>
+        <!-- Logout Button -->
+        <a href="logout.php" class="logout-btn">Log Out</a>
     </div>
 
 </body>

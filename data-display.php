@@ -128,7 +128,7 @@ if ($conn->connect_error) {
 <div class="table-container">
     <!-- Logout Button -->
     <div class="logout-button">
-        <a href="logout.php">Log Out</a>
+        <a href="welcome.php">Back</a>
     </div>
 
     <h2>Data Records</h2>
