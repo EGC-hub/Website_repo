@@ -35,9 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $created_at = date("Y-m-d H:i:s");
 
     // Prepare an insert statement
-    $stmt = $conn->prepare("INSERT INTO tasks (user_id, task_name, expected_start_date, expected_finish_date, status, created_at) 
+    $stmt = $conn->prepare("INSERT INTO tasks (user_id, task_name, expected_start_date, expected_finish_date, status, recorded_timestamp) 
                             VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isssss", $user_id, $task_name, $expected_start_date, $expected_finish_date, $status, $created_at);
+    $stmt->bind_param("isssss", $user_id, $task_name, $expected_start_date, $expected_finish_date, $status, $recorded_timestamp);
 
     // Execute the statement
     if ($stmt->execute()) {
