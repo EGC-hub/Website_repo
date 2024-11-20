@@ -13,7 +13,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 // Session timeout (Optional)
-$timeout_duration = 600; // 30 minutes in seconds
+$timeout_duration = 600; 
 
 // Check if 'last_activity' is set and if it has exceeded the timeout
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
