@@ -150,9 +150,26 @@ $result = $stmt->get_result();
             color: #888;
             padding: 20px;
         }
+
+        .logout-button {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .logout-button a {
+            background-color: #002c5f;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
+
+    <div class="logout-button">
+        <a href="welcome.php">Back</a>
+    </div>
 
 <div class="task-container">
     <h2>Add New Task</h2>
