@@ -11,6 +11,11 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 // Get user ID from session
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
+// Verify that the user ID is not null
+if ($user_id === null) {
+    die("Error: User ID is not set. Please log in again.");
+}
+
 // Configuration for database
 $dbHost = 'localhost';
 $dbUsername = 'euro_admin';
@@ -30,9 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Collect form data
     $task_name = $_POST['task_name'];
     $expected_start_date = $_POST['expected_start_date'];
-    $expected_end_date = $_POST['expected_end_date'];
+    $expected_end_date = $_POST['expected_finish_date'];
     $status = $_POST['status'];
-    $created_at = date("Y-m-d H:i:s");
+    $recorded_timestamp = date("Y-m-d H:i:s");
 
     // Prepare an insert statement
     $stmt = $conn->prepare("INSERT INTO tasks (user_id, task_name, expected_start_date, expected_finish_date, status, recorded_timestamp) 
