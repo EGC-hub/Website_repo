@@ -49,6 +49,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Close the statement
     $stmt->close();
 }
+
+// Retrieve tasks for the logged-in user
+$sql = "SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
