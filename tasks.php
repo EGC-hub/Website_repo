@@ -146,8 +146,8 @@ $result = $stmt->get_result();
             <input type="date" id="expected_start_date" name="expected_start_date" required>
         </div>
         <div class="form-group">
-            <label for="expected_end_date">Expected End Date</label>
-            <input type="date" id="expected_end_date" name="expected_end_date" required>
+            <label for="expected_finish_date">Expected End Date</label>
+            <input type="date" id="expected_finish_date" name="expected_finish_date" required>
         </div>
         <div class="form-group">
             <label for="status">Status</label>
@@ -176,7 +176,7 @@ $result = $stmt->get_result();
                 <tr>
                     <td><?php echo htmlspecialchars($row['task_name']); ?></td>
                     <td><?php echo htmlspecialchars($row['expected_start_date']); ?></td>
-                    <td><?php echo htmlspecialchars($row['expected_end_date']); ?></td>
+                    <td><?php echo htmlspecialchars($row['expected_finish_date']); ?></td>
                     <td><?php echo htmlspecialchars($row['status']); ?></td>
                     <td><?php echo htmlspecialchars($row['created_at']); ?></td>
                 </tr>
