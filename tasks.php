@@ -16,6 +16,21 @@ if ($user_id === null) {
     die("Error: User ID is not set. Please log in again.");
 }
 
+// Session timeout (Optional)
+$timeout_duration = 600; 
+
+// Check if 'last_activity' is set and if it has exceeded the timeout
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
+    // If the session is expired, destroy it and redirect to login page
+    session_unset();
+    session_destroy();
+    header("Location: portal-login.html");
+    exit;
+}
+
+// Update last activity time
+$_SESSION['last_activity'] = time();
+
 // Configuration for database
 $dbHost = 'localhost';
 $dbUsername = 'euro_admin';
