@@ -40,8 +40,7 @@
                 $_SESSION['loggedin'] = true;
                 $_SESSION['username'] = $username;
                 $_SESSION['role'] = $user['role'];
-                $_SESSION['user_id'] = $user_id;
-                
+
                 // Redirect to the data display page
                 header("Location: welcome.php");
                 exit;
