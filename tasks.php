@@ -32,27 +32,32 @@ if ($conn->connect_error) {
 
 // Check if form is submitted for adding a new task
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Collect form data
-    $task_name = $_POST['task_name'];
-    $expected_start_date = $_POST['expected_start_date'];
-    $expected_finish_date = $_POST['expected_finish_date'];
-    $status = $_POST['status'];
+    // Collect form data and validate
+    $task_name = isset($_POST['task_name']) ? trim($_POST['task_name']) : null;
+    $expected_start_date = isset($_POST['expected_start_date']) ? trim($_POST['expected_start_date']) : null;
+    $expected_finish_date = isset($_POST['expected_finish_date']) ? trim($_POST['expected_finish_date']) : null;
+    $status = isset($_POST['status']) ? trim($_POST['status']) : 'pending';
     $recorded_timestamp = date("Y-m-d H:i:s");
 
-    // Prepare an insert statement
-    $stmt = $conn->prepare("INSERT INTO tasks (user_id, task_name, expected_start_date, expected_finish_date, status, recorded_timestamp) 
-                            VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isssss", $user_id, $task_name, $expected_start_date, $expected_finish_date, $status, $recorded_timestamp);
-
-    // Execute the statement
-    if ($stmt->execute()) {
-        echo '<script>alert("New task added successfully.");</script>';
+    // Validate required fields
+    if (empty($task_name) || empty($expected_start_date) || empty($expected_finish_date)) {
+        echo '<script>alert("Please fill in all the required fields.");</script>';
     } else {
-        echo '<script>alert("Failed to add new task.");</script>';
-    }
+        // Prepare an insert statement
+        $stmt = $conn->prepare("INSERT INTO tasks (user_id, task_name, expected_start_date, expected_finish_date, status, recorded_timestamp) 
+                                VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("isssss", $user_id, $task_name, $expected_start_date, $expected_finish_date, $status, $recorded_timestamp);
 
-    // Close the statement
-    $stmt->close();
+        // Execute the statement
+        if ($stmt->execute()) {
+            echo '<script>alert("New task added successfully.");</script>';
+        } else {
+            echo '<script>alert("Failed to add new task.");</script>';
+        }
+
+        // Close the statement
+        $stmt->close();
+    }
 }
 
 // Retrieve tasks for the logged-in user
@@ -178,7 +183,7 @@ $result = $stmt->get_result();
                     <td><?php echo htmlspecialchars($row['expected_start_date']); ?></td>
                     <td><?php echo htmlspecialchars($row['expected_finish_date']); ?></td>
                     <td><?php echo htmlspecialchars($row['status']); ?></td>
-                    <td><?php echo htmlspecialchars($row['created_at']); ?></td>
+                    <td><?php echo htmlspecialchars($row['recorded_timestamp']); ?></td>
                 </tr>
             <?php endwhile; ?>
         </table>
