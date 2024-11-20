@@ -43,6 +43,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($task_name) || empty($expected_start_date) || empty($expected_finish_date)) {
         echo '<script>alert("Please fill in all the required fields.");</script>';
     } else {
+        // Debugging check - add this line before inserting a new task
+        echo "Debug: User ID in session is: " . $user_id;
+
+
         // Prepare an insert statement
         $stmt = $conn->prepare("INSERT INTO tasks (user_id, task_name, expected_start_date, expected_finish_date, status, recorded_timestamp) 
                                 VALUES (?, ?, ?, ?, ?, ?)");
