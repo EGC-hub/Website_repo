@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Collect form data
     $task_name = $_POST['task_name'];
     $expected_start_date = $_POST['expected_start_date'];
-    $expected_end_date = $_POST['expected_finish_date'];
+    $expected_finish_date = $_POST['expected_finish_date'];
     $status = $_POST['status'];
     $recorded_timestamp = date("Y-m-d H:i:s");
 
