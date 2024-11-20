@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Retrieve tasks for the logged-in user
-$sql = "SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC";
+$sql = "SELECT * FROM tasks WHERE user_id = ? ORDER BY recorded_timestamp DESC";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
