@@ -247,9 +247,14 @@ $result = $stmt->get_result();
                         <form method="POST" action="update-status.php">
                             <input type="hidden" name="task_id" value="<?php echo $row['task_id'];?>">
                             <select name="status" onchange="this.form.submit()">
-                                <option value="pending" <?php if ($row['status'] == 'pending') echo 'elected';?>>Pending</option>
-                                <option value="started" <?php if ($row['status'] == 'tarted') echo 'elected';?>>Started</option>
-                                <option value="completed" <?php if ($row['status'] == 'completed') echo 'elected';?>>Completed</option>
+                                <?php 
+                                // Assume $row['status'] has the latest value from the database
+                                $statuses = array('pending', 'tarted', 'completed');
+                                foreach ($statuses as $statusValue) {
+                                    $selected = ($row['status'] == $statusValue)? 'elected' : '';
+                                    echo "<option value='$statusValue' $selected>$statusValue</option>";
+                                }
+                            ?>
                             </select>
                         </form>
                     </td>
