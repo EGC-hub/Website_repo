@@ -249,7 +249,7 @@ $result = $stmt->get_result();
                             <select name="status" onchange="this.form.submit()">
                                 <?php 
                                 // Assume $row['status'] has the latest value from the database
-                                $statuses = array('pending', 'started', 'completed');
+                                $statuses = array('Pending', 'Started', 'Completed');
                                 foreach ($statuses as $statusValue) {
                                     $selected = ($row['status'] == $statusValue)? 'elected' : '';
                                     echo "<option value='$statusValue' $selected>$statusValue</option>";
