@@ -163,6 +163,34 @@ $result = $stmt->get_result();
             text-decoration: none;
             border-radius: 5px;
         }
+
+                .task-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .task-table th,.task-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .task-table th {
+            background-color: #f0f0f0;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
     </style>
 </head>
 <body>
@@ -200,28 +228,44 @@ $result = $stmt->get_result();
 
 <div class="task-container">
     <h2>Your Tasks</h2>
-    <?php if ($result->num_rows > 0): ?>
-        <table>
+    <?php if ($result->num_rows > 0):?>
+        <table class="task-table">
             <tr>
                 <th>Task Name</th>
                 <th>Start Date</th>
                 <th>End Date</th>
                 <th>Status</th>
                 <th>Created At</th>
+                <th>Actions</th>
             </tr>
-            <?php while ($row = $result->fetch_assoc()): ?>
+            <?php while ($row = $result->fetch_assoc()):?>
                 <tr>
-                    <td><?php echo htmlspecialchars($row['task_name']); ?></td>
-                    <td><?php echo htmlspecialchars($row['expected_start_date']); ?></td>
-                    <td><?php echo htmlspecialchars($row['expected_finish_date']); ?></td>
-                    <td><?php echo htmlspecialchars($row['status']); ?></td>
-                    <td><?php echo htmlspecialchars($row['recorded_timestamp']); ?></td>
+                    <td><?php echo htmlspecialchars($row['task_name']);?></td>
+                    <td><?php echo htmlspecialchars($row['expected_start_date']);?></td>
+                    <td><?php echo htmlspecialchars($row['expected_finish_date']);?></td>
+                    <td>
+                        <form method="POST" action="update-status.php">
+                            <input type="hidden" name="task_id" value="<?php echo $row['id'];?>">
+                            <select name="status" onchange="this.form.submit()">
+                                <option value="pending" <?php if ($row['status'] == 'pending') echo 'elected';?>>Pending</option>
+                                <option value="started" <?php if ($row['status'] == 'tarted') echo 'elected';?>>Started</option>
+                                <option value="completed" <?php if ($row['status'] == 'completed') echo 'elected';?>>Completed</option>
+                            </select>
+                        </form>
+                    </td>
+                    <td><?php echo htmlspecialchars($row['recorded_timestamp']);?></td>
+                    <td>
+                        <form method="POST" action="delete-task.php">
+                            <input type="hidden" name="task_id" value="<?php echo $row['id'];?>">
+                            <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this task?')">Delete</button>
+                        </form>
+                    </td>
                 </tr>
-            <?php endwhile; ?>
+            <?php endwhile;?>
         </table>
-    <?php else: ?>
+    <?php else:?>
         <div class="no-tasks">No tasks available.</div>
-    <?php endif; ?>
+    <?php endif;?>
 </div>
 
 </body>
