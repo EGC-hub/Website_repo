@@ -245,7 +245,7 @@ $result = $stmt->get_result();
                     <td><?php echo htmlspecialchars($row['expected_finish_date']);?></td>
                     <td>
                         <form method="POST" action="update-status.php">
-                            <input type="hidden" name="task_id" value="<?php echo $row['id'];?>">
+                            <input type="hidden" name="task_id" value="<?php echo $row['task_id'];?>">
                             <select name="status" onchange="this.form.submit()">
                                 <option value="pending" <?php if ($row['status'] == 'pending') echo 'elected';?>>Pending</option>
                                 <option value="started" <?php if ($row['status'] == 'tarted') echo 'elected';?>>Started</option>
@@ -256,7 +256,7 @@ $result = $stmt->get_result();
                     <td><?php echo htmlspecialchars($row['recorded_timestamp']);?></td>
                     <td>
                         <form method="POST" action="delete-task.php">
-                            <input type="hidden" name="task_id" value="<?php echo $row['id'];?>">
+                            <input type="hidden" name="task_id" value="<?php echo $row['task_id'];?>">
                             <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this task?')">Delete</button>
                         </form>
                     </td>
