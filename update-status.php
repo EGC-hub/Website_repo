@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $task_id = $_POST['task_id'];
     $status = $_POST['status'];
 
-    $stmt = $conn->prepare("UPDATE tasks SET status =? WHERE id =?");
+    $stmt = $conn->prepare("UPDATE tasks SET status =? WHERE task_id =?");
     $stmt->bind_param("si", $status, $task_id);
     $stmt->execute();
 
