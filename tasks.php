@@ -247,11 +247,17 @@ $result = $stmt->get_result();
                         <form method="POST" action="update-status.php">
                             <input type="hidden" name="task_id" value="<?php echo $row['task_id'];?>">
                             <select name="status" onchange="this.form.submit()">
-                                <?php 
-                                // Assume $row['status'] has the latest value from the database
-                                $statuses = array('Pending', 'Started', 'Completed');
+                            <?php 
+                                // Fetch the latest status from the database for each task
+                                $stmt = $conn->prepare("SELECT status FROM tasks WHERE task_id =?");
+                                $stmt->bind_param("i", $row['task_id']);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                $latestStatus = $result->fetch_assoc()['status'];
+
+                                $statuses = array('pending', 'tarted', 'completed');
                                 foreach ($statuses as $statusValue) {
-                                    $selected = ($row['status'] == $statusValue)? 'elected' : '';
+                                    $selected = ($latestStatus == $statusValue)? 'elected' : '';
                                     echo "<option value='$statusValue' $selected>$statusValue</option>";
                                 }
                             ?>
