@@ -251,7 +251,7 @@ $result = $stmt->get_result();
                                 // Assume $row['status'] has the latest value from the database
                                 $statuses = array('Pending', 'Started', 'Completed');
                                 foreach ($statuses as $statusValue) {
-                                    $selected = ($row['status'] == $statusValue)? 'elected' : '';
+                                    $selected = ($row['status'] == $statusValue)? 'selected' : '';
                                     echo "<option value='$statusValue' $selected>$statusValue</option>";
                                 }
                             ?>
