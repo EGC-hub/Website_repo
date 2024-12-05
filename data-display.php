@@ -78,7 +78,7 @@ if (!empty($selectedService)) {
     } else {
         $query .= " AND";
     }
-    $query .= " services = ?";
+    $query .= " services LIKE ?";
 }
 
 if (!empty($selectedCountry)) {
@@ -98,6 +98,7 @@ $params = [];
 $types = '';
 
 if (!empty($selectedService)) {
+    $selectedService = '%' . $selectedService . '%'; // Use LIKE for partial matching
     $types .= 's';
     $params[] = &$selectedService;
 }
