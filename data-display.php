@@ -53,13 +53,17 @@ $countries = [];
 
 if ($resultServices && $resultServices->num_rows > 0) {
     while ($row = $resultServices->fetch_assoc()) {
-        $services[] = $row['services'];
+        if (isset($row['services'])) {
+            $services[] = $row['services'];
+        }
     }
 }
 
 if ($resultCountries && $resultCountries->num_rows > 0) {
     while ($row = $resultCountries->fetch_assoc()) {
-        $countries[] = $row['country'];
+        if (isset($row['country'])) {
+            $countries[] = $row['country'];
+        }
     }
 }
 
@@ -234,8 +238,8 @@ $result = $stmt->get_result();
             <select id="service" name="service">
                 <option value="">All Services</option>
                 <?php foreach ($services as $service): ?>
-                    <option value="<?php echo htmlspecialchars($service); ?>"<?php if ($selectedService === $service) echo ' selected'; ?>>
-                        <?php echo htmlspecialchars($service); ?>
+                    <option value="<?php echo htmlspecialchars($service, ENT_QUOTES, 'UTF-8'); ?>"<?php if ($selectedService === $service) echo ' selected'; ?>>
+                        <?php echo htmlspecialchars($service, ENT_QUOTES, 'UTF-8'); ?>
                     </option>
                 <?php endforeach; ?>
             </select>
@@ -243,8 +247,8 @@ $result = $stmt->get_result();
             <select id="country" name="country">
                 <option value="">All Countries</option>
                 <?php foreach ($countries as $country): ?>
-                    <option value="<?php echo htmlspecialchars($country); ?>"<?php if ($selectedCountry === $country) echo ' selected'; ?>>
-                        <?php echo htmlspecialchars($country); ?>
+                    <option value="<?php echo htmlspecialchars($country, ENT_QUOTES, 'UTF-8'); ?>"<?php if ($selectedCountry === $country) echo ' selected'; ?>>
+                        <?php echo htmlspecialchars($country, ENT_QUOTES, 'UTF-8'); ?>
                     </option>
                 <?php endforeach; ?>
             </select>
@@ -275,16 +279,16 @@ $result = $stmt->get_result();
         // Loop through and display data rows
         while ($row = $result->fetch_assoc()) {
             echo '<tr>';
-            echo '<td>'. htmlspecialchars($counter) .'</td>';
-            echo '<td>' . htmlspecialchars($row['first_name'] ?? '') . '</td>';
-            echo '<td>' . htmlspecialchars($row['last_name'] ?? '') . '</td>';
-            echo '<td>' . htmlspecialchars($row['dial_code'] ?? '') . '</td>';
-            echo '<td>' . htmlspecialchars($row['phone'] ?? '') . '</td>';
-            echo '<td>' . htmlspecialchars($row['country'] ?? '') . '</td>';
-            echo '<td>' . htmlspecialchars($row['email'] ?? '') . '</td>';
-            echo '<td>' . htmlspecialchars($row['submitted_at'] ?? '') . '</td>';
-            echo '<td>' . htmlspecialchars($row['services'] ?? '') . '</td>';
-            echo '<td>' . htmlspecialchars($row['message'] ?? '') . '</td>';
+            echo '<td>'. htmlspecialchars($counter, ENT_QUOTES, 'UTF-8') .'</td>';
+            echo '<td>' . htmlspecialchars($row['first_name'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
+            echo '<td>' . htmlspecialchars($row['last_name'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
+            echo '<td>' . htmlspecialchars($row['dial_code'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
+            echo '<td>' . htmlspecialchars($row['phone'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
+            echo '<td>' . htmlspecialchars($row['country'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
+            echo '<td>' . htmlspecialchars($row['email'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
+            echo '<td>' . htmlspecialchars($row['submitted_at'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
+            echo '<td>' . htmlspecialchars($row['services'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
+            echo '<td>' . htmlspecialchars($row['message'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
             echo '</tr>';
 
             $counter++;
