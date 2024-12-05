@@ -121,6 +121,28 @@ if ($conn->connect_error) {
         .container {
             width: 100%;
         }
+
+        .filter-form {
+            margin-bottom: 20px;
+        }
+
+        .filter-form input, .filter-form select {
+            padding: 8px;
+            margin-right: 10px;
+        }
+
+        .filter-form button {
+            padding: 8px 16px;
+            background-color: #002c5f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .filter-form button:hover {
+            background-color: #001a3d;
+        }
     </style>
 </head>
 <body>
@@ -131,14 +153,74 @@ if ($conn->connect_error) {
         <a href="welcome.php">Back</a>
     </div>
 
+    <!-- Filter Form -->
+    <div class="filter-form">
+        <form method="GET" action="">
+            <label for="service">Service:</label>
+            <input type="text" id="service" name="service" value="<?php echo isset($_GET['service']) ? htmlspecialchars($_GET['service']) : ''; ?>">
+            <label for="country">Country:</label>
+            <input type="text" id="country" name="country" value="<?php echo isset($_GET['country']) ? htmlspecialchars($_GET['country']) : ''; ?>">
+            <button type="submit">Filter</button>
+        </form>
+    </div>
+
     <h2>Data Records</h2>
 
     <?php
-    // Query to fetch data in descending order based on 'id'
-    $query = "SELECT * FROM contact_form_submissions ORDER BY id DESC"; // Replace 'your_table_name' with the actual table name
-    $result = $conn->query($query);
+    // Get filter values from GET request
+    $service = isset($_GET['service']) ? $_GET['service'] : '';
+    $country = isset($_GET['country']) ? $_GET['country'] : '';
 
-    if ($result && $result->num_rows > 0) {
+    // Build SQL query based on filters
+    $query = "SELECT * FROM contact_form_submissions";
+    $firstCondition = true;
+
+    if (!empty($service)) {
+        if ($firstCondition) {
+            $query .= " WHERE";
+            $firstCondition = false;
+        } else {
+            $query .= " AND";
+        }
+        $query .= " services LIKE ?";
+    }
+
+    if (!empty($country)) {
+        if ($firstCondition) {
+            $query .= " WHERE";
+        } else {
+            $query .= " AND";
+        }
+        $query .= " country LIKE ?";
+    }
+
+    $query .= " ORDER BY id DESC";
+
+    // Prepare and bind
+    $stmt = $conn->prepare($query);
+    $params = [];
+    $types = '';
+
+    if (!empty($service)) {
+        $service = '%' . $service . '%';
+        $types .= 's';
+        $params[] = &$service;
+    }
+
+    if (!empty($country)) {
+        $country = '%' . $country . '%';
+        $types .= 's';
+        $params[] = &$country;
+    }
+
+    if (!empty($types)) {
+        $stmt->bind_param($types, ...$params);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
         echo '<table>';
         echo '<tr>';
         echo '<th>ID</th>';
@@ -179,10 +261,8 @@ if ($conn->connect_error) {
         echo '<p class="no-data">No data found.</p>';
     }
 
-    // Free result set
-    $result->free();
-
-    // Close database connection
+    // Close statement and connection
+    $stmt->close();
     $conn->close();
     ?>
 </div>
