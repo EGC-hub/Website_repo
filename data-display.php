@@ -40,8 +40,81 @@ $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 if ($conn->connect_error) {
     die("Connection failed: ". $conn->connect_error);
 }
-?>
 
+// Fetch distinct services and countries
+$queryServices = "SELECT DISTINCT services FROM contact_form_submissions";
+$queryCountries = "SELECT DISTINCT country FROM contact_form_submissions";
+
+$resultServices = $conn->query($queryServices);
+$resultCountries = $conn->query($queryCountries);
+
+$services = [];
+$countries = [];
+
+if ($resultServices && $resultServices->num_rows > 0) {
+    while ($row = $resultServices->fetch_assoc()) {
+        $services[] = $row['services'];
+    }
+}
+
+if ($resultCountries && $resultCountries->num_rows > 0) {
+    while ($row = $resultCountries->fetch_assoc()) {
+        $countries[] = $row['country'];
+    }
+}
+
+// Get filter values from GET request
+$selectedService = isset($_GET['service']) ? $_GET['service'] : '';
+$selectedCountry = isset($_GET['country']) ? $_GET['country'] : '';
+
+// Build SQL query based on filters
+$query = "SELECT * FROM contact_form_submissions";
+$firstCondition = true;
+
+if (!empty($selectedService)) {
+    if ($firstCondition) {
+        $query .= " WHERE";
+        $firstCondition = false;
+    } else {
+        $query .= " AND";
+    }
+    $query .= " services = ?";
+}
+
+if (!empty($selectedCountry)) {
+    if ($firstCondition) {
+        $query .= " WHERE";
+    } else {
+        $query .= " AND";
+    }
+    $query .= " country = ?";
+}
+
+$query .= " ORDER BY id DESC";
+
+// Prepare and bind
+$stmt = $conn->prepare($query);
+$params = [];
+$types = '';
+
+if (!empty($selectedService)) {
+    $types .= 's';
+    $params[] = &$selectedService;
+}
+
+if (!empty($selectedCountry)) {
+    $types .= 's';
+    $params[] = &$selectedCountry;
+}
+
+if (!empty($types)) {
+    $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -126,7 +199,7 @@ if ($conn->connect_error) {
             margin-bottom: 20px;
         }
 
-        .filter-form input, .filter-form select {
+        .filter-form select {
             padding: 8px;
             margin-right: 10px;
         }
@@ -157,9 +230,23 @@ if ($conn->connect_error) {
     <div class="filter-form">
         <form method="GET" action="">
             <label for="service">Service:</label>
-            <input type="text" id="service" name="service" value="<?php echo isset($_GET['service']) ? htmlspecialchars($_GET['service']) : ''; ?>">
+            <select id="service" name="service">
+                <option value="">All Services</option>
+                <?php foreach ($services as $service): ?>
+                    <option value="<?php echo htmlspecialchars($service); ?>"<?php if ($selectedService === $service) echo ' selected'; ?>>
+                        <?php echo htmlspecialchars($service); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
             <label for="country">Country:</label>
-            <input type="text" id="country" name="country" value="<?php echo isset($_GET['country']) ? htmlspecialchars($_GET['country']) : ''; ?>">
+            <select id="country" name="country">
+                <option value="">All Countries</option>
+                <?php foreach ($countries as $country): ?>
+                    <option value="<?php echo htmlspecialchars($country); ?>"<?php if ($selectedCountry === $country) echo ' selected'; ?>>
+                        <?php echo htmlspecialchars($country); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
             <button type="submit">Filter</button>
         </form>
     </div>
@@ -167,59 +254,6 @@ if ($conn->connect_error) {
     <h2>Data Records</h2>
 
     <?php
-    // Get filter values from GET request
-    $service = isset($_GET['service']) ? $_GET['service'] : '';
-    $country = isset($_GET['country']) ? $_GET['country'] : '';
-
-    // Build SQL query based on filters
-    $query = "SELECT * FROM contact_form_submissions";
-    $firstCondition = true;
-
-    if (!empty($service)) {
-        if ($firstCondition) {
-            $query .= " WHERE";
-            $firstCondition = false;
-        } else {
-            $query .= " AND";
-        }
-        $query .= " services LIKE ?";
-    }
-
-    if (!empty($country)) {
-        if ($firstCondition) {
-            $query .= " WHERE";
-        } else {
-            $query .= " AND";
-        }
-        $query .= " country LIKE ?";
-    }
-
-    $query .= " ORDER BY id DESC";
-
-    // Prepare and bind
-    $stmt = $conn->prepare($query);
-    $params = [];
-    $types = '';
-
-    if (!empty($service)) {
-        $service = '%' . $service . '%';
-        $types .= 's';
-        $params[] = &$service;
-    }
-
-    if (!empty($country)) {
-        $country = '%' . $country . '%';
-        $types .= 's';
-        $params[] = &$country;
-    }
-
-    if (!empty($types)) {
-        $stmt->bind_param($types, ...$params);
-    }
-
-    $stmt->execute();
-    $result = $stmt->get_result();
-
     if ($result->num_rows > 0) {
         echo '<table>';
         echo '<tr>';
