@@ -71,6 +71,29 @@ if ($resultCountries && $resultCountries->num_rows > 0) {
 $selectedService = isset($_GET['service']) ? $_GET['service'] : '';
 $selectedCountry = isset($_GET['country']) ? $_GET['country'] : '';
 
+// Handle lead quality update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['lead_quality']) && isset($_POST['id'])) {
+    $leadQuality = $_POST['lead_quality'];
+    $id = $_POST['id'];
+
+    // Prepare and bind the update statement
+    $updateQuery = "UPDATE contact_form_submissions SET lead_quality = ? WHERE id = ?";
+    $updateStmt = $conn->prepare($updateQuery);
+    $updateStmt->bind_param("si", $leadQuality, $id);
+
+    if ($updateStmt->execute()) {
+        // Update successful
+        // Refresh the page to show updated data
+        header("Location: " . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
+        exit;
+    } else {
+        // Update failed
+        echo '<script>alert("Failed to update lead quality.");</script>';
+    }
+
+    $updateStmt->close();
+}
+
 // Build SQL query based on filters
 $query = "SELECT * FROM contact_form_submissions";
 $firstCondition = true;
@@ -118,30 +141,6 @@ if (!empty($types)) {
 
 $stmt->execute();
 $result = $stmt->get_result();
-
-// Handle lead quality update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['lead_quality'])) {
-    $leadQuality = $_POST['lead_quality'];
-    $id = $_POST['id'];
-
-    // Prepare and bind the update statement
-    $updateQuery = "UPDATE contact_form_submissions SET lead_quality = ? WHERE id = ?";
-    $updateStmt = $conn->prepare($updateQuery);
-    $updateStmt->bind_param("si", $leadQuality, $id);
-
-    if ($updateStmt->execute()) {
-        // Update successful
-        echo '<script>alert("Lead quality updated successfully!");</script>';
-        // Refresh the page to show updated data
-        header("Location: " . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
-        exit;
-    } else {
-        // Update failed
-        echo '<script>alert("Failed to update lead quality.");</script>';
-    }
-
-    $updateStmt->close();
-}
 
 ?>
 <!DOCTYPE html>
@@ -302,7 +301,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['lead_quality'])) {
 
     <?php
     if ($result->num_rows > 0) {
-        echo '<form method="POST" action="">';
         echo '<table>';
         echo '<tr>';
         echo '<th>ID</th>';
@@ -346,6 +344,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['lead_quality'])) {
             echo '<td>' . $services . '</td>';
             echo '<td>' . $message . '</td>';
             echo '<td>';
+            echo '<form method="POST" action="">';
             echo '<select name="lead_quality" class="lead-quality-select">';
             echo '<option value="">Select Quality</option>';
             echo '<option value="High"' . ($leadQuality === 'High' ? ' selected' : '') . '>High</option>';
@@ -354,6 +353,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['lead_quality'])) {
             echo '</select>';
             echo '<input type="hidden" name="id" value="' . $id . '">';
             echo '<button type="submit" name="update_lead_quality" value="' . $id . '" class="update-button">Update</button>';
+            echo '</form>';
             echo '</td>';
             echo '</tr>';
 
@@ -361,7 +361,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['lead_quality'])) {
         }
 
         echo '</table>';
-        echo '</form>';
     } else {
         // Display a message if no data is found
         echo '<p class="no-data">No data found.</p>';
