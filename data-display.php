@@ -119,6 +119,27 @@ if (!empty($types)) {
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Handle lead quality update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['lead_quality'])) {
+    $leadQuality = $_POST['lead_quality'];
+    $id = $_POST['id'];
+
+    // Prepare and bind the update statement
+    $updateQuery = "UPDATE contact_form_submissions SET lead_quality = ? WHERE id = ?";
+    $updateStmt = $conn->prepare($updateQuery);
+    $updateStmt->bind_param("si", $leadQuality, $id);
+
+    if ($updateStmt->execute()) {
+        // Update successful
+        echo '<script>alert("Lead quality updated successfully!");</script>';
+    } else {
+        // Update failed
+        echo '<script>alert("Failed to update lead quality.");</script>';
+    }
+
+    $updateStmt->close();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -221,6 +242,11 @@ $result = $stmt->get_result();
         .filter-form button:hover {
             background-color: #001a3d;
         }
+
+        .lead-quality-select {
+            padding: 5px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -260,6 +286,7 @@ $result = $stmt->get_result();
 
     <?php
     if ($result->num_rows > 0) {
+        echo '<form method="POST" action="">';
         echo '<table>';
         echo '<tr>';
         echo '<th>ID</th>';
@@ -272,29 +299,52 @@ $result = $stmt->get_result();
         echo '<th>Submitted At</th>';
         echo '<th>Services</th>';
         echo '<th>Message</th>';
+        echo '<th>Lead Quality</th>';
         echo '</tr>';
 
         $counter = 1;
 
         // Loop through and display data rows
         while ($row = $result->fetch_assoc()) {
+            $id = htmlspecialchars($row['id'], ENT_QUOTES, 'UTF-8');
+            $firstName = htmlspecialchars($row['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
+            $lastName = htmlspecialchars($row['last_name'] ?? '', ENT_QUOTES, 'UTF-8');
+            $dialCode = htmlspecialchars($row['dial_code'] ?? '', ENT_QUOTES, 'UTF-8');
+            $phone = htmlspecialchars($row['phone'] ?? '', ENT_QUOTES, 'UTF-8');
+            $country = htmlspecialchars($row['country'] ?? '', ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($row['email'] ?? '', ENT_QUOTES, 'UTF-8');
+            $submittedAt = htmlspecialchars($row['submitted_at'] ?? '', ENT_QUOTES, 'UTF-8');
+            $services = htmlspecialchars($row['services'] ?? '', ENT_QUOTES, 'UTF-8');
+            $message = htmlspecialchars($row['message'] ?? '', ENT_QUOTES, 'UTF-8');
+            $leadQuality = htmlspecialchars($row['lead_quality'] ?? '', ENT_QUOTES, 'UTF-8');
+
             echo '<tr>';
-            echo '<td>'. htmlspecialchars($counter, ENT_QUOTES, 'UTF-8') .'</td>';
-            echo '<td>' . htmlspecialchars($row['first_name'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
-            echo '<td>' . htmlspecialchars($row['last_name'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
-            echo '<td>' . htmlspecialchars($row['dial_code'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
-            echo '<td>' . htmlspecialchars($row['phone'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
-            echo '<td>' . htmlspecialchars($row['country'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
-            echo '<td>' . htmlspecialchars($row['email'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
-            echo '<td>' . htmlspecialchars($row['submitted_at'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
-            echo '<td>' . htmlspecialchars($row['services'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
-            echo '<td>' . htmlspecialchars($row['message'] ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
+            echo '<td>' . $id . '</td>';
+            echo '<td>' . $firstName . '</td>';
+            echo '<td>' . $lastName . '</td>';
+            echo '<td>' . $dialCode . '</td>';
+            echo '<td>' . $phone . '</td>';
+            echo '<td>' . $country . '</td>';
+            echo '<td>' . $email . '</td>';
+            echo '<td>' . $submittedAt . '</td>';
+            echo '<td>' . $services . '</td>';
+            echo '<td>' . $message . '</td>';
+            echo '<td>';
+            echo '<select name="lead_quality" class="lead-quality-select">';
+            echo '<option value="High"' . ($leadQuality === 'High' ? ' selected' : '') . '>High</option>';
+            echo '<option value="Medium"' . ($leadQuality === 'Medium' ? ' selected' : '') . '>Medium</option>';
+            echo '<option value="Low"' . ($leadQuality === 'Low' ? ' selected' : '') . '>Low</option>';
+            echo '</select>';
+            echo '<input type="hidden" name="id" value="' . $id . '">';
+            echo '<button type="submit" name="update_lead_quality" value="' . $id . '">Update</button>';
+            echo '</td>';
             echo '</tr>';
 
             $counter++;
         }
 
         echo '</table>';
+        echo '</form>';
     } else {
         // Display a message if no data is found
         echo '<p class="no-data">No data found.</p>';
