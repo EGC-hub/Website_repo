@@ -132,6 +132,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['lead_quality'])) {
     if ($updateStmt->execute()) {
         // Update successful
         echo '<script>alert("Lead quality updated successfully!");</script>';
+        // Refresh the page to show updated data
+        header("Location: " . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
+        exit;
     } else {
         // Update failed
         echo '<script>alert("Failed to update lead quality.");</script>';
@@ -247,6 +250,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['lead_quality'])) {
             padding: 5px;
             width: 100%;
         }
+
+        .update-button {
+            padding: 5px 10px;
+            background-color: #002c5f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .update-button:hover {
+            background-color: #001a3d;
+        }
     </style>
 </head>
 <body>
@@ -319,7 +335,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['lead_quality'])) {
             $leadQuality = htmlspecialchars($row['lead_quality'] ?? '', ENT_QUOTES, 'UTF-8');
 
             echo '<tr>';
-            echo '<td>' . $id . '</td>';
+            echo '<td>' . $counter . '</td>'; // Incremented number for display
             echo '<td>' . $firstName . '</td>';
             echo '<td>' . $lastName . '</td>';
             echo '<td>' . $dialCode . '</td>';
@@ -331,12 +347,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['lead_quality'])) {
             echo '<td>' . $message . '</td>';
             echo '<td>';
             echo '<select name="lead_quality" class="lead-quality-select">';
+            echo '<option value="">Select Quality</option>';
             echo '<option value="High"' . ($leadQuality === 'High' ? ' selected' : '') . '>High</option>';
             echo '<option value="Medium"' . ($leadQuality === 'Medium' ? ' selected' : '') . '>Medium</option>';
             echo '<option value="Low"' . ($leadQuality === 'Low' ? ' selected' : '') . '>Low</option>';
             echo '</select>';
             echo '<input type="hidden" name="id" value="' . $id . '">';
-            echo '<button type="submit" name="update_lead_quality" value="' . $id . '">Update</button>';
+            echo '<button type="submit" name="update_lead_quality" value="' . $id . '" class="update-button">Update</button>';
             echo '</td>';
             echo '</tr>';
 
