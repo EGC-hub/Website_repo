@@ -160,7 +160,7 @@ $result = $stmt->get_result();
         
         .table-container {
             width: 100%;
-            max-width: 1250px;
+            max-width: 1300px;
             margin: 0 auto;
             background-color: #fff;
             padding: 20px;
