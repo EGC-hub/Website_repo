@@ -362,7 +362,7 @@ $result = $stmt->get_result();
 
         echo '</table>';
     } else {
-        // Display a message if no data is found
+
         echo '<p class="no-data">No data found.</p>';
     }
 
