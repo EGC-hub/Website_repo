@@ -13,7 +13,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION
 $dbHost = 'localhost';
 $dbUsername = 'euro_admin';
 $dbPassword = 'euroglobal123';
-$dbName = 'euro_login_system';
+$dbName = 'euro_contact_form_db';
 
 // Create a connection
 $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
@@ -146,6 +146,22 @@ $conn->close();
             text-align: center;
             margin-bottom: 20px;
         }
+
+        .back-btn {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #ccc;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background-color: #888;
+        }
     </style>
 </head>
 <body>
@@ -179,6 +195,9 @@ $conn->close();
             </div>
             <button type="submit">Create User</button>
         </form>
+
+        <!-- Back Button -->
+        <a href="welcome.php" class="back-btn">Back to Dashboard</a>
     </div>
 
 </body>
