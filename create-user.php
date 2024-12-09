@@ -152,7 +152,7 @@ $conn->close();
             width: 100%;
             margin-top: 20px;
             padding: 10px;
-            background-color: #ccc;
+            background-color: #002c5f;
             color: white;
             text-align: center;
             border-radius: 5px;
@@ -160,7 +160,7 @@ $conn->close();
         }
 
         .back-btn:hover {
-            background-color: #888;
+            background-color: #004080;
         }
     </style>
 </head>
