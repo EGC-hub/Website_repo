@@ -9,8 +9,9 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-// Retrieve the username from the session
+// Retrieve the username and role from the session
 $username = $_SESSION['username'];
+$userRole = $_SESSION['role']; // Assuming the role is stored in session as 'role'
 
 // Optional: Session timeout settings
 $timeout_duration = 600;
@@ -105,6 +106,11 @@ $_SESSION['last_activity'] = time();
             <!-- Buttons for navigation -->
             <a href="data-display.php" class="btn">Data Display</a>
             <a href="tasks.php" class="btn">Tasks</a>
+
+            <!-- Display 'Create User' button only if user has 'admin' role -->
+            <?php if ($userRole === 'admin'): ?>
+                <a href="create-user.php" class="btn">Create User</a>
+            <?php endif; ?>
         </div>
         <!-- Logout Button -->
         <a href="logout.php" class="logout-btn">Log Out</a>
