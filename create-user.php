@@ -73,6 +73,7 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -113,7 +114,9 @@ $conn->close();
             margin-bottom: 5px;
         }
 
-        input[type="text"], input[type="password"], select {
+        input[type="text"],
+        input[type="password"],
+        select {
             width: 100%;
             padding: 10px;
             border-radius: 5px;
@@ -157,6 +160,7 @@ $conn->close();
             text-align: center;
             border-radius: 5px;
             text-decoration: none;
+            font-size: 16px;
         }
 
         .back-btn:hover {
@@ -164,6 +168,7 @@ $conn->close();
         }
     </style>
 </head>
+
 <body>
 
     <div class="form-container">
@@ -201,4 +206,5 @@ $conn->close();
     </div>
 
 </body>
+
 </html>
