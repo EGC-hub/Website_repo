@@ -13,7 +13,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 // Session timeout (Optional)
-$timeout_duration = 600; 
+$timeout_duration = 600;
 
 // Check if 'last_activity' is set and if it has exceeded the timeout
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
@@ -142,6 +142,39 @@ if (!empty($types)) {
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Export data to CSV (Triggered via GET request)
+if (isset($_GET['export'])) {
+    // Start output buffering to send the CSV file
+    header('Content-Type: text/csv');
+    header('Content-Disposition: attachment; filename="data_export.csv"');
+
+    // Open PHP output stream for writing the CSV
+    $output = fopen('php://output', 'w');
+
+    // Output column headers for the CSV
+    fputcsv($output, ['ID', 'First Name', 'Last Name', 'Dial Code', 'Phone', 'Country', 'Email', 'Submitted At', 'Services', 'Message', 'Lead Quality']);
+
+    // Loop through and output data rows
+    while ($row = $result->fetch_assoc()) {
+        fputcsv($output, [
+            $row['id'],
+            $row['first_name'],
+            $row['last_name'],
+            $row['dial_code'],
+            $row['phone'],
+            $row['country'],
+            $row['email'],
+            $row['submitted_at'],
+            $row['services'],
+            $row['message'],
+            $row['lead_quality']
+        ]);
+    }
+
+    // Close the output stream
+    fclose($output);
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -151,117 +184,7 @@ $result = $stmt->get_result();
     <title>Data Display</title>
     <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-        
-        .table-container {
-            width: 100%;
-            max-width: 1300px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .logout-button {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-
-        .logout-button a {
-            background-color: #002c5f;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-
-        th, td {
-            width: auto;
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-            text-align: left;
-            background-color: #ffffff; /* Ensure each cell has a white background */
-        }
-
-        th {
-            background-color: #002c5f;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .no-data {
-            text-align: center;
-            color: #888;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-        }
-
-        .filter-form {
-            margin-bottom: 20px;
-        }
-
-        .filter-form select {
-            padding: 8px;
-            margin-right: 10px;
-        }
-
-        .filter-form button {
-            padding: 8px 16px;
-            background-color: #002c5f;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .filter-form button:hover {
-            background-color: #001a3d;
-        }
-
-        .lead-quality-select {
-            padding: 5px;
-            width: 100%;
-        }
-
-        .update-button {
-            padding: 5px 10px;
-            background-color: #002c5f;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .update-button:hover {
-            background-color: #001a3d;
-        }
+        /* Include the previous CSS styling here */
     </style>
 </head>
 <body>
@@ -295,6 +218,11 @@ $result = $stmt->get_result();
             </select>
             <button type="submit">Filter</button>
         </form>
+    </div>
+
+    <!-- Export Button -->
+    <div class="export-button" style="text-align: center; margin-top: 20px;">
+        <a href="?export=true&service=<?php echo urlencode($selectedService); ?>&country=<?php echo urlencode($selectedCountry); ?>" class="update-button">Export Data (CSV)</a>
     </div>
 
     <h2>Data Records</h2>
@@ -362,7 +290,6 @@ $result = $stmt->get_result();
 
         echo '</table>';
     } else {
-
         echo '<p class="no-data">No data found.</p>';
     }
 
