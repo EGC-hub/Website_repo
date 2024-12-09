@@ -79,6 +79,12 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create User</title>
     <style>
+        /* General Box Sizing */
+        * {
+            box-sizing: border-box;
+            /* Include padding and border in width and height */
+        }
+
         /* Style for the form */
         body {
             font-family: Arial, sans-serif;
@@ -150,8 +156,10 @@ $conn->close();
             margin-bottom: 20px;
         }
 
+        /* Back button style */
         .back-btn {
             display: block;
+            /* Make it a block-level element */
             width: 100%;
             margin-top: 20px;
             padding: 10px;
