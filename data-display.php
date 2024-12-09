@@ -184,7 +184,134 @@ if (isset($_GET['export'])) {
     <title>Data Display</title>
     <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
     <style>
-        /* Include the previous CSS styling here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .table-container {
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .logout-button {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .logout-button a {
+            background-color: #002c5f;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            width: auto;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+            background-color: #ffffff; /* Ensure each cell has a white background */
+        }
+
+        th {
+            background-color: #002c5f;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+        }
+
+        .filter-form {
+            margin-bottom: 20px;
+        }
+
+        .filter-form select {
+            padding: 8px;
+            margin-right: 10px;
+        }
+
+        .filter-form button {
+            padding: 8px 16px;
+            background-color: #002c5f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .filter-form button:hover {
+            background-color: #001a3d;
+        }
+
+        .lead-quality-select {
+            padding: 5px;
+            width: 100%;
+        }
+
+        .update-button {
+            padding: 5px 10px;
+            background-color: #002c5f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .update-button:hover {
+            background-color: #001a3d;
+        }
+
+        .export-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .export-button a {
+            padding: 8px 16px;
+            background-color: #003366;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .export-button a:hover {
+            background-color: #00264d;
+        }
     </style>
 </head>
 <body>
@@ -221,8 +348,8 @@ if (isset($_GET['export'])) {
     </div>
 
     <!-- Export Button -->
-    <div class="export-button" style="text-align: center; margin-top: 20px;">
-        <a href="?export=true&service=<?php echo urlencode($selectedService); ?>&country=<?php echo urlencode($selectedCountry); ?>" class="update-button">Export Data (CSV)</a>
+    <div class="export-button">
+        <a href="?export=true<?php echo $selectedService ? '&service=' . urlencode($selectedService) : ''; ?><?php echo $selectedCountry ? '&country=' . urlencode($selectedCountry) : ''; ?>">Export Data (CSV)</a>
     </div>
 
     <h2>Data Records</h2>
