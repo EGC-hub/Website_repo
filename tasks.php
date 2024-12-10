@@ -47,14 +47,20 @@ if ($conn->connect_error) {
 // Fetch users for task assignment (admin and manager roles)
 $users = [];
 if ($user_role === 'admin' || $user_role === 'manager') {
-    $userQuery = $user_role === 'admin'
-        ? "SELECT id, username FROM users WHERE role IN ('user', 'manager')"
-        : "SELECT id, username FROM users WHERE role = 'user'";
+    if ($user_role === 'admin') {
+        // Admin can assign tasks to users and managers
+        $userQuery = "SELECT id, username FROM users WHERE role IN ('user', 'manager')";
+    } else {
+        // Manager can assign tasks to users and self
+        $userQuery = "SELECT id, username FROM users WHERE role = 'user' UNION SELECT id, username FROM users WHERE id = $user_id";
+    }
+
     $userResult = $conn->query($userQuery);
     while ($row = $userResult->fetch_assoc()) {
         $users[] = $row;
     }
 }
+
 
 // Handle form submission for adding a task
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
