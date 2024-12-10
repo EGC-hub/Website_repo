@@ -256,7 +256,7 @@ $result = $stmt->get_result();
             </form>
         </div>
     <?php endif; ?>
-    
+
 
     <div class="task-container">
         <h2>Tasks</h2>
@@ -276,8 +276,8 @@ $result = $stmt->get_result();
                 <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['task_name']); ?></td>
-                        <td><?php echo htmlspecialchars($row['expected_start_date']); ?></td>
-                        <td><?php echo htmlspecialchars($row['expected_finish_date']); ?></td>
+                        <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))); ?></td>
+                        <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))); ?></td>
                         <td>
                             <form method="POST" action="update-status.php">
                                 <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
@@ -294,7 +294,7 @@ $result = $stmt->get_result();
                         </td>
                         <?php if ($user_role !== 'user'): ?>
                             <td><?php echo htmlspecialchars($row['assigned_to']); ?></td><?php endif; ?>
-                        <td><?php echo htmlspecialchars($row['recorded_timestamp']); ?></td>
+                        <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))); ?></td>
                         <?php if ($user_role !== 'user'): ?>
                             <td>
                                 <form method="POST" action="delete-task.php">
