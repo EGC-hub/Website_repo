@@ -9,10 +9,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION
     exit;
 }
 
-// Enable error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 // Database connection
 $dbHost = 'localhost';
 $dbUsername = 'euro_admin';
