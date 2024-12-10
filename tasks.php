@@ -28,6 +28,10 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
 
 $_SESSION['last_activity'] = time();
 
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Database connection
 $dbHost = 'localhost';
 $dbUsername = 'euro_admin';
