@@ -259,7 +259,7 @@ $result = $stmt->get_result();
     
 
     <div class="task-container">
-        <h2>Your Tasks</h2>
+        <h2>Tasks</h2>
         <?php if ($result->num_rows > 0): ?>
             <table class="task-table">
                 <tr>
