@@ -17,7 +17,7 @@ ini_set('display_errors', 1);
 $dbHost = 'localhost';
 $dbUsername = 'euro_admin';
 $dbPassword = 'euroglobal123';
-$dbName = 'euro_contact_form_db';
+$dbName = 'euro_login_system';
 
 // Create a connection
 $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
