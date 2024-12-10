@@ -69,6 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password</title>
+    <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
     <style>
         body {
             font-family: Arial, sans-serif;

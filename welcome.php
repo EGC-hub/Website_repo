@@ -33,6 +33,7 @@ $_SESSION['last_activity'] = time();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome Page</title>
+    <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
     <style>
         body {
             display: flex;
