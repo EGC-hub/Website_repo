@@ -215,8 +215,8 @@ $result = $stmt->get_result();
         <a href="welcome.php">Back</a>
     </div>
 
-    <div class="task-container">
-        <?php if ($user_role !== 'user'): ?>
+    <?php if ($user_role !== 'user'): ?>
+        <div class="task-container">
             <h2>Add New Task</h2>
             <form method="POST" action="tasks.php">
                 <div class="form-group">
@@ -243,8 +243,9 @@ $result = $stmt->get_result();
                 </div>
                 <button type="submit" class="submit-btn">Add Task</button>
             </form>
-        <?php endif; ?>
-    </div>
+        </div>
+    <?php endif; ?>
+    
 
     <div class="task-container">
         <h2>Your Tasks</h2>
