@@ -95,15 +95,16 @@ $taskQuery = $user_role === 'admin'
        JOIN users ON tasks.user_id = users.id ORDER BY recorded_timestamp DESC"
     : ($user_role === 'manager'
         ? "SELECT tasks.*, users.username AS assigned_to FROM tasks 
-           JOIN users ON tasks.user_id = users.id WHERE users.role = 'user' ORDER BY recorded_timestamp DESC"
+           JOIN users ON tasks.user_id = users.id WHERE users.role = 'user' OR tasks.user_id = ? ORDER BY recorded_timestamp DESC"
         : "SELECT * FROM tasks WHERE user_id = ? ORDER BY recorded_timestamp DESC");
 
 $stmt = $conn->prepare($taskQuery);
-if ($user_role === 'user') {
+if ($user_role === 'manager' || $user_role === 'user') {
     $stmt->bind_param("i", $user_id);
 }
 $stmt->execute();
 $result = $stmt->get_result();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
