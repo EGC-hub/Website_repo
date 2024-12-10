@@ -216,8 +216,8 @@ $result = $stmt->get_result();
     </div>
 
     <div class="task-container">
-        <h2>Add New Task</h2>
         <?php if ($user_role !== 'user'): ?>
+            <h2>Add New Task</h2>
             <form method="POST" action="tasks.php">
                 <div class="form-group">
                     <label for="task_name">Task Name</label>
