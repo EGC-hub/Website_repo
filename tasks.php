@@ -49,7 +49,7 @@ $users = [];
 if ($user_role === 'admin' || $user_role === 'manager') {
     $userQuery = $user_role === 'admin'
         ? "SELECT id, username FROM users WHERE role IN ('user', 'manager')"
-        : "SELECT id, username FROM users WHERE role IN = ('user', 'manager')";
+        : "SELECT id, username FROM users WHERE role = 'user'";
     $userResult = $conn->query($userQuery);
     while ($row = $userResult->fetch_assoc()) {
         $users[] = $row;
