@@ -60,65 +60,6 @@
 <body>
     <div class="main-page-wrapper">
 
-
-
-        <!-- 
-			=============================================
-				Theme Inner Banner
-			============================================== 
-			-->
-        <div class="theme-inner-banner section-spacing">
-            <div class="overlay">
-                <div class="container">
-                    <h2>Study Abroad Consultancy</h2>
-                </div> <!-- /.container -->
-            </div> <!-- /.overlay -->
-        </div> <!-- /.theme-inner-banner -->
-
-
-        <!-- 
-			=============================================
-				Service Details
-			============================================== 
-			-->
-        <section class="service-details section-spacing">
-            <div class="container">
-                <div class="row">
-                    <div class="col-xl-12 col-lg-12 col-12">
-                        <div class="study-abroad">
-                            <h5>Study Abroad Consultants in UAE, Dubai</h5>
-                            <img src="images/home/Students.jpeg" alt="">
-                            <p>
-                                Our study abroad consulting services are dedicated to helping you achieve your dreams of
-                                pursuing an overseas education. We believe that studying abroad is an incredibly
-                                valuable experience that can broaden your horizons, build your skills, and enrich your
-                                perspective on the world.
-                            </p>
-                            <br>
-                            <p>
-                                Our team of experienced consultants is here to guide you through every step of the
-                                process, from choosing the right program to ensuring a successful and fulfilling
-                                experience. Our services begin with an initial consultation, during which we get to know
-                                you and your goals for studying abroad. Based on this information, we'll work with you
-                                to identify the right program and destination to fit your needs and aspirations.Once
-                                you've chosen a program, we'll guide you through the application process, providing
-                                expert advice and support along the way and We'll help you navigate the logistical
-                                details, including visa applications and other important considerations.
-                            </p>
-                            <br>
-                            <p>
-                                At our study abroad consultants in UAE/Dubai, we're passionate about helping students
-                                like you achieve their goals and explore the world through overseas education. Euro
-                                Global Consultants has the knowledge, experience, and resources to help you make the
-                                most of your study abroad experience. Contact us today to learn more about how we can
-                                help you achieve your dreams.
-                            </p>
-                        </div>
-                    </div><!-- /.col- -->
-                </div> <!-- /.row -->
-            </div> <!-- /.container -->
-        </section> <!-- /.service-details -->
-
         <section class="training-section course_section">
             <div class="auto-container">
                 <h3 class="title1">Find Your Dream Program</h3>
