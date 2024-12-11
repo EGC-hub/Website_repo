@@ -319,6 +319,31 @@ $programs = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
 
         </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Default filter values
+                const defaultFilterLevel = '.bachelors';
+                const defaultFilterCountry = '*'; // This means 'all'
+                const defaultFilterDomain = '.engineering';
+
+                // Combine default filters
+                const defaultFilter = `${defaultFilterLevel}${defaultFilterCountry}${defaultFilterDomain}`;
+
+                // Trigger filtering on page load
+                const grid = document.querySelector('.grid'); // Assuming '.grid' is the container for filtered items
+                const items = grid.querySelectorAll('.service-block');
+
+                items.forEach(item => {
+                    // Show items that match the default filter
+                    if (item.classList.contains('bachelors') && item.classList.contains('engineering')) {
+                        item.style.display = 'block'; // Show matching items
+                    } else {
+                        item.style.display = 'none'; // Hide non-matching items
+                    }
+                });
+            });
+
+        </script>
 
         <!-- Theme js -->
         <script src="js/theme.js"></script>
