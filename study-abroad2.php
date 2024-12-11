@@ -82,7 +82,52 @@ $programs = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="auto-container">
                 <h3 class="title1">Find Your Dream Program</h3>
                 <div class="filters">
-                    <!-- Filters (e.g., by Level of Study, Country, Domain) -->
+
+                    <div class="ui-group">
+                        <h3>Find by Level of Study</h3>
+                        <div class="button-group js-radio-button-group" data-filter-group="color1">
+                            <!-- <button class="button is-checked" data-filter="">All</button> -->
+                            <button class="button is-checked" data-filter=".bachelors">Bachelors</button>
+                            <button class="button" data-filter=".masters">Masters</button>
+
+                        </div>
+                    </div>
+
+                    <div class="ui-group">
+                        <h3>Find by Country</h3>
+                        <div class="button-group js-radio-button-group" data-filter-group="size">
+                            <button class="button is-checked" data-filter="*">All</button>
+                            <!-- <button class="button" data-filter=".usa">USA</button>
+                            <button class="button" data-filter=".uk">UK</button>
+                            <button class="button" data-filter=".europe">Europe</button>
+                            <button class="button" data-filter=".canada">Canada</button>
+                            <button class="button" data-filter=".germany">Germany</button> -->
+                            <button class="button" data-filter=".italy">Italy</button>
+                            <button class="button" data-filter=".hungary">Hungary</button>
+                            <button class="button" data-filter=".latvia">Latvia</button>
+                            <button class="button" data-filter=".slovakia">Slovakia</button>
+                            <button class="button" data-filter=".portugal">Portugal</button>
+                            <button class="button" data-filter=".czech">Czech Republic</button>
+                            <button class="button" data-filter=".lithuania">Lithuania</button>
+                            <button class="button" data-filter=".malta">Malta</button>
+                            <!-- <button class="button" data-filter="."></button> -->
+
+
+                        </div>
+                    </div>
+                    <div class="ui-group">
+                        <h3>Find by Domain</h3>
+                        <div class="button-group js-radio-button-group" data-filter-group="color">
+
+                            <button class="button is-checked" data-filter=".engineering">Engineering</button>
+                            <button class="button" data-filter=".arts">Arts &amp; Science</button>
+                            <button class="button" data-filter=".management">Management</button>
+                            <button class="button" data-filter=".health">Health &amp; Medicine</button>
+                            <button class="button" data-filter=".Building">Building &amp; Architecture</button>
+
+
+                        </div>
+                    </div>
                 </div>
                 <div class="row grid mt-5">
                     <?php foreach ($programs as $program): ?>
