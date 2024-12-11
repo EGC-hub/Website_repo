@@ -121,7 +121,7 @@ $programs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <script src="vendor/jquery.2.2.3.min.js"></script>
-    <script src="vendor/isotope.pkgd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js"></script>
     <script>
         // Initialize Isotope grid
         var $grid = $('.grid').isotope({
