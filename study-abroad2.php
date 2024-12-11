@@ -7075,7 +7075,7 @@
 			</div>
 		</section>
 
-		<section class="why-choose-us-three pt-0"></section>
+		<section class="why-choose-us-three pt-0">
 			<div class="auto-container">
 				<div class="banner-box-three">
 					<div class="inner-box">
