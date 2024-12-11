@@ -12,13 +12,14 @@ Phase 1
 Phase 2
 1) Created a manual form for data collection
 2) Created an admin portal for viewing the data collected in the database as well as to track tasks given.
+3) Role based privelleges have been also added.
 
 Technical Details
 Phase 1
 1) New website template was used from https://elements.envato.com/charles-business-consulting-html-template-K5VJAD
 2) JavaScript Libraries used are JQuery, BootStrap, Popper JS, Camera Slider (Used in carousel), slimmenu (for the menus in the header), wowjs, owl carousel, countto and fancybox.
 Phase 2
-1) MySQL database and PHP were used for points 1 & 2
+1) MySQL database and PHP were used for points 1,2 & 3
 
 Version Control
 Github location - https://github.com/Sadu-sadullah/EuroGlobalConsultancy_Updated
