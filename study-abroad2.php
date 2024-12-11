@@ -75,7 +75,7 @@ $programs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <h3>Find by Domain</h3>
                         <div class="button-group js-radio-button-group" data-filter-group="domain">
                             <button class="button is-checked" data-filter="*">All</button>
-                            <button class="button is-checked" data-filter=".engineering">Engineering</button>
+                            <button class="button" data-filter=".engineering">Engineering</button>
                             <button class="button" data-filter=".arts">Arts &amp; Science</button>
                             <button class="button" data-filter=".management">Management</button>
                             <button class="button" data-filter=".health">Health &amp; Medicine</button>
