@@ -92,7 +92,7 @@ $programs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="content-box">
                                     <h6 class="lab"><?= htmlspecialchars($program['program_lab']) ?></h6>
                                     <h5 class="title"><a
-                                            href="<?= htmlspecialchars($program['know_more_url']) ?>"><?= htmlspecialchars($program['program_title']) ?></a>
+                                            href="contact.html"><?= htmlspecialchars($program['program_title']) ?></a>
                                     </h5>
                                     <div class="course_tags">
                                         <div class="course_tag">
@@ -110,7 +110,7 @@ $programs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <span class="cc"><?= htmlspecialchars(trim($tag)) ?></span>
                                         <?php endforeach; ?>
                                         <span class="cc2 cc"><a style="color: inherit;"
-                                                href="<?= htmlspecialchars($program['know_more_url']) ?>">Know More</a></span>
+                                                href="contact.html">Know More</a></span>
                                     </div>
                                 </div>
                             </div>
