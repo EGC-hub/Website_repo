@@ -6,6 +6,10 @@ error_reporting(E_ALL);
 
 $config = include '../config.php'; 
 
+if ($config === null) {
+    die('Config file could not be loaded. Check the path and contents.');
+}
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
