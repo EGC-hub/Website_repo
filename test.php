@@ -1,3 +1,3 @@
 <?php
-echo dirname(__DIR__) . '/config.php';
+echo dirname(__DIR__) . 'config.php';
 ?>
