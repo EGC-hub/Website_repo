@@ -283,7 +283,7 @@ $result = $stmt->get_result();
 
 <body>
     <div class="logout-button">
-        <a href="logout.php">Logout</a>
+        <a href="welcome.php">Back</a>
     </div>
     <div class="task-container">
         <h2>Task Management</h2>
