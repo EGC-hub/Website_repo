@@ -8,12 +8,6 @@ require 'PHPMailer/src/SMTP.php';
 
 session_start();
 
-
-// Enable error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-
 // Check if the user is not logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: portal-login.html");
