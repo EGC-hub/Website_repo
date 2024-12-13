@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errorMsg = "Username already taken.";
         } else {
             // Insert the new user into the database
-            $insertQuery = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+            $insertQuery = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
             $stmt = $conn->prepare($insertQuery);
             $stmt->bind_param("sss", $username, $hashedPassword, $role);
 
@@ -205,6 +205,10 @@ $conn->close();
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
             </div>
             <div class="form-group">
                 <label for="role">Role</label>
