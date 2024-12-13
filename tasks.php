@@ -4,6 +4,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+$config = include dirname(__DIR__) . '/config.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -82,8 +84,8 @@ function sendTaskNotification($email, $username, $task_name, $start_date, $end_d
         $mail->isSMTP();
         $mail->Host = 'smtppro.zoho.com'; // Update with your SMTP server
         $mail->SMTPAuth = true;
-        $mail->Username = 'enquiry@euroglobalconsultancy.com'; // Update with your email
-        $mail->Password = 'euro@2023'; // Update with your email password
+        $mail->Username = $config['email_username'];
+        $mail->Password = $config['email_password'];
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
