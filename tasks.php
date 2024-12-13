@@ -295,13 +295,13 @@ $result = $stmt->get_result();
                 </div>
 
                 <div class="form-group">
-                    <label for="expected_start_date">Expected Start Date:</label>
-                    <input type="date" id="expected_start_date" name="expected_start_date" required>
+                    <label for="expected_start_date">Expected Start Date & Time</label>
+                    <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
                 </div>
-
+                
                 <div class="form-group">
-                    <label for="expected_finish_date">Expected Finish Date:</label>
-                    <input type="date" id="expected_finish_date" name="expected_finish_date" required>
+                    <label for="expected_finish_date">Expected End Date & Time</label>
+                    <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
                 </div>
 
                 <div class="form-group">
