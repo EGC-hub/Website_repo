@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Insert the new user into the database
             $insertQuery = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
             $stmt = $conn->prepare($insertQuery);
-            $stmt->bind_param("sss", $username, $hashedPassword, $role);
+            $stmt->bind_param("ssss", $username, $email, $hashedPassword, $role);
 
             if ($stmt->execute()) {
                 $successMsg = "User created successfully.";
