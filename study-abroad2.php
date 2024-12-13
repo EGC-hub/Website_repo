@@ -1,20 +1,15 @@
 <?php
 $config = include '../config.php';
+// Database Connection
+$dsn = "mysql:host=localhost;dbname=euro_universities;charset=utf8mb4";
+$username = $config['dbUsername'];
+$password = $config['dbPassword'];
 
-// Database connection
-$dbHost = 'localhost';
-$dbUsername = $config['dbUsername'];
-$dbPassword = $config['dbPassword'];
-$dbName = 'euro_universities';
-
-// Create a connection
-$conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+try {
+    $pdo = new PDO($dsn, $username, $password);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
 }
-
 
 // Fetch Programs
 $query = "SELECT * FROM programs";
