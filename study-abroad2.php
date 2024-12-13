@@ -7,11 +7,14 @@ $dbUsername = $config['dbUsername'];
 $dbPassword = $config['dbPassword'];
 $dbName = 'euro_universities';
 
-try {
-    $pdo = new PDO($dsn, $username, $password);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+// Create a connection
+$conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
+
 
 // Fetch Programs
 $query = "SELECT * FROM programs";
