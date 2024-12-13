@@ -37,6 +37,7 @@ $successMsg = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Sanitize inputs
     $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
     $password = trim($_POST['password']);
     $role = $_POST['role'];
 
