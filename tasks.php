@@ -44,10 +44,12 @@ $_SESSION['last_activity'] = time();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+$config = include '../config.php';
+
 // Database connection
 $dbHost = 'localhost';
-$dbUsername = 'euro_admin';
-$dbPassword = 'euroglobal123';
+$dbUsername = $config['dbUsername'];
+$dbPassword = $config['dbPassword'];
 $dbName = 'euro_login_system';
 
 $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
