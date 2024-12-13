@@ -4,8 +4,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$config = include("../config.php");
-
 if ($config === null) {
     die('Config file could not be loaded. Check the path and contents.');
 }
@@ -84,12 +82,13 @@ function sendTaskNotification($email, $username, $task_name, $start_date, $end_d
     $mail = new PHPMailer(true);
 
     try {
+        $config = include("../config.php");
         // Server settings
         $mail->isSMTP();
         $mail->Host = 'smtppro.zoho.com'; // Update with your SMTP server
         $mail->SMTPAuth = true;
-        $mail->Username = $config['email_username'];
-        $mail->Password = $config['email_password'];
+        $mail->Username = $config["email_username"];
+        $mail->Password = $config["email_password"];
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
