@@ -1,4 +1,11 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'PHPMailer/src/Exception.php';
+require 'PHPMailer/src/PHPMailer.php';
+require 'PHPMailer/src/SMTP.php';
+
 session_start();
 
 // Check if the user is not logged in
@@ -49,10 +56,10 @@ $users = [];
 if ($user_role === 'admin' || $user_role === 'manager') {
     if ($user_role === 'admin') {
         // Admin can assign tasks to users and managers
-        $userQuery = "SELECT id, username FROM users WHERE role IN ('user', 'manager')";
+        $userQuery = "SELECT id, username, email FROM users WHERE role IN ('user', 'manager')";
     } else {
         // Manager can assign tasks to users and self
-        $userQuery = "SELECT id, username FROM users WHERE role = 'user' UNION SELECT id, username FROM users WHERE id = $user_id";
+        $userQuery = "SELECT id, username, email FROM users WHERE role = 'user' UNION SELECT id, username, email FROM users WHERE id = $user_id";
     }
 
     $userResult = $conn->query($userQuery);
@@ -61,6 +68,41 @@ if ($user_role === 'admin' || $user_role === 'manager') {
     }
 }
 
+// Function to send email notifications
+function sendTaskNotification($email, $username, $task_name, $start_date, $end_date) {
+    $mail = new PHPMailer(true);
+
+    try {
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host = 'smtppro.zoho.com'; // Update with your SMTP server
+        $mail->SMTPAuth = true;
+        $mail->Username = 'enquiry@euroglobalconsultancy.com'; // Update with your email
+        $mail->Password = 'euro@2023'; // Update with your email password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        // Recipients
+        $mail->setFrom('enquiry@euroglobalconsultancy.com', 'Task Management System');
+        $mail->addAddress($email, $username);
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = 'New Task Assigned';
+        $mail->Body = "<h3>Hello $username,</h3>" .
+            "<p>You have been assigned a new task:</p>" .
+            "<ul>" .
+            "<li><strong>Task Name:</strong> $task_name</li>" .
+            "<li><strong>Start Date:</strong> $start_date</li>" .
+            "<li><strong>End Date:</strong> $end_date</li>" .
+            "</ul>" .
+            "<p>Please log in to your account for more details.</p>";
+
+        $mail->send();
+    } catch (Exception $e) {
+        error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
+    }
+}
 
 // Handle form submission for adding a task
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
@@ -82,6 +124,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
 
         if ($stmt->execute()) {
             echo '<script>alert("Task added successfully.");</script>';
+
+            // Fetch the assigned user's email and username
+            $userQuery = $conn->prepare("SELECT username, email FROM users WHERE id = ?");
+            $userQuery->bind_param("i", $assigned_user_id);
+            $userQuery->execute();
+            $userResult = $userQuery->get_result();
+
+            if ($userResult->num_rows > 0) {
+                $user = $userResult->fetch_assoc();
+                $email = $user['email'];
+                $username = $user['username'];
+
+                // Send email notification
+                sendTaskNotification($email, $username, $task_name, $expected_start_date, $expected_finish_date);
+            }
         } else {
             echo '<script>alert("Failed to add task.");</script>';
         }
@@ -104,7 +161,6 @@ if ($user_role === 'manager' || $user_role === 'user') {
 }
 $stmt->execute();
 $result = $stmt->get_result();
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -190,127 +246,103 @@ $result = $stmt->get_result();
             border-radius: 5px;
         }
 
-        .task-table {
-            width: 100%;
-            border-collapse: collapse;
+        .logout-button a:hover {
+            background-color: #004080;
         }
 
-        .task-table th,
-        .task-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 10px;
             text-align: left;
         }
 
-        .task-table th {
-            background-color: #f0f0f0;
-        }
-
-        .delete-btn {
-            background-color: #e74c3c;
+        th {
+            background-color: #002c5f;
             color: white;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
         }
 
-        .delete-btn:hover {
-            background-color: #c0392b;
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
     </style>
-
 </head>
 
 <body>
     <div class="logout-button">
-        <a href="welcome.php">Back</a>
+        <a href="logout.php">Logout</a>
     </div>
-
-    <?php if ($user_role !== 'user'): ?>
-        <div class="task-container">
-            <h2>Add New Task</h2>
-            <form method="POST" action="tasks.php">
+    <div class="task-container">
+        <h2>Task Management</h2>
+        <?php if ($user_role === 'admin' || $user_role === 'manager') : ?>
+            <form method="post" action="">
                 <div class="form-group">
-                    <label for="task_name">Task Name</label>
+                    <label for="task_name">Task Name:</label>
                     <input type="text" id="task_name" name="task_name" required>
                 </div>
+
                 <div class="form-group">
-                    <label for="expected_start_date">Expected Start Date & Time</label>
-                    <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
+                    <label for="expected_start_date">Expected Start Date:</label>
+                    <input type="date" id="expected_start_date" name="expected_start_date" required>
                 </div>
+
                 <div class="form-group">
-                    <label for="expected_finish_date">Expected End Date & Time</label>
-                    <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
+                    <label for="expected_finish_date">Expected Finish Date:</label>
+                    <input type="date" id="expected_finish_date" name="expected_finish_date" required>
                 </div>
+
                 <div class="form-group">
-                    <label for="assigned_user_id">Assign To</label>
+                    <label for="assigned_user_id">Assign to:</label>
                     <select id="assigned_user_id" name="assigned_user_id" required>
-                        <option value="">Select User</option>
-                        <?php foreach ($users as $user): ?>
-                            <option value="<?php echo $user['id']; ?>"><?php echo htmlspecialchars($user['username']); ?>
+                        <option value="">Select a user</option>
+                        <?php foreach ($users as $user) : ?>
+                            <option value="<?= $user['id'] ?>">
+                                <?= htmlspecialchars($user['username']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
+
                 <button type="submit" class="submit-btn">Add Task</button>
             </form>
-        </div>
-    <?php endif; ?>
+        <?php endif; ?>
 
-
-
-    <div class="task-container">
-        <h2>Tasks</h2>
-        <?php if ($result->num_rows > 0): ?>
-            <table class="task-table">
-                <tr>
-                    <th>Task Name</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Status</th>
-                    <?php if ($user_role !== 'user'): ?>
-                        <th>Assigned To</th><?php endif; ?>
-                    <th>Created At</th>
-                    <?php if ($user_role !== 'user'): ?>
-                        <th>Actions</th><?php endif; ?>
-                </tr>
-                <?php while ($row = $result->fetch_assoc()): ?>
+        <h2>Your Tasks</h2>
+        <?php if ($result->num_rows > 0) : ?>
+            <table>
+                <thead>
                     <tr>
-                        <td><?php echo htmlspecialchars($row['task_name']); ?></td>
-                        <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))); ?></td>
-                        <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))); ?></td>
-                        <td>
-                            <form method="POST" action="update-status.php">
-                                <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
-                                <select name="status" onchange="this.form.submit()">
-                                    <?php
-                                    $statuses = ['Pending', 'Started', 'Completed'];
-                                    foreach ($statuses as $statusValue) {
-                                        $selected = ($row['status'] === $statusValue) ? 'selected' : '';
-                                        echo "<option value='$statusValue' $selected>$statusValue</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </form>
-                        </td>
-                        <?php if ($user_role !== 'user'): ?>
-                            <td><?php echo htmlspecialchars($row['assigned_to']); ?></td><?php endif; ?>
-                        <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))); ?></td>
-                        <?php if ($user_role !== 'user'): ?>
-                            <td>
-                                <form method="POST" action="delete-task.php">
-                                    <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
-                                    <button type="submit" class="delete-btn"
-                                        onclick="return confirm('Are you sure?')">Delete</button>
-                                </form>
-                            </td>
-                        <?php endif; ?>
+                        <th>Task Name</th>
+                        <th>Assigned To</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Recorded At</th>
                     </tr>
-                <?php endwhile; ?>
+                </thead>
+                <tbody>
+                    <?php while ($task = $result->fetch_assoc()) : ?>
+                        <tr>
+                            <td><?= htmlspecialchars($task['task_name']) ?></td>
+                            <td><?= htmlspecialchars($task['assigned_to'] ?? 'Self') ?></td>
+                            <td><?= htmlspecialchars($task['expected_start_date']) ?></td>
+                            <td><?= htmlspecialchars($task['expected_finish_date']) ?></td>
+                            <td><?= htmlspecialchars($task['status']) ?></td>
+                            <td><?= htmlspecialchars($task['recorded_timestamp']) ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
             </table>
-        <?php else: ?>
-            <div class="no-tasks">No tasks available.</div>
+        <?php else : ?>
+            <p class="no-tasks">No tasks available.</p>
         <?php endif; ?>
     </div>
 </body>
