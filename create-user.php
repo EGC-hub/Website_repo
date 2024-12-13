@@ -129,6 +129,7 @@ $conn->close();
 
         input[type="text"],
         input[type="password"],
+        input[type="email"],
         select {
             width: 100%;
             padding: 10px;
