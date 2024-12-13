@@ -1,8 +1,10 @@
 <?php
-// Database configuration
+$config = include '../config.php';
+
+// Database connection
 $dbHost = 'localhost';
-$dbUsername = 'euro_admin';
-$dbPassword = 'euroglobal123';
+$dbUsername = $config['dbUsername'];
+$dbPassword = $config['dbPassword'];
 $dbName = 'euro_login_system';
 
 // Establish database connection

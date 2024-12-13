@@ -1,9 +1,11 @@
 <?php
-// Database configuration
-$servername = "localhost";
-$username = "euro_admin";
-$password = "euroglobal123";
-$dbname = "euro_contact_form_db";
+$config = include '../config.php';
+
+// Database connection
+$dbHost = 'localhost';
+$dbUsername = $config['dbUsername'];
+$dbPassword = $config['dbPassword'];
+$dbName = 'euro_contact_form_db';
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

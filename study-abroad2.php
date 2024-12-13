@@ -1,8 +1,11 @@
 <?php
-// Database Connection
-$dsn = "mysql:host=localhost;dbname=euro_universities;charset=utf8mb4";
-$username = "euro_admin";
-$password = "euroglobal123";
+$config = include '../config.php';
+
+// Database connection
+$dbHost = 'localhost';
+$dbUsername = $config['dbUsername'];
+$dbPassword = $config['dbPassword'];
+$dbName = 'euro_universities';
 
 try {
     $pdo = new PDO($dsn, $username, $password);

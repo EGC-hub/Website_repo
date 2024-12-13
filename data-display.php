@@ -27,10 +27,12 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
 // Update last activity time
 $_SESSION['last_activity'] = time();
 
-// Configuration for database
+$config = include '../config.php';
+
+// Database connection
 $dbHost = 'localhost';
-$dbUsername = 'euro_admin';
-$dbPassword = 'euroglobal123';
+$dbUsername = $config['dbUsername'];
+$dbPassword = $config['dbPassword'];
 $dbName = 'euro_contact_form_db';
 
 // Establish database connection

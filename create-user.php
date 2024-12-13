@@ -9,10 +9,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION
     exit;
 }
 
+$config = include '../config.php';
+
 // Database connection
 $dbHost = 'localhost';
-$dbUsername = 'euro_admin';
-$dbPassword = 'euroglobal123';
+$dbUsername = $config['dbUsername'];
+$dbPassword = $config['dbPassword'];
 $dbName = 'euro_login_system';
 
 // Create a connection
