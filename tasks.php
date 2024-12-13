@@ -285,41 +285,42 @@ $result = $stmt->get_result();
     <div class="logout-button">
         <a href="welcome.php">Back</a>
     </div>
-    <div class="task-container">
-        <h2>Task Management</h2>
-        <?php if ($user_role === 'admin' || $user_role === 'manager') : ?>
-            <form method="post" action="">
-                <div class="form-group">
-                    <label for="task_name">Task Name:</label>
-                    <input type="text" id="task_name" name="task_name" required>
-                </div>
 
-                <div class="form-group">
-                    <label for="expected_start_date">Expected Start Date & Time</label>
-                    <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
-                </div>
+    <?php if ($user_role === 'admin' || $user_role === 'manager') : ?>
+        <div class="task-container">
+            <h2>Task Management</h2>
+                <form method="post" action="">
+                    <div class="form-group">
+                        <label for="task_name">Task Name:</label>
+                        <input type="text" id="task_name" name="task_name" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="expected_finish_date">Expected End Date & Time</label>
-                    <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
-                </div>
+                    <div class="form-group">
+                        <label for="expected_start_date">Expected Start Date & Time</label>
+                        <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="assigned_user_id">Assign to:</label>
-                    <select id="assigned_user_id" name="assigned_user_id" required>
-                        <option value="">Select a user</option>
-                        <?php foreach ($users as $user) : ?>
-                            <option value="<?= $user['id'] ?>">
-                                <?= htmlspecialchars($user['username']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label for="expected_finish_date">Expected End Date & Time</label>
+                        <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
+                    </div>
 
-                <button type="submit" class="submit-btn">Add Task</button>
-            </form>
-        <?php endif; ?>
-    </div>
+                    <div class="form-group">
+                        <label for="assigned_user_id">Assign to:</label>
+                        <select id="assigned_user_id" name="assigned_user_id" required>
+                            <option value="">Select a user</option>
+                            <?php foreach ($users as $user) : ?>
+                                <option value="<?= $user['id'] ?>">
+                                    <?= htmlspecialchars($user['username']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Add Task</button>
+                </form>
+        </div>
+    <?php endif; ?>
     <div class="task-container">
         <h2>Tasks</h2>
         <?php if ($result->num_rows > 0): ?>
