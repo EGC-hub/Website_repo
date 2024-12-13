@@ -298,7 +298,7 @@ $result = $stmt->get_result();
                     <label for="expected_start_date">Expected Start Date & Time</label>
                     <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="expected_finish_date">Expected End Date & Time</label>
                     <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
@@ -319,35 +319,58 @@ $result = $stmt->get_result();
                 <button type="submit" class="submit-btn">Add Task</button>
             </form>
         <?php endif; ?>
-
-        <h2>Your Tasks</h2>
-        <?php if ($result->num_rows > 0) : ?>
-            <table>
-                <thead>
+    </div>
+    <div class="task-container">
+        <h2>Tasks</h2>
+        <?php if ($result->num_rows > 0): ?>
+            <table class="task-table">
+                <tr>
+                    <th>Task Name</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <?php if ($user_role !== 'user'): ?>
+                        <th>Assigned To</th><?php endif; ?>
+                    <th>Created At</th>
+                    <?php if ($user_role !== 'user'): ?>
+                        <th>Actions</th><?php endif; ?>
+                </tr>
+                <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
-                        <th>Task Name</th>
-                        <th>Assigned To</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Status</th>
-                        <th>Recorded At</th>
+                        <td><?php echo htmlspecialchars($row['task_name']); ?></td>
+                        <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))); ?></td>
+                        <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))); ?></td>
+                        <td>
+                            <form method="POST" action="update-status.php">
+                                <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
+                                <select name="status" onchange="this.form.submit()">
+                                    <?php
+                                    $statuses = ['Pending', 'Started', 'Completed'];
+                                    foreach ($statuses as $statusValue) {
+                                        $selected = ($row['status'] === $statusValue) ? 'selected' : '';
+                                        echo "<option value='$statusValue' $selected>$statusValue</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </form>
+                        </td>
+                        <?php if ($user_role !== 'user'): ?>
+                            <td><?php echo htmlspecialchars($row['assigned_to']); ?></td><?php endif; ?>
+                        <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))); ?></td>
+                        <?php if ($user_role !== 'user'): ?>
+                            <td>
+                                <form method="POST" action="delete-task.php">
+                                    <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
+                                    <button type="submit" class="delete-btn"
+                                        onclick="return confirm('Are you sure?')">Delete</button>
+                                </form>
+                            </td>
+                        <?php endif; ?>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php while ($task = $result->fetch_assoc()) : ?>
-                        <tr>
-                            <td><?= htmlspecialchars($task['task_name']) ?></td>
-                            <td><?= htmlspecialchars($task['assigned_to'] ?? 'Self') ?></td>
-                            <td><?= htmlspecialchars($task['expected_start_date']) ?></td>
-                            <td><?= htmlspecialchars($task['expected_finish_date']) ?></td>
-                            <td><?= htmlspecialchars($task['status']) ?></td>
-                            <td><?= htmlspecialchars($task['recorded_timestamp']) ?></td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
+                <?php endwhile; ?>
             </table>
-        <?php else : ?>
-            <p class="no-tasks">No tasks available.</p>
+        <?php else: ?>
+            <div class="no-tasks">No tasks available.</div>
         <?php endif; ?>
     </div>
 </body>
