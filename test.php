@@ -1,3 +1,4 @@
 <?php
-echo dirname(__DIR__) . 'config.php';
+$config = include("config.php");
+echo $config;
 ?>
