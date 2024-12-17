@@ -112,6 +112,11 @@ $_SESSION['last_activity'] = time();
             <?php if ($userRole === 'admin'): ?>
                 <a href="create-user.php" class="btn">Create User</a>
             <?php endif; ?>
+
+            <!-- Display 'View Users' if user has 'admin' or 'manager' role -->
+            <?php if ($userRole === 'admin' || $userRole === 'manager'): ?>
+                <a href="view-users.php" class="btn">View Users</a>
+            <?php endif; ?>
         </div>
         <!-- Logout Button -->
         <a href="logout.php" class="logout-btn">Log Out</a>
