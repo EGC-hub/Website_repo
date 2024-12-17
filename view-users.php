@@ -64,8 +64,54 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
     <title>View Users</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Optional CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333333;
+        }
+        h2 {
+            margin-top: 30px;
+            color: #555555;
+            border-bottom: 2px solid #cccccc;
+            padding-bottom: 5px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        ul li:hover {
+            background: #f1f1f1;
+        }
+        .info {
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1rem;
+            color: #555555;
+        }
+    </style>
 </head>
 <body>
     <h1>Users</h1>
