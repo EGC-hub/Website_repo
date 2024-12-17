@@ -22,7 +22,7 @@ $user_department = $_SESSION['department']; // Assume this is set during login
 
 // Fetch users based on role
 try {
-    $pdo = new PDO($dsn, $db_username, $db_password);
+    $pdo = new PDO($dsn, $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     if ($user_role === 'admin') {
