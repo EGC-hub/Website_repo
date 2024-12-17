@@ -17,6 +17,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] === 'user') {
 }
 
 $user_role = $_SESSION['role'];
+$user_name = $_SESSION['username'];
 
 try {
     $pdo = new PDO($dsn, $username, $password);
@@ -156,7 +157,7 @@ try {
 <body>
 
 <div class="form-container">
-    <h1>Edit User</h1>
+    <h1>Edit User: <? $user_name ?></h1>
     <?php if (isset($error)): ?>
         <div class="error"><?= htmlspecialchars($error) ?></div>
     <?php elseif (isset($success)): ?>
