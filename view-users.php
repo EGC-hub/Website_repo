@@ -125,7 +125,7 @@ try {
             display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
-            background-color: #1d3557;
+            background-color: #002c5f;
             color: #fff;
             text-decoration: none;
             border-radius: 5px;
@@ -134,7 +134,7 @@ try {
         }
 
         .back-button:hover {
-            background-color: #457b9d;
+            background-color: #004080;
         }
 
         @media (max-width: 768px) {
