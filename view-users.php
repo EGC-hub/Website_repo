@@ -158,7 +158,7 @@ try {
         <h1>Users</h1>
 
         <?php if ($user_role === 'admin'): ?>
-            <p>Viewing all users grouped by department:</p>
+            <p>Viewing all users grouped by department</p>
         <?php elseif ($user_role === 'manager'): ?>
             <p>Viewing users in your department: <strong><?= htmlspecialchars($user_department) ?></strong></p>
         <?php endif; ?>
