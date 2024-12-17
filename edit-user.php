@@ -17,7 +17,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] === 'user') {
 }
 
 $user_role = $_SESSION['role'];
-$user_name = $_SESSION['username'];
 
 try {
     $pdo = new PDO($dsn, $username, $password);
@@ -30,6 +29,13 @@ try {
     $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $query = "SELECT username FROM users WHERE id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $id); // 'i' indicates an integer type for the id
+    $stmt->execute();
+    $stmt->bind_result($username);
+    $stmt->fetch();
 
     if (!$user) {
         echo "User not found.";
@@ -157,7 +163,7 @@ try {
 <body>
 
 <div class="form-container">
-    <h1>Edit User: <? echo $user_name ?></h1>
+    <h1>Edit User: <? echo $username ?></h1>
     <?php if (isset($error)): ?>
         <div class="error"><?= htmlspecialchars($error) ?></div>
     <?php elseif (isset($success)): ?>
