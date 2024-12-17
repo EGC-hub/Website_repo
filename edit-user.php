@@ -16,6 +16,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] === 'user') {
     exit;
 }
 
+$user_role = $_SESSION['role'];
+
 try {
     $pdo = new PDO($dsn, $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -165,7 +167,7 @@ try {
             <label for="email">Email</label>
             <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
         </div>
-        <?php if ($_SESSION('role') == 'admin'): ?>
+        <?php if ($user_role == 'admin'): ?>
         <div class="form-group">
             <label for="department">Department</label>
             <input type="text" id="department" name="department" value="<?= htmlspecialchars($user['department']) ?>" required>
