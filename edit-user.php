@@ -172,7 +172,6 @@ try {
             <label for="department">Department</label>
             <input type="text" id="department" name="department" value="<?= htmlspecialchars($user['department']) ?>" required>
         </div>
-        <?php endif; ?>
         <div class="form-group">
             <label for="role">Role</label>
             <select id="role" name="role" required>
@@ -180,6 +179,7 @@ try {
                 <option value="manager" <?= $user['role'] === 'manager' ? 'selected' : '' ?>>Manager</option>
             </select>
         </div>
+        <?php endif; ?>
         <button type="submit">Save Changes</button>
     </form>
     <a href="view-users.php" class="back-btn">Back</a>
