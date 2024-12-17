@@ -28,7 +28,7 @@ try {
     if ($user_role === 'admin') {
         // Admin: View all users except admins
         $stmt = $pdo->prepare("
-            SELECT id, name, email, role, department 
+            SELECT id, username, email, role, department 
             FROM users 
             WHERE role != 'admin'
             ORDER BY department, name
