@@ -43,7 +43,7 @@
                 $_SESSION['username'] = $username;
                 $_SESSION['role'] = $user['role'];
                 $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_department'] = $user['department'];
+                $_SESSION['department'] = $user['department'];
 
                 // Redirect to the data display page
                 header("Location: welcome.php");
