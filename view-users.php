@@ -49,6 +49,7 @@ try {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -99,7 +100,8 @@ try {
             margin-bottom: 20px;
         }
 
-        table th, table td {
+        table th,
+        table td {
             padding: 10px;
             text-align: left;
             border: 1px solid #ddd;
@@ -131,12 +133,29 @@ try {
             background-color: #004080;
         }
 
+        .edit-button {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #457b9d;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .edit-button:hover {
+        background-color: #1d3557;
+    }
+
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.8rem;
             }
 
-            table th, table td {
+            table th,
+            table td {
                 font-size: 0.9rem;
                 padding: 8px;
             }
@@ -147,13 +166,14 @@ try {
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Users</h1>
 
         <?php if ($user_role === 'admin'): ?>
             <p>Viewing all users grouped by department</p>
-            <?php 
+            <?php
             $current_department = '';
             foreach ($users as $user):
                 if ($current_department !== $user['department']) {
@@ -180,6 +200,7 @@ try {
                             <th>Username</th>
                             <th>Email</th>
                             <th>Role</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -189,6 +210,9 @@ try {
                                 <td><?= htmlspecialchars($user['username']) ?></td>
                                 <td><?= htmlspecialchars($user['email']) ?></td>
                                 <td><?= htmlspecialchars($user['role']) ?></td>
+                                <td>
+                                    <a href="edit-user.php?id=<?= $user['id'] ?>" class="edit-button">Edit</a>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -201,4 +225,5 @@ try {
         <a href="welcome.php" class="back-button">Back</a>
     </div>
 </body>
+
 </html>
