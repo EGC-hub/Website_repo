@@ -71,7 +71,8 @@ if ($user_role === 'admin' || $user_role === 'manager') {
 }
 
 // Function to send email notifications
-function sendTaskNotification($email, $username, $task_name, $start_date, $end_date) {
+function sendTaskNotification($email, $username, $task_name, $start_date, $end_date)
+{
     $mail = new PHPMailer(true);
 
     try {
@@ -151,11 +152,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
 
 // Fetch tasks for the logged-in user
 $taskQuery = $user_role === 'admin'
-    ? "SELECT tasks.*, users.username AS assigned_to FROM tasks 
-       JOIN users ON tasks.user_id = users.id ORDER BY recorded_timestamp DESC"
+    ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
+    FROM tasks 
+    JOIN users ON tasks.user_id = users.id 
+    ORDER BY recorded_timestamp DESC"
     : ($user_role === 'manager'
-        ? "SELECT tasks.*, users.username AS assigned_to FROM tasks 
-           JOIN users ON tasks.user_id = users.id WHERE users.role = 'user' OR tasks.user_id = ? ORDER BY recorded_timestamp DESC"
+        ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
+    FROM tasks 
+    JOIN users ON tasks.user_id = users.id 
+    WHERE users.department = (SELECT department FROM users WHERE id = ?) 
+    ORDER BY recorded_timestamp DESC"
         : "SELECT * FROM tasks WHERE user_id = ? ORDER BY recorded_timestamp DESC");
 
 $stmt = $conn->prepare($taskQuery);
@@ -259,11 +265,14 @@ $result = $stmt->get_result();
             margin-top: 20px;
         }
 
-        table, th, td {
+        table,
+        th,
+        td {
             border: 1px solid #ccc;
         }
 
-        th, td {
+        th,
+        td {
             padding: 10px;
             text-align: left;
         }
@@ -284,39 +293,39 @@ $result = $stmt->get_result();
         <a href="welcome.php">Back</a>
     </div>
 
-    <?php if ($user_role === 'admin' || $user_role === 'manager') : ?>
+    <?php if ($user_role === 'admin' || $user_role === 'manager'): ?>
         <div class="task-container">
             <h2>Task Management</h2>
-                <form method="post" action="">
-                    <div class="form-group">
-                        <label for="task_name">Task Name:</label>
-                        <input type="text" id="task_name" name="task_name" required>
-                    </div>
+            <form method="post" action="">
+                <div class="form-group">
+                    <label for="task_name">Task Name:</label>
+                    <input type="text" id="task_name" name="task_name" required>
+                </div>
 
-                    <div class="form-group">
-                        <label for="expected_start_date">Expected Start Date & Time</label>
-                        <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
-                    </div>
+                <div class="form-group">
+                    <label for="expected_start_date">Expected Start Date & Time</label>
+                    <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
+                </div>
 
-                    <div class="form-group">
-                        <label for="expected_finish_date">Expected End Date & Time</label>
-                        <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
-                    </div>
+                <div class="form-group">
+                    <label for="expected_finish_date">Expected End Date & Time</label>
+                    <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
+                </div>
 
-                    <div class="form-group">
-                        <label for="assigned_user_id">Assign to:</label>
-                        <select id="assigned_user_id" name="assigned_user_id" required>
-                            <option value="">Select a user</option>
-                            <?php foreach ($users as $user) : ?>
-                                <option value="<?= $user['id'] ?>">
-                                    <?= htmlspecialchars($user['username']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="assigned_user_id">Assign to:</label>
+                    <select id="assigned_user_id" name="assigned_user_id" required>
+                        <option value="">Select a user</option>
+                        <?php foreach ($users as $user): ?>
+                            <option value="<?= $user['id'] ?>">
+                                <?= htmlspecialchars($user['username']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-                    <button type="submit" class="submit-btn">Add Task</button>
-                </form>
+                <button type="submit" class="submit-btn">Add Task</button>
+            </form>
         </div>
     <?php endif; ?>
     <div class="task-container">
@@ -329,11 +338,15 @@ $result = $stmt->get_result();
                     <th>End Date</th>
                     <th>Status</th>
                     <?php if ($user_role !== 'user'): ?>
-                        <th>Assigned To</th><?php endif; ?>
+                        <th>Assigned To</th>
+                        <th>Department</th>
+                    <?php endif; ?>
                     <th>Created At</th>
                     <?php if ($user_role !== 'user'): ?>
-                        <th>Actions</th><?php endif; ?>
+                        <th>Actions</th>
+                    <?php endif; ?>
                 </tr>
+
                 <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['task_name']); ?></td>
@@ -354,7 +367,9 @@ $result = $stmt->get_result();
                             </form>
                         </td>
                         <?php if ($user_role !== 'user'): ?>
-                            <td><?php echo htmlspecialchars($row['assigned_to']); ?></td><?php endif; ?>
+                            <td><?php echo htmlspecialchars($row['assigned_to']); ?></td>
+                            <td><?php echo htmlspecialchars($row['department']); ?></td>
+                        <?php endif; ?>
                         <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))); ?></td>
                         <?php if ($user_role !== 'user'): ?>
                             <td>
