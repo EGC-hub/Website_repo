@@ -134,19 +134,19 @@ try {
         }
 
         .edit-button {
-        display: inline-block;
-        padding: 5px 10px;
-        background-color: #457b9d;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 0.9rem;
-        transition: background-color 0.3s ease;
-    }
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #457b9d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
 
-    .edit-button:hover {
-        background-color: #1d3557;
-    }
+        .edit-button:hover {
+            background-color: #1d3557;
+        }
 
 
         @media (max-width: 768px) {
@@ -194,7 +194,13 @@ try {
                     </thead>
                     <tbody>";
                 }
-                echo "<tr><td>" . htmlspecialchars($user['id']) . "</td><td>" . htmlspecialchars($user['username']) . "</td><td>" . htmlspecialchars($user['email']) . "</td><td>" . htmlspecialchars($user['role']) . '</td><td>a href="edit-user.php?id=<?= $user["id"] ?>class="edit-button">Edit</a></td>';
+                echo "<tr>
+                        <td>" . htmlspecialchars($user['id']) . "</td>
+                        <td>" . htmlspecialchars($user['username']) . "</td>
+                        <td>" . htmlspecialchars($user['email']) . "</td>
+                        <td>" . htmlspecialchars($user['role']) . "</td>
+                        <td><a href='edit-user.php?id=" . urlencode($user['id']) . "' class='edit-button'>Edit</a></td>
+                    </tr>";
             endforeach;
             if ($current_department !== '') {
                 echo "</tbody></table>";
