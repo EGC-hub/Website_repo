@@ -157,7 +157,7 @@ try {
 <body>
 
 <div class="form-container">
-    <h1>Edit User: <? $user_name ?></h1>
+    <h1>Edit User: <? echo $user_name ?></h1>
     <?php if (isset($error)): ?>
         <div class="error"><?= htmlspecialchars($error) ?></div>
     <?php elseif (isset($success)): ?>
