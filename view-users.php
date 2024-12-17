@@ -182,9 +182,19 @@ try {
                     }
                     $current_department = $user['department'];
                     echo "<h2>Department: " . htmlspecialchars($current_department) . "</h2>";
-                    echo "<table><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th></tr></thead><tbody>";
+                    echo "<table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>";
                 }
-                echo "<tr><td>" . htmlspecialchars($user['id']) . "</td><td>" . htmlspecialchars($user['username']) . "</td><td>" . htmlspecialchars($user['email']) . "</td><td>" . htmlspecialchars($user['role']) . "</td></tr>";
+                echo "<tr><td>" . htmlspecialchars($user['id']) . "</td><td>" . htmlspecialchars($user['username']) . "</td><td>" . htmlspecialchars($user['email']) . "</td><td>" . htmlspecialchars($user['role']) . '</td><td>a href="edit-user.php?id=<?= $user["id"] ?>class="edit-button">Edit</a></td>';
             endforeach;
             if ($current_department !== '') {
                 echo "</tbody></table>";
