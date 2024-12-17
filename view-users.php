@@ -6,6 +6,9 @@ error_reporting(E_ALL);
 
 session_start();
 require_once '../config.php'; // Database connection
+$dsn = "mysql:host=localhost;dbname=euro_login_system;charset=utf8mb4";
+$username = $config['dbUsername'];
+$password = $config['dbPassword'];
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
