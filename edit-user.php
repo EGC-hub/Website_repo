@@ -25,22 +25,17 @@ try {
     $userId = $_GET['id'];
 
     // Fetch user details
-    $stmt = $pdo->prepare("SELECT id, email, role, department FROM users WHERE id = :id");
+    $stmt = $pdo->prepare("SELECT id, username, email, role, department FROM users WHERE id = :id");
     $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    $query = "SELECT username FROM users WHERE id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $id); // 'i' indicates an integer type for the id
-    $stmt->execute();
-    $stmt->bind_result($username);
-    $stmt->fetch();
 
     if (!$user) {
         echo "User not found.";
         exit;
     }
+
+    $username = $user['username'];
 
     // Handle form submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
