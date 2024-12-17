@@ -80,6 +80,12 @@ try {
             margin-bottom: 20px;
         }
 
+        h2 {
+            font-size: 1.5rem;
+            color: #457b9d;
+            margin-top: 30px;
+        }
+
         p {
             text-align: center;
             font-size: 1rem;
@@ -146,36 +152,50 @@ try {
         <h1>Users</h1>
 
         <?php if ($user_role === 'admin'): ?>
-            <p>Viewing all users grouped by department:</p>
+            <p>Viewing all users grouped by department</p>
+            <?php 
+            $current_department = '';
+            foreach ($users as $user):
+                if ($current_department !== $user['department']) {
+                    if ($current_department !== '') {
+                        echo "</tbody></table>";
+                    }
+                    $current_department = $user['department'];
+                    echo "<h2>Department: " . htmlspecialchars($current_department) . "</h2>";
+                    echo "<table><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th></tr></thead><tbody>";
+                }
+                echo "<tr><td>" . htmlspecialchars($user['id']) . "</td><td>" . htmlspecialchars($user['username']) . "</td><td>" . htmlspecialchars($user['email']) . "</td><td>" . htmlspecialchars($user['role']) . "</td></tr>";
+            endforeach;
+            if ($current_department !== '') {
+                echo "</tbody></table>";
+            }
+            ?>
         <?php elseif ($user_role === 'manager'): ?>
             <p>Viewing users in your department: <strong><?= htmlspecialchars($user_department) ?></strong></p>
-        <?php endif; ?>
-
-        <?php if (!empty($users)): ?>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Department</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($users as $user): ?>
+            <?php if (!empty($users)): ?>
+                <table>
+                    <thead>
                         <tr>
-                            <td><?= htmlspecialchars($user['id']) ?></td>
-                            <td><?= htmlspecialchars($user['username']) ?></td>
-                            <td><?= htmlspecialchars($user['email']) ?></td>
-                            <td><?= htmlspecialchars($user['role']) ?></td>
-                            <td><?= htmlspecialchars($user['department']) ?></td>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php else: ?>
-            <p>No users found.</p>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($users as $user): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($user['id']) ?></td>
+                                <td><?= htmlspecialchars($user['username']) ?></td>
+                                <td><?= htmlspecialchars($user['email']) ?></td>
+                                <td><?= htmlspecialchars($user['role']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p>No users found.</p>
+            <?php endif; ?>
         <?php endif; ?>
 
         <a href="welcome.php" class="back-button">Back</a>
