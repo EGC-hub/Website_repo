@@ -31,7 +31,7 @@ try {
             SELECT id, username, email, role, department 
             FROM users 
             WHERE role != 'admin'
-            ORDER BY department, name
+            ORDER BY department, username
         ");
     } elseif ($user_role === 'manager') {
         // Manager: View only users in the same department, excluding admins and their own account
@@ -41,7 +41,7 @@ try {
             WHERE department = :department 
             AND role NOT IN ('admin', 'manager') 
             AND id != :user_id
-            ORDER BY name
+            ORDER BY username
         ");
         $stmt->bindParam(':department', $user_department);
         $stmt->bindParam(':user_id', $user_id);
@@ -88,7 +88,7 @@ try {
                     $current_department = $user['department'];
                     echo "<h2>" . htmlspecialchars($current_department) . "</h2><ul>";
                 }
-                echo "<li>" . htmlspecialchars($user['name']) . " (" . htmlspecialchars($user['email']) . ") - " . htmlspecialchars($user['role']) . "</li>";
+                echo "<li>" . htmlspecialchars($user['username']) . " (" . htmlspecialchars($user['email']) . ") - " . htmlspecialchars($user['role']) . "</li>";
             endforeach;
             if ($current_department !== '') {
                 echo "</ul>";
@@ -97,7 +97,7 @@ try {
         <?php else: ?>
             <ul>
                 <?php foreach ($users as $user): ?>
-                    <li><?= htmlspecialchars($user['name']) ?> (<?= htmlspecialchars($user['email']) ?>) - <?= htmlspecialchars($user['role']) ?></li>
+                    <li><?= htmlspecialchars($user['username']) ?> (<?= htmlspecialchars($user['email']) ?>) - <?= htmlspecialchars($user['role']) ?></li>
                 <?php endforeach; ?>
             </ul>
         <?php endif; ?>
