@@ -102,6 +102,7 @@ $_SESSION['last_activity'] = time();
 <body>
 
     <div class="welcome-container">
+        <?php echo $user_role ?>
         <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
         <div class="button-container">
             <!-- Buttons for navigation -->
