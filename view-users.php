@@ -87,45 +87,33 @@ try {
             margin-bottom: 30px;
         }
 
-        h2 {
-            font-size: 1.5rem;
-            color: #1d3557;
-            margin-top: 30px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #a8dadc;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        ul li {
-            font-size: 1rem;
-            margin: 10px 0;
-            padding: 15px;
-            background: #f1faee;
-            border: 1px solid #a8dadc;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        ul li:hover {
-            background-color: #e9f5f5;
-        }
-
-        .info {
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin-bottom: 20px;
-            text-align: center;
-            font-size: 1rem;
-            color: #555555;
+        }
+
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #1d3557;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
 
         .back-button {
             display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
-            background-color: #002c5f;
+            background-color: #1d3557;
             color: #fff;
             text-decoration: none;
             border-radius: 5px;
@@ -134,7 +122,7 @@ try {
         }
 
         .back-button:hover {
-            background-color: #004080;
+            background-color: #457b9d;
         }
 
         @media (max-width: 768px) {
@@ -142,13 +130,13 @@ try {
                 font-size: 1.8rem;
             }
 
-            h2 {
-                font-size: 1.3rem;
+            table th, table td {
+                font-size: 0.9rem;
+                padding: 8px;
             }
 
-            ul li {
+            .back-button {
                 font-size: 0.9rem;
-                padding: 10px;
             }
         }
     </style>
@@ -158,41 +146,39 @@ try {
         <h1>Users</h1>
 
         <?php if ($user_role === 'admin'): ?>
-            <p>Viewing all users grouped by department</p>
+            <p>Viewing all users grouped by department:</p>
         <?php elseif ($user_role === 'manager'): ?>
             <p>Viewing users in your department: <strong><?= htmlspecialchars($user_department) ?></strong></p>
         <?php endif; ?>
 
         <?php if (!empty($users)): ?>
-            <?php if ($user_role === 'admin'): ?>
-                <?php
-                $current_department = '';
-                foreach ($users as $user):
-                    if ($current_department !== $user['department']) {
-                        if ($current_department !== '') {
-                            echo "</ul>";
-                        }
-                        $current_department = $user['department'];
-                        echo "<h2>" . htmlspecialchars($current_department) . "</h2><ul>";
-                    }
-                    echo "<li>" . htmlspecialchars($user['username']) . " (" . htmlspecialchars($user['email']) . ") - " . htmlspecialchars($user['role']) . "</li>";
-                endforeach;
-                if ($current_department !== '') {
-                    echo "</ul>";
-                }
-                ?>
-            <?php else: ?>
-                <ul>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Department</th>
+                    </tr>
+                </thead>
+                <tbody>
                     <?php foreach ($users as $user): ?>
-                        <li><?= htmlspecialchars($user['username']) ?> (<?= htmlspecialchars($user['email']) ?>) - <?= htmlspecialchars($user['role']) ?></li>
+                        <tr>
+                            <td><?= htmlspecialchars($user['id']) ?></td>
+                            <td><?= htmlspecialchars($user['username']) ?></td>
+                            <td><?= htmlspecialchars($user['email']) ?></td>
+                            <td><?= htmlspecialchars($user['role']) ?></td>
+                            <td><?= htmlspecialchars($user['department']) ?></td>
+                        </tr>
                     <?php endforeach; ?>
-                </ul>
-            <?php endif; ?>
+                </tbody>
+            </table>
         <?php else: ?>
             <p>No users found.</p>
         <?php endif; ?>
 
-        <a href="welcome.php" class="back-button">Back</a>
+        <a href="dashboard.php" class="back-button">Back</a>
     </div>
 </body>
 </html>
