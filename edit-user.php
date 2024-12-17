@@ -12,7 +12,7 @@ $password = $config['dbPassword'];
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login.php");
+    header("Location: portal-login.html");
     exit;
 }
 
