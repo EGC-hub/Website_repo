@@ -40,9 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
     $role = $_POST['role'];
+    $department = trim($_POST['department']);
 
     // Validate the inputs
-    if (empty($username) || empty($password) || empty($role)) {
+    if (empty($username) || empty($password) || empty($role) || empty($department)) {
         $errorMsg = "Please fill in all fields.";
     } elseif (!in_array($role, ['manager', 'user'])) {
         $errorMsg = "Invalid role selected.";
@@ -61,9 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errorMsg = "Username already taken.";
         } else {
             // Insert the new user into the database
-            $insertQuery = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
+            $insertQuery = "INSERT INTO users (username, email, password, role, department) VALUES (?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($insertQuery);
-            $stmt->bind_param("ssss", $username, $email, $hashedPassword, $role);
+            $stmt->bind_param("sssss", $username, $email, $hashedPassword, $role, $department);
 
             if ($stmt->execute()) {
                 $successMsg = "User created successfully.";
@@ -218,6 +219,10 @@ $conn->close();
                     <option value="user">User</option>
                     <option value="manager">Manager</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="department">Department</label>
+                <input type="text" id="department" name="department" required>
             </div>
             <button type="submit">Create User</button>
         </form>
