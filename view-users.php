@@ -121,6 +121,22 @@ try {
             color: #555555;
         }
 
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #1d3557;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #457b9d;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.8rem;
@@ -175,6 +191,8 @@ try {
         <?php else: ?>
             <p>No users found.</p>
         <?php endif; ?>
+
+        <a href="dashboard.php" class="back-button">Back</a>
     </div>
 </body>
 </html>
