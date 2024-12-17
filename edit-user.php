@@ -165,10 +165,12 @@ try {
             <label for="email">Email</label>
             <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
         </div>
+        <?php if ($_SESSION('role') == 'admin'): ?>
         <div class="form-group">
             <label for="department">Department</label>
             <input type="text" id="department" name="department" value="<?= htmlspecialchars($user['department']) ?>" required>
         </div>
+        <?php endif; ?>
         <div class="form-group">
             <label for="role">Role</label>
             <select id="role" name="role" required>
