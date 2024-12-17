@@ -192,7 +192,7 @@ try {
             <p>No users found.</p>
         <?php endif; ?>
 
-        <a href="dashboard.php" class="back-button">Back</a>
+        <a href="welcome.php" class="back-button">Back</a>
     </div>
 </body>
 </html>
