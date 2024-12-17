@@ -36,7 +36,7 @@ try {
     } elseif ($user_role === 'manager') {
         // Manager: View only users in the same department, excluding admins and their own account
         $stmt = $pdo->prepare("
-            SELECT id, name, email, role, department 
+            SELECT id, username, email, role, department 
             FROM users 
             WHERE department = :department 
             AND role NOT IN ('admin', 'manager') 
