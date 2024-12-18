@@ -40,30 +40,47 @@ try {
     // Handle form submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim($_POST['email']);
-        $role = trim($_POST['role']);
-        $department = trim($_POST['department']);
-
-        if (empty($email) || empty($role) || empty($department)) {
-            $error = "All fields are required.";
-        } elseif (!in_array($role, ['user', 'manager'])) {
-            $error = "Invalid role selected.";
-        } else {
-            $updateStmt = $pdo->prepare("UPDATE users SET email = :email, role = :role, department = :department WHERE id = :id");
-            $updateStmt->bindParam(':email', $email);
-            $updateStmt->bindParam(':role', $role);
-            $updateStmt->bindParam(':department', $department);
-            $updateStmt->bindParam(':id', $userId);
-
-            if ($updateStmt->execute()) {
-                $success = "User updated successfully.";
-                $user['email'] = $email;
-                $user['role'] = $role;
-                $user['department'] = $department;
+        $role = isset($_POST['role']) ? trim($_POST['role']) : null;
+        $department = isset($_POST['department']) ? trim($_POST['department']) : null;
+    
+        if (empty($email)) {
+            $error = "Email is required.";
+        } elseif ($userRole === 'admin') { // Admin can change all fields
+            if (empty($role) || empty($department)) {
+                $error = "Role and Department are required for admin updates.";
+            } elseif (!in_array($role, ['user', 'manager'])) {
+                $error = "Invalid role selected.";
             } else {
-                $error = "Failed to update user. Please try again.";
+                $updateStmt = $pdo->prepare("UPDATE users SET email = :email, role = :role, department = :department WHERE id = :id");
+                $updateStmt->bindParam(':email', $email);
+                $updateStmt->bindParam(':role', $role);
+                $updateStmt->bindParam(':department', $department);
+                $updateStmt->bindParam(':id', $userId);
+    
+                if ($updateStmt->execute()) {
+                    $success = "User updated successfully.";
+                    $user['email'] = $email;
+                    $user['role'] = $role;
+                    $user['department'] = $department;
+                } else {
+                    $error = "Failed to update user. Please try again.";
+                }
             }
+        } elseif ($userRole === 'manager') { // Manager can only change email
+            $updateStmt = $pdo->prepare("UPDATE users SET email = :email WHERE id = :id");
+            $updateStmt->bindParam(':email', $email);
+            $updateStmt->bindParam(':id', $userId);
+    
+            if ($updateStmt->execute()) {
+                $success = "Email updated successfully.";
+                $user['email'] = $email;
+            } else {
+                $error = "Failed to update email. Please try again.";
+            }
+        } else {
+            $error = "You do not have permission to update this user.";
         }
-    }
+    }    
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
 }
