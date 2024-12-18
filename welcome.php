@@ -105,7 +105,10 @@ $_SESSION['last_activity'] = time();
         <h1>Welcome, <?php echo htmlspecialchars($username);?>!</h1>
         <div class="button-container">
             <!-- Buttons for navigation -->
+            <?php if ($userRole === 'admin'): ?>
             <a href="data-display.php" class="btn">Data Display</a>
+            <?php endif; ?>
+
             <a href="tasks.php" class="btn">Tasks</a>
 
             <!-- Display 'Create User' button only if user has 'admin' role -->
