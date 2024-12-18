@@ -60,9 +60,11 @@ if ($user_role === 'admin' || $user_role === 'manager') {
         // Admin can assign tasks to users and managers
         $userQuery = "SELECT id, username, email FROM users WHERE role IN ('user', 'manager')";
     } else {
-        // Manager can assign tasks to users and self
-        $userQuery = "SELECT id, username, email FROM users WHERE role = 'user' UNION SELECT id, username, email FROM users WHERE id = $user_id";
-    }
+        // Manager can only assign tasks to users in their department
+        $userQuery = "SELECT id, username, email 
+                      FROM users 
+                      WHERE role = 'user' AND department = (SELECT department FROM users WHERE id = $user_id)";
+    }    
 
     $userResult = $conn->query($userQuery);
     while ($row = $userResult->fetch_assoc()) {
@@ -157,12 +159,13 @@ $taskQuery = $user_role === 'admin'
     JOIN users ON tasks.user_id = users.id 
     ORDER BY recorded_timestamp DESC"
     : ($user_role === 'manager'
-        ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
-    FROM tasks 
-    JOIN users ON tasks.user_id = users.id 
-    WHERE tasks.user_id IN (SELECT id FROM users WHERE department = (SELECT department FROM users WHERE id = ?)) 
-    ORDER BY recorded_timestamp DESC"
-        : "SELECT * FROM tasks WHERE user_id = ? ORDER BY recorded_timestamp DESC");
+    ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
+        FROM tasks 
+        JOIN users ON tasks.user_id = users.id 
+        WHERE users.department = (SELECT department FROM users WHERE id = ?) 
+        ORDER BY recorded_timestamp DESC"
+    : "SELECT * FROM tasks WHERE user_id = ? ORDER BY recorded_timestamp DESC");
+
 
 $stmt = $conn->prepare($taskQuery);
 if ($user_role === 'manager' || $user_role === 'user') {
