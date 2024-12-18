@@ -1,18 +1,21 @@
 <?php
 $config = include '../config.php';
 
-// Database connection
+// Database connection details
 $dbHost = 'localhost';
 $dbUsername = $config['dbUsername'];
 $dbPassword = $config['dbPassword'];
 $dbName = 'euro_login_system';
 
-// Establish database connection
-$conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
+// DSN for PDO
+$dsn = "mysql:host=$dbHost;dbname=$dbName;charset=utf8";
 
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: ". $conn->connect_error);
+try {
+    // Establish database connection using PDO
+    $pdo = new PDO($dsn, $dbUsername, $dbPassword);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
 }
 
 // Update status
@@ -20,18 +23,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $task_id = $_POST['task_id'];
     $status = $_POST['status'];
 
-    $stmt = $conn->prepare("UPDATE tasks SET status =? WHERE task_id =?");
-    $stmt->bind_param("si", $status, $task_id);
-    $stmt->execute();
+    try {
+        // Prepare the SQL statement
+        $stmt = $pdo->prepare("UPDATE tasks SET status = ? WHERE task_id = ?");
+        $stmt->execute([$status, $task_id]);
 
-    if ($stmt->affected_rows > 0) {
-        echo '<script>alert("Status updated successfully."); window.location.href = "tasks.php";</script>';
-    } else {
-        echo '<script>alert("Failed to update status."); window.location.href = "tasks.php";</script>';
+        if ($stmt->rowCount() > 0) {
+            echo '<script>alert("Status updated successfully."); window.location.href = "tasks.php";</script>';
+        } else {
+            echo '<script>alert("Failed to update status."); window.location.href = "tasks.php";</script>';
+        }
+    } catch (PDOException $e) {
+        echo '<script>alert("Error: ' . $e->getMessage() . '"); window.location.href = "tasks.php";</script>';
     }
-
-    $stmt->close();
 }
 
-$conn->close();
+// Close connection (optional since PDO automatically manages connections)
+$pdo = null;
 ?>
