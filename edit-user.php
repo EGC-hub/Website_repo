@@ -40,15 +40,13 @@ try {
     // Handle form submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim($_POST['email']);
-        $role = isset($_POST['role']) ? trim($_POST['role']) : null;
-        $department = isset($_POST['department']) ? trim($_POST['department']) : null;
+        $role = isset($_POST['role']) ? trim($_POST['role']) : $user['role']; // Keep the current role if not provided
+        $department = isset($_POST['department']) ? trim($_POST['department']) : $user['department']; // Keep the current department if not provided
     
         if (empty($email)) {
             $error = "Email is required.";
         } elseif ($userRole === 'admin') { // Admin can change all fields
-            if (empty($role) || empty($department)) {
-                $error = "Role and Department are required for admin updates.";
-            } elseif (!in_array($role, ['user', 'manager'])) {
+            if (!in_array($role, ['user', 'manager'])) {
                 $error = "Invalid role selected.";
             } else {
                 $updateStmt = $pdo->prepare("UPDATE users SET email = :email, role = :role, department = :department WHERE id = :id");
@@ -80,7 +78,8 @@ try {
         } else {
             $error = "You do not have permission to update this user.";
         }
-    }    
+    }
+       
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
 }
