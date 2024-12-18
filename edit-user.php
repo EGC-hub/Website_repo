@@ -45,7 +45,7 @@ try {
     
         if (empty($email)) {
             $error = "Email is required.";
-        } elseif ($userRole === 'admin') { // Admin can change all fields
+        } elseif ($user_role === 'admin') { // Admin can change all fields
             if (!in_array($role, ['user', 'manager'])) {
                 $error = "Invalid role selected.";
             } else {
@@ -64,7 +64,7 @@ try {
                     $error = "Failed to update user. Please try again.";
                 }
             }
-        } elseif ($userRole === 'manager') { // Manager can only change email
+        } elseif ($user_role === 'manager') { // Manager can only change email
             $updateStmt = $pdo->prepare("UPDATE users SET email = :email WHERE id = :id");
             $updateStmt->bindParam(':email', $email);
             $updateStmt->bindParam(':id', $userId);
