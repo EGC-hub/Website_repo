@@ -58,12 +58,12 @@ $users = [];
 if ($user_role === 'admin' || $user_role === 'manager') {
     if ($user_role === 'admin') {
         // Admin can assign tasks to users and managers
-        $userQuery = "SELECT id, username, email FROM users WHERE role IN ('user', 'manager') OR id = $user_id";
+        $userQuery = "SELECT id, username, email FROM users WHERE role IN ('user', 'manager')";
     } else {
         // Manager can only assign tasks to users in their department
         $userQuery = "SELECT id, username, email 
                       FROM users 
-                      WHERE role = 'user' AND department = (SELECT department FROM users WHERE id = $user_id)";
+                      WHERE role = 'user' AND department = (SELECT department FROM users WHERE id = $user_id) OR id = $user_id";
     }    
 
     $userResult = $conn->query($userQuery);
