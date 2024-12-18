@@ -58,7 +58,7 @@ $users = [];
 if ($user_role === 'admin' || $user_role === 'manager') {
     if ($user_role === 'admin') {
         // Admin can assign tasks to users and managers
-        $userQuery = "SELECT id, username, email FROM users WHERE role IN ('user', 'manager')";
+        $userQuery = "SELECT id, username, email FROM users WHERE role IN ('user', 'manager') OR id = $user_id";
     } else {
         // Manager can only assign tasks to users in their department
         $userQuery = "SELECT id, username, email 
@@ -132,7 +132,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
             echo '<script>alert("Task added successfully.");</script>';
 
             // Fetch the assigned user's email and username
-            $userQuery = $conn->prepare("SELECT username, email FROM users WHERE id = ? OR id = $user_id");
+            $userQuery = $conn->prepare("SELECT username, email FROM users WHERE id = ?");
             $userQuery->bind_param("i", $assigned_user_id);
             $userQuery->execute();
             $userResult = $userQuery->get_result();
