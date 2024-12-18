@@ -161,8 +161,10 @@ $taskQuery = $user_role === 'admin'
     FROM tasks 
     JOIN users ON tasks.user_id = users.id 
     WHERE users.department = (SELECT department FROM users WHERE id = ?) 
+    AND tasks.user_id IN (SELECT id FROM users WHERE department = (SELECT department FROM users WHERE id = ?))
     ORDER BY recorded_timestamp DESC"
         : "SELECT * FROM tasks WHERE user_id = ? ORDER BY recorded_timestamp DESC");
+
 
 $stmt = $conn->prepare($taskQuery);
 if ($user_role === 'manager' || $user_role === 'user') {
