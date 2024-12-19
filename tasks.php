@@ -193,7 +193,7 @@ $result = $stmt->get_result();
 
         .task-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 1200px;
             margin: 25px auto;
             background-color: #fff;
             padding: 20px;
