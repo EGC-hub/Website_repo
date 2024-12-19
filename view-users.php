@@ -149,30 +149,30 @@ try {
         }
 
         .delete-button {
-                display: inline-block;
-                padding: 5px 10px;
-                background-color: #e63946;
-                /* Red color for the delete button */
-                color: white;
-                text-decoration: none;
-                border-radius: 5px;
-                font-size: 0.9rem;
-                border: none;
-                /* Removes default button border */
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #e63946;
+            /* Red color for the delete button */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            border: none;
+            /* Removes default button border */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-            .delete-button:hover {
-                background-color: #d62828;
-                /* Darker red for hover effect */
-            }
+        .delete-button:hover {
+            background-color: #d62828;
+            /* Darker red for hover effect */
+        }
 
-            button.delete-button {
-                font-family: 'Poppins', sans-serif;
-                /* Ensures consistent font style */
-            }
-            
+        button.delete-button {
+            font-family: 'Poppins', sans-serif;
+            /* Ensures consistent font style */
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.8rem;
