@@ -328,6 +328,17 @@ $result = $stmt->get_result();
         .edit-button:hover {
             background-color: #1d3557;
         }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 10px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ensure consistent box sizing */
+        }
     </style>
 </head>
 
