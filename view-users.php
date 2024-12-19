@@ -199,7 +199,7 @@ try {
                         <td>" . htmlspecialchars($user['role']) . "</td>
                         <td>
                         <a href='edit-user.php?id=" . urlencode($user['id']) . "' class='edit-button'>Edit</a>
-                        <a href='delete-user.php?id=" . urlencode($user['id']) . "' class='edit-button'>Edit</a>
+                        <a href='delete-user.php?id=" . urlencode($user['id']) . "' class='edit-button'>Delete</a>
                         </td>
                     </tr>";
             endforeach;
