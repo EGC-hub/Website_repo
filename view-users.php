@@ -199,7 +199,10 @@ try {
                         <td>" . htmlspecialchars($user['role']) . "</td>
                         <td>
                         <a href='edit-user.php?id=" . urlencode($user['id']) . "' class='edit-button'>Edit</a>
-                        <a href='delete-user.php?id=" . urlencode($user['id']) . "' class='edit-button'>Delete</a>
+                        <form action='delete-user.php' method='POST' style='display:inline;'>
+                        <input type='hidden' name='user_id' value='" . htmlspecialchars($user['id']) . "'>
+                        <button type='submit' class='edit-button' onclick='return confirm(\"Are you sure you want to delete this user?\")'>Delete</button>
+                        </form>
                         </td>
                     </tr>";
             endforeach;
