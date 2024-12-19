@@ -148,23 +148,7 @@ try {
             background-color: #1d3557;
         }
 
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-
-            table th,
-            table td {
-                font-size: 0.9rem;
-                padding: 8px;
-            }
-
-            .back-button {
-                font-size: 0.9rem;
-            }
-
-            .delete-button {
+        .delete-button {
                 display: inline-block;
                 padding: 5px 10px;
                 background-color: #e63946;
@@ -187,6 +171,21 @@ try {
             button.delete-button {
                 font-family: 'Poppins', sans-serif;
                 /* Ensures consistent font style */
+            }
+            
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            table th,
+            table td {
+                font-size: 0.9rem;
+                padding: 8px;
+            }
+
+            .back-button {
+                font-size: 0.9rem;
             }
         }
     </style>
