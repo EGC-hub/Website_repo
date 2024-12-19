@@ -197,7 +197,10 @@ try {
                         <td>" . htmlspecialchars($user['username']) . "</td>
                         <td>" . htmlspecialchars($user['email']) . "</td>
                         <td>" . htmlspecialchars($user['role']) . "</td>
-                        <td><a href='edit-user.php?id=" . urlencode($user['id']) . "' class='edit-button'>Edit</a></td>
+                        <td>
+                        <a href='edit-user.php?id=" . urlencode($user['id']) . "' class='edit-button'>Edit</a>
+                        <a href='delete-user.php?id=" . urlencode($user['id']) . "' class='edit-button'>Edit</a>
+                        </td>
                     </tr>";
             endforeach;
             if ($current_department !== '') {
@@ -224,7 +227,6 @@ try {
                                 <td><?= htmlspecialchars($user['role']) ?></td>
                                 <td>
                                     <a href="edit-user.php?id=<?= $user['id'] ?>" class="edit-button">Edit</a>
-                                    <a href="delete-user.php?id=<?= $user['id'] ?>" class="edit-button">Delete</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
