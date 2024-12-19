@@ -313,6 +313,21 @@ $result = $stmt->get_result();
             font-family: 'Poppins', sans-serif;
             /* Ensures consistent font style */
         }
+
+        .edit-button {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #457b9d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-button:hover {
+            background-color: #1d3557;
+        }
     </style>
 </head>
 
@@ -401,6 +416,7 @@ $result = $stmt->get_result();
                         <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))); ?></td>
                         <?php if ($user_role !== 'user'): ?>
                             <td>
+                                <a href="edit-user.php?id=<?= $user['id'] ?>" class="edit-button">Edit</a>
                                 <form method="POST" action="delete-task.php">
                                     <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
                                     <button type="submit" class="delete-button"
