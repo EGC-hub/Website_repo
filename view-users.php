@@ -163,6 +163,31 @@ try {
             .back-button {
                 font-size: 0.9rem;
             }
+
+            .delete-button {
+                display: inline-block;
+                padding: 5px 10px;
+                background-color: #e63946;
+                /* Red color for the delete button */
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+                font-size: 0.9rem;
+                border: none;
+                /* Removes default button border */
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+            .delete-button:hover {
+                background-color: #d62828;
+                /* Darker red for hover effect */
+            }
+
+            button.delete-button {
+                font-family: 'Poppins', sans-serif;
+                /* Ensures consistent font style */
+            }
         }
     </style>
 </head>
@@ -201,7 +226,7 @@ try {
                         <a href='edit-user.php?id=" . urlencode($user['id']) . "' class='edit-button'>Edit</a>
                         <form action='delete-user.php' method='POST' style='display:inline;'>
                         <input type='hidden' name='user_id' value='" . htmlspecialchars($user['id']) . "'>
-                        <button type='submit' class='edit-button' onclick='return confirm(\"Are you sure you want to delete this user?\")'>Delete</button>
+                        <button type='submit' class='delete-button' onclick='return confirm(\"Are you sure you want to delete this user?\")'>Delete</button>
                         </form>
                         </td>
                     </tr>";
