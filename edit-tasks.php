@@ -47,7 +47,7 @@ try {
             $error = "All fields are required.";
         } else {
             // Update the task in the database
-            $updateStmt = $pdo->prepare("UPDATE tasks SET task_name = :task_name, expected_start_date = :expected_start_date, expected_finish_date = :expected_finish_date, status = :status WHERE task_id = :task_id");
+            $updateStmt = $pdo->prepare("UPDATE tasks SET task_name = :task_name, expected_start_date = :expected_start_date, expected_finish_date = :expected_finish_date WHERE task_id = :task_id");
             $updateStmt->bindParam(':task_name', $taskName);
             $updateStmt->bindParam(':expected_start_date', $expectedStartDate);
             $updateStmt->bindParam(':expected_finish_date', $expectedFinishDate);
