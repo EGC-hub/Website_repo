@@ -41,10 +41,9 @@ try {
         $taskName = trim($_POST['task_name']);
         $expectedStartDate = trim($_POST['expected_start_date']);
         $expectedFinishDate = trim($_POST['expected_finish_date']);
-        $status = trim($_POST['status']);
 
         // Validate inputs
-        if (empty($taskName) || empty($expectedStartDate) || empty($expectedFinishDate) || empty($status)) {
+        if (empty($taskName) || empty($expectedStartDate) || empty($expectedFinishDate)) {
             $error = "All fields are required.";
         } else {
             // Update the task in the database
@@ -52,7 +51,6 @@ try {
             $updateStmt->bindParam(':task_name', $taskName);
             $updateStmt->bindParam(':expected_start_date', $expectedStartDate);
             $updateStmt->bindParam(':expected_finish_date', $expectedFinishDate);
-            $updateStmt->bindParam(':status', $status);
             $updateStmt->bindParam(':task_id', $taskId);
 
             if ($updateStmt->execute()) {
@@ -61,7 +59,6 @@ try {
                 $task['task_name'] = $taskName;
                 $task['expected_start_date'] = $expectedStartDate;
                 $task['expected_finish_date'] = $expectedFinishDate;
-                $task['status'] = $status;
             } else {
                 $error = "Failed to update task. Please try again.";
             }
@@ -181,17 +178,9 @@ try {
             <label for="expected_finish_date">Expected Finish Date</label>
             <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($task['expected_finish_date']))) ?>" required>
         </div>
-        <div class="form-group">
-            <label for="status">Status</label>
-            <select id="status" name="status" required>
-                <option value="Pending" <?= $task['status'] === 'Pending' ? 'selected' : '' ?>>Pending</option>
-                <option value="Started" <?= $task['status'] === 'Started' ? 'selected' : '' ?>>Started</option>
-                <option value="Completed" <?= $task['status'] === 'Completed' ? 'selected' : '' ?>>Completed</option>
-            </select>
-        </div>
         <button type="submit">Save Changes</button>
     </form>
-    <a href="view-tasks.php" class="back-btn">Back</a>
+    <a href="tasks.php" class="back-btn">Back</a>
 </div>
 
 </body>
