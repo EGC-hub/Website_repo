@@ -427,7 +427,7 @@ $result = $stmt->get_result();
                         <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))); ?></td>
                         <?php if ($user_role !== 'user'): ?>
                             <td>
-                                <a href="edit-user.php?id=<?= $user['id'] ?>" class="edit-button">Edit</a>
+                                <a href="edit-tasks.php?id=<?= $user['id'] ?>" class="edit-button">Edit</a>
                                 <form method="POST" action="delete-task.php">
                                     <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
                                     <button type="submit" class="delete-button"
