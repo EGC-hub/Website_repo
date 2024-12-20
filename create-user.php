@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
     $role = $_POST['role'];
-    $department = trim($_POST['department']);
+    $department = $_POST['department'];
 
     // Validate the inputs
     if (empty($username) || empty($password) || empty($role) || empty($department)) {
