@@ -222,7 +222,7 @@ $conn->close();
             </div>
             <div class="form-group">
                 <label for="department">Department</label>
-                <select id="department" name="role" required>
+                <select id="department" name="department" required>
                     <option value="user">HR</option>
                     <option value="manager">IT</option>
                 </select>
