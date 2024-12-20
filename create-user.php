@@ -223,8 +223,8 @@ $conn->close();
             <div class="form-group">
                 <label for="department">Department</label>
                 <select id="department" name="department" required>
-                    <option value="user">HR</option>
-                    <option value="manager">IT</option>
+                    <option value="HR">HR</option>
+                    <option value="IT">IT</option>
                 </select>
             </div>
             <button type="submit">Create User</button>
