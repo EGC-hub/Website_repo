@@ -688,16 +688,12 @@ $result = $stmt->get_result();
     <!-- JS for the dropdown handling -->
     <script>
         function handleStatusChange(event, taskId) {
-            console.log("handleStatusChange triggered");
-            console.log("Task ID:", taskId);
-            console.log("Event target value:", event.target.value);
-
             if (event.target.value === 'Completed') {
                 event.preventDefault();
 
                 // Populate the hidden fields
                 document.getElementById('task-id').value = taskId;
-                document.getElementById('modal-status').value = 'Completed';
+                document.getElementById('modal-status').value = document.getElementById('status').value;
 
                 // Debugging output
                 console.log("Task ID set:", document.getElementById('task-id').value);
@@ -711,18 +707,6 @@ $result = $stmt->get_result();
                 event.target.form.submit();
             }
         }
-    </script>
-    <script>
-        document.querySelector("#completionModal form").addEventListener("submit", function (event) {
-            console.log("Submitting Modal Form");
-            console.log("Task ID:", document.getElementById('task-id').value);
-            console.log("Status:", document.getElementById('status').value);
-
-            if (!document.getElementById('status').value) {
-                alert("Error: Status is not set!");
-                event.preventDefault(); // Prevent form submission
-            }
-        });
     </script>
     <!-- script for the filtering -->
     <script>
