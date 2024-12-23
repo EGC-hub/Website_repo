@@ -544,6 +544,7 @@ $result = $stmt->get_result();
                     </div>
                     <div class="modal-body">
                         <input type="hidden" id="task-id" name="task_id">
+                        <input type="hidden" id="status" name="status">
                         <div class="mb-3">
                             <label for="completion-description" class="form-label">What was completed?</label>
                             <textarea class="form-control" id="completion-description" name="completion_description"
