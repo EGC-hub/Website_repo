@@ -1,8 +1,4 @@
 <?php
-// echo "<pre>";
-// print_r($_POST);
-// echo "</pre>";
-// exit;
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -30,12 +26,12 @@ try {
 // Update status
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate input
-    if (empty($_POST['task_id'])) {
-        die("Error: Task ID is required.");
+    if (empty($_POST['task_id']) || empty($_POST['status'])) {
+        die("Error: Task ID and status are required.");
     }
 
     $taskId = (int)$_POST['task_id'];
-    $status = $_POST['status'] ?? 'Pending'; // Default to 'Pending' if status is missing
+    $status = $_POST['status'];
     $completionDescription = $_POST['completion_description'] ?? null;
 
     try {
