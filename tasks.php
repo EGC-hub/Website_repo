@@ -546,7 +546,7 @@ $result = $stmt->get_result();
                         <!-- Hidden input for Task ID -->
                         <input type="hidden" id="task-id" name="task_id">
                         <!-- Hidden input for Status -->
-                        <input type="hidden" id="modal-status" name="modal-status">
+                        <input type="hidden" id="modal-status" name="status">
 
                         <div class="mb-3">
                             <label for="completion-description" class="form-label">What was completed?</label>
