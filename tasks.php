@@ -393,6 +393,7 @@ $result = $stmt->get_result();
                     <th>Start Date</th>
                     <th>End Date</th>
                     <th>Status</th>
+                    <th>Project Type</th>
                     <?php if ($user_role !== 'user'): ?>
                         <th>Assigned To</th>
                         <th>Department</th>
