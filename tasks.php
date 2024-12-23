@@ -449,8 +449,8 @@ $result = $stmt->get_result();
                 <div class="filter-buttons">
                     <button onclick="filterTasks('All')" class="btn btn-primary">All</button>
                     <!-- Dynamically generate buttons for each project -->
-                    <?php foreach ($projects as $project): ?>
-                        <button onclick="filterTasks('<?= htmlspecialchars($project) ?>')" class="btn btn-secondary">
+                    <?php foreach ($project_names as $project_name): ?>
+                        <button onclick="filterTasks('<?= htmlspecialchars($project_name) ?>')" class="btn btn-secondary">
                             <?= htmlspecialchars($project) ?>
                         </button>
                     <?php endforeach; ?>
