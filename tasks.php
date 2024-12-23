@@ -387,7 +387,9 @@ $result = $stmt->get_result();
         <?php if ($result->num_rows > 0): ?>
             <table class="task-table">
                 <tr>
+                    <th>Project Name</th>
                     <th>Task Name</th>
+                    <th>Task Description</th>
                     <th>Start Date</th>
                     <th>End Date</th>
                     <th>Status</th>
@@ -403,7 +405,9 @@ $result = $stmt->get_result();
 
                 <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
+                        <td><?php echo htmlspecialchars( $row['project_name']) ?></td>
                         <td><?php echo htmlspecialchars($row['task_name']); ?></td>
+                        <td><?php echo htmlspecialchars( $row['task_description']) ?></td>
                         <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))); ?></td>
                         <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))); ?></td>
                         <td>
@@ -420,6 +424,7 @@ $result = $stmt->get_result();
                                 </select>
                             </form>
                         </td>
+                        <td><?php echo htmlspecialchars( $row['project_type']) ?></td>
                         <?php if ($user_role !== 'user'): ?>
                             <td><?php echo htmlspecialchars($row['assigned_to']); ?></td>
                             <td><?php echo htmlspecialchars($row['department']); ?></td>
