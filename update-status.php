@@ -30,12 +30,12 @@ try {
 // Update status
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate input
-    if (empty($_POST['task_id']) || empty($_POST['status'])) {
-        die("Error: Task ID and status are required.");
+    if (empty($_POST['task_id'])) {
+        die("Error: Task ID is required.");
     }
 
     $taskId = (int)$_POST['task_id'];
-    $status = $_POST['status'];
+    $status = $_POST['status'] ?? 'Pending'; // Default to 'Pending' if status is missing
     $completionDescription = $_POST['completion_description'] ?? null;
 
     try {
