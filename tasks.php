@@ -127,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
             "INSERT INTO tasks (user_id, project_name, task_name, expected_start_date, expected_finish_date, status, recorded_timestamp) 
             VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
-        $stmt->bind_param("isssss", $assigned_user_id, $project_name, $task_name, $expected_start_date, $expected_finish_date, $status, $recorded_timestamp);
+        $stmt->bind_param("issssss", $assigned_user_id, $project_name, $task_name, $expected_start_date, $expected_finish_date, $status, $recorded_timestamp);
 
         if ($stmt->execute()) {
             echo '<script>alert("Task added successfully.");</script>';
