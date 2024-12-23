@@ -73,7 +73,7 @@ if ($user_role === 'admin' || $user_role === 'manager') {
 }
 
 // Function to send email notifications
-function sendTaskNotification($email, $username, $task_name, $start_date, $end_date)
+function sendTaskNotification($email, $username, $project_name, $project_type, $task_name, $task_description, $start_date, $end_date)
 {
     $mail = new PHPMailer(true);
 
@@ -98,7 +98,10 @@ function sendTaskNotification($email, $username, $task_name, $start_date, $end_d
         $mail->Body = "<h3>Hello $username,</h3>" .
             "<p>You have been assigned a new task:</p>" .
             "<ul>" .
+            "<li><strong>Project Name:</strong> $project_name</li>" .
             "<li><strong>Task Name:</strong> $task_name</li>" .
+            "<li><strong>Task Description:</strong> $task_description</li>" .
+            "<li><strong>Project Type:</strong> $project_type</li>" .
             "<li><strong>Start Date:</strong> $start_date</li>" .
             "<li><strong>End Date:</strong> $end_date</li>" .
             "</ul>" .
@@ -157,7 +160,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
                 $username = $user['username'];
 
                 // Send email notification
-                sendTaskNotification($email, $username, $task_name, $expected_start_date, $expected_finish_date);
+                sendTaskNotification($email, $username, $project_name,$task_name, $task_description, $project_type, $expected_start_date, $expected_finish_date);
             }
         } else {
             echo '<script>alert("Failed to add task.");</script>';
