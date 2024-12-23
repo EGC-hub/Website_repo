@@ -174,18 +174,18 @@ $taskQuery = $user_role === 'admin'
     ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
        FROM tasks 
        JOIN users ON tasks.user_id = users.id 
-       ORDER BY FIELD(status, 'Completed', 'Started', 'Pending'), 
+       ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), 
                 recorded_timestamp DESC"
     : ($user_role === 'manager'
         ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
            FROM tasks 
            JOIN users ON tasks.user_id = users.id 
            WHERE users.department = (SELECT department FROM users WHERE id = ?) 
-           ORDER BY FIELD(status, 'Completed', 'Started', 'Pending'), 
+           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), 
                     recorded_timestamp DESC"
         : "SELECT * FROM tasks 
            WHERE user_id = ? 
-           ORDER BY FIELD(status, 'Completed', 'Started', 'Pending'), 
+           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Pending'), 
                     recorded_timestamp DESC");
 
 $stmt = $conn->prepare($taskQuery);
@@ -560,7 +560,7 @@ $result = $stmt->get_result();
                         data-status="<?= htmlspecialchars($row['status']) ?>">
                         <td><?= htmlspecialchars($row['project_name']) ?></td>
                         <td>
-                            <?php if ($row['status'] === 'Completed' && $user_role === 'admin'): ?>
+                            <?php if ($row['status'] === 'Completed on Time' && $user_role === 'admin'): ?>
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
                                     data-description="<?= htmlspecialchars($row['completion_description']) ?>">
                                     <?= htmlspecialchars($row['task_name']) ?>
@@ -577,9 +577,9 @@ $result = $stmt->get_result();
                                 <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
                                 <select id="status" name="status"
                                     onchange="handleStatusChange(event, <?= $row['task_id'] ?>)"
-                                    <?= $row['status'] === 'Completed' ? 'disabled' : '' ?>>
+                                    <?= $row['status'] === 'Completed on Time' ? 'disabled' : '' ?>>
                                     <?php
-                                    $statuses = ['Pending', 'Started', 'Completed'];
+                                    $statuses = ['Pending', 'Started', 'Completed on Time', 'Delayed Completion'];
                                     foreach ($statuses as $statusValue) {
                                         $selected = ($row['status'] === $statusValue) ? 'selected' : '';
                                         echo "<option value='$statusValue' $selected>$statusValue</option>";
@@ -688,16 +688,12 @@ $result = $stmt->get_result();
     <!-- JS for the dropdown handling -->
     <script>
         function handleStatusChange(event, taskId) {
-            if (event.target.value === 'Completed') {
+            if (event.target.value === 'Completed on Time') {
                 event.preventDefault();
 
                 // Populate the hidden fields
                 document.getElementById('task-id').value = taskId;
                 document.getElementById('modal-status').value = document.getElementById('status').value;
-
-                // Debugging output
-                console.log("Task ID set:", document.getElementById('task-id').value);
-                console.log("Status set to Completed");
 
                 // Show the modal
                 const modal = new bootstrap.Modal(document.getElementById('completionModal'));

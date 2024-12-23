@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $completionDescription = $_POST['completion_description'] ?? null;
 
     try {
-        if ($status === 'Completed' && $completionDescription) {
+        if ($status === 'Completed on Time' && $completionDescription) {
             // Update with completion description
             $stmt = $pdo->prepare(
                 "UPDATE tasks SET status = :status, completion_description = :completion_description WHERE task_id = :task_id"
