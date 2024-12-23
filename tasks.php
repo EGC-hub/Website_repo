@@ -492,6 +492,21 @@ $result = $stmt->get_result();
             </table>
         </div>
     <?php endif; ?>
+    <?php
+    // Initialize variables to hold unique project names and all task rows
+    $projects = [];
+    $rows = [];
+
+    // Process the query result to populate $projects and $rows
+    while ($row = $result->fetch_assoc()) {
+        $rows[] = $row; // Store each row for rendering
+    
+        // Add project name to $projects if not already included
+        if (!in_array($row['project_name'], $projects)) {
+            $projects[] = $row['project_name'];
+        }
+    }
+    ?>
     <div class="task-container">
         <h2>Tasks</h2>
         <?php if ($result->num_rows > 0): ?>
