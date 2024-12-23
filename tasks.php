@@ -174,23 +174,19 @@ $taskQuery = $user_role === 'admin'
     ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
        FROM tasks 
        JOIN users ON tasks.user_id = users.id 
-       ORDER BY project_name, 
-                FIELD(status, 'Completed', 'Started', 'Pending'), 
+       ORDER BY FIELD(status, 'Completed', 'Started', 'Pending'), 
                 recorded_timestamp DESC"
     : ($user_role === 'manager'
         ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
        FROM tasks 
        JOIN users ON tasks.user_id = users.id 
        WHERE users.department = (SELECT department FROM users WHERE id = ?) 
-       ORDER BY project_name, 
-                FIELD(status, 'Completed', 'Started', 'Pending'), 
+       ORDER BY FIELD(status, 'Completed', 'Started', 'Pending'), 
                 recorded_timestamp DESC"
         : "SELECT * FROM tasks 
        WHERE user_id = ? 
-       ORDER BY project_name, 
-                FIELD(status, 'Completed', 'Started', 'Pending'), 
+       ORDER BY FIELD(status, 'Completed', 'Started', 'Pending'), 
                 recorded_timestamp DESC");
-
 $stmt = $conn->prepare($taskQuery);
 if ($user_role === 'manager' || $user_role === 'user') {
     $stmt->bind_param("i", $user_id);
@@ -383,6 +379,60 @@ $result = $stmt->get_result();
             font-size: 14px;
             line-height: 1.5;
         }
+
+        .filter-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .filter-buttons {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .filter-buttons .btn {
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #002c5f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .filter-buttons .btn:hover {
+            background-color: #004080;
+        }
+
+        .filter-buttons .btn-secondary {
+            background-color: #457b9d;
+        }
+
+        .filter-buttons .btn-secondary:hover {
+            background-color: #1d3557;
+        }
+
+        .filter-date {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-date label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .filter-date input {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
     </style>
 </head>
 
@@ -393,55 +443,53 @@ $result = $stmt->get_result();
 
     <?php if ($user_role === 'admin' || $user_role === 'manager'): ?>
         <div class="task-container">
-            <h2>Task Management</h2>
-            <form method="post" action="">
-                <div class="form-group">
-                    <label for="project_name">Project Name:</label>
-                    <input type="text" id="project_name" name="project_name" required>
+            <h2>Tasks</h2>
+            <!-- Buttons for filtering -->
+            <div class="filter-container">
+                <div class="filter-buttons">
+                    <button onclick="filterTasks('All')" class="btn btn-primary">All</button>
+                    <!-- Dynamically generate buttons for each project -->
+                    <?php foreach ($projects as $project): ?>
+                        <button onclick="filterTasks('<?= htmlspecialchars($project) ?>')" class="btn btn-secondary">
+                            <?= htmlspecialchars($project) ?>
+                        </button>
+                    <?php endforeach; ?>
                 </div>
 
-                <div class="form-group">
-                    <label for="task_name">Task Name:</label>
-                    <input type="text" id="task_name" name="task_name" required>
+                <!-- Date range filter -->
+                <div class="filter-date">
+                    <label for="start-date">Start Date:</label>
+                    <input type="date" id="start-date" onchange="filterByDate()">
+                    <label for="end-date">End Date:</label>
+                    <input type="date" id="end-date" onchange="filterByDate()">
                 </div>
-
-                <div>
-                    <label for="task_description">Task Description:</label>
-                    <textarea id="task_description" name="task_description" rows="4"></textarea>
-                </div>
-
-                <div>
-                    <label for="project_type">Project Type:</label>
-                    <select id="project_type" name="project_type">
-                        <option value="Internal">Internal</option>
-                        <option value="External">External</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="expected_start_date">Expected Start Date & Time</label>
-                    <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="expected_finish_date">Expected End Date & Time</label>
-                    <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="assigned_user_id">Assign to:</label>
-                    <select id="assigned_user_id" name="assigned_user_id" required>
-                        <option value="">Select a user</option>
-                        <?php foreach ($users as $user): ?>
-                            <option value="<?= $user['id'] ?>">
-                                <?= htmlspecialchars($user['username']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <button type="submit" class="submit-btn">Add Task</button>
-            </form>
+            </div>
+            <!-- Tasks table -->
+            <table id="tasks-table" class="task-table">
+                <thead>
+                    <tr>
+                        <th>Task Name</th>
+                        <th>Status</th>
+                        <th>Project Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Assigned To</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($rows as $row): ?>
+                        <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
+                            data-status="<?= htmlspecialchars($row['status']) ?>">
+                            <td><?= htmlspecialchars($row['task_name']) ?></td>
+                            <td><?= htmlspecialchars($row['status']) ?></td>
+                            <td><?= htmlspecialchars($row['project_name']) ?></td>
+                            <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
+                            <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
+                            <td><?= htmlspecialchars($row['assigned_to']) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     <?php endif; ?>
     <div class="task-container">
@@ -634,17 +682,35 @@ $result = $stmt->get_result();
             }
         }
     </script>
+    <!-- Script for the filtering -->
     <script>
-        document.querySelector("#completionModal form").addEventListener("submit", function (event) {
-            console.log("Submitting Modal Form");
-            console.log("Task ID:", document.getElementById('task-id').value);
-            console.log("Status:", document.getElementById('status').value);
+        function filterTasks(project) {
+            const rows = document.querySelectorAll('#tasks-table tbody tr');
+            rows.forEach(row => {
+                if (project === 'All' || row.dataset.project === project) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
 
-            if (!document.getElementById('status').value) {
-                alert("Error: Status is not set!");
-                event.preventDefault(); // Prevent form submission
-            }
-        });
+        function filterByDate() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            const rows = document.querySelectorAll('#tasks-table tbody tr');
+            rows.forEach(row => {
+                const rowDate = row.querySelector('td:nth-child(4)').textContent.trim(); // Start Date column
+                const taskDate = new Date(rowDate);
+
+                if ((startDate && taskDate < new Date(startDate)) || (endDate && taskDate > new Date(endDate))) {
+                    row.style.display = 'none';
+                } else {
+                    row.style.display = '';
+                }
+            });
+        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
