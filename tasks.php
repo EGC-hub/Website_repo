@@ -532,34 +532,6 @@ $result = $stmt->get_result();
         <?php endif; ?>
     </div>
 
-    <!-- Bootstrap modal for the user popup for writing what has been completed -->
-    <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form method="POST" action="update-status.php">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="completionModalLabel">Task Completion</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="task-id" name="task_id">
-                        <input type="hidden" id="status" name="status">
-                        <div class="mb-3">
-                            <label for="completion-description" class="form-label">What was completed?</label>
-                            <textarea class="form-control" id="completion-description" name="completion_description"
-                                rows="4" required></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal & script for the completion of tasks -->
     <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel"
         aria-hidden="true">
