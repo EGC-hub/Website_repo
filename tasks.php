@@ -64,7 +64,7 @@ if ($user_role === 'admin' || $user_role === 'manager') {
         $userQuery = "SELECT id, username, email 
                       FROM users 
                       WHERE role = 'user' AND department = (SELECT department FROM users WHERE id = $user_id) OR id = $user_id";
-    }    
+    }
 
     $userResult = $conn->query($userQuery);
     while ($row = $userResult->fetch_assoc()) {
@@ -133,15 +133,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->bind_param(
-            "issssssss", 
-            $assigned_user_id, 
-            $project_name, 
-            $task_name, 
-            $task_description, 
-            $project_type, 
-            $expected_start_date, 
-            $expected_finish_date, 
-            $status, 
+            "issssssss",
+            $assigned_user_id,
+            $project_name,
+            $task_name,
+            $task_description,
+            $project_type,
+            $expected_start_date,
+            $expected_finish_date,
+            $status,
             $recorded_timestamp
         );
 
@@ -160,7 +160,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
                 $username = $user['username'];
 
                 // Send email notification
-                sendTaskNotification($email, $username, $project_name,$task_name, $task_description, $project_type, $expected_start_date, $expected_finish_date);
+                sendTaskNotification($email, $username, $project_name, $task_name, $task_description, $project_type, $expected_start_date, $expected_finish_date);
             }
         } else {
             echo '<script>alert("Failed to add task.");</script>';
@@ -172,17 +172,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
 // Fetch tasks for the logged-in user
 $taskQuery = $user_role === 'admin'
     ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
-    FROM tasks 
-    JOIN users ON tasks.user_id = users.id 
-    ORDER BY recorded_timestamp DESC"
+       FROM tasks 
+       JOIN users ON tasks.user_id = users.id 
+       ORDER BY project_name, 
+                FIELD(status, 'Completed', 'Started', 'Pending'), 
+                recorded_timestamp DESC"
     : ($user_role === 'manager'
-    ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
-        FROM tasks 
-        JOIN users ON tasks.user_id = users.id 
-        WHERE users.department = (SELECT department FROM users WHERE id = ?) 
-        ORDER BY recorded_timestamp DESC"
-    : "SELECT * FROM tasks WHERE user_id = ? ORDER BY recorded_timestamp DESC");
-
+        ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
+       FROM tasks 
+       JOIN users ON tasks.user_id = users.id 
+       WHERE users.department = (SELECT department FROM users WHERE id = ?) 
+       ORDER BY project_name, 
+                FIELD(status, 'Completed', 'Started', 'Pending'), 
+                recorded_timestamp DESC"
+        : "SELECT * FROM tasks 
+       WHERE user_id = ? 
+       ORDER BY project_name, 
+                FIELD(status, 'Completed', 'Started', 'Pending'), 
+                recorded_timestamp DESC");
 
 $stmt = $conn->prepare($taskQuery);
 if ($user_role === 'manager' || $user_role === 'user') {
@@ -306,6 +313,7 @@ $result = $stmt->get_result();
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+
         .delete-button {
             display: inline-block;
             padding: 5px 10px;
@@ -354,7 +362,8 @@ $result = $stmt->get_result();
             display: inline-block;
             border: 1px solid #ccc;
             border-radius: 4px;
-            box-sizing: border-box; /* Ensure consistent box sizing */
+            box-sizing: border-box;
+            /* Ensure consistent box sizing */
         }
 
         textarea {
@@ -364,8 +373,10 @@ $result = $stmt->get_result();
             display: inline-block;
             border: 1px solid #ccc;
             border-radius: 4px;
-            box-sizing: border-box; /* Ensure consistent box sizing */
-            resize: vertical; /* Allows resizing vertically */
+            box-sizing: border-box;
+            /* Ensure consistent box sizing */
+            resize: vertical;
+            /* Allows resizing vertically */
             font-family: Arial, sans-serif;
             font-size: 14px;
             line-height: 1.5;
@@ -396,7 +407,7 @@ $result = $stmt->get_result();
                     <label for="task_description">Task Description:</label>
                     <textarea id="task_description" name="task_description" rows="4"></textarea>
                 </div>
-    
+
                 <div>
                     <label for="project_type">Project Type:</label>
                     <select id="project_type" name="project_type">
@@ -453,16 +464,27 @@ $result = $stmt->get_result();
                     <?php endif; ?>
                 </tr>
 
-                <?php while ($row = $result->fetch_assoc()): ?>
+                <?php
+                $currentProject = null;
+                while ($row = $result->fetch_assoc()):
+                    if ($currentProject !== $row['project_name']):
+                        $currentProject = $row['project_name'];
+                        ?>
+                        <tr>
+                            <td colspan="100%" style="background-color: #f4f4f4; font-weight: bold; text-align: center;">
+                                <?= htmlspecialchars($currentProject) ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
                     <tr>
-                        <td><?php echo htmlspecialchars( $row['project_name']) ?></td>
-                        <td><?php echo htmlspecialchars($row['task_name']); ?></td>
-                        <td><?php echo htmlspecialchars( $row['task_description']) ?></td>
-                        <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))); ?></td>
-                        <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))); ?></td>
+                        <td><?= htmlspecialchars($row['project_name']) ?></td>
+                        <td><?= htmlspecialchars($row['task_name']) ?></td>
+                        <td><?= htmlspecialchars($row['task_description']) ?></td>
+                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
+                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
                         <td>
                             <form method="POST" action="update-status.php">
-                                <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
+                                <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
                                 <select name="status" onchange="this.form.submit()">
                                     <?php
                                     $statuses = ['Pending', 'Started', 'Completed'];
@@ -474,17 +496,17 @@ $result = $stmt->get_result();
                                 </select>
                             </form>
                         </td>
-                        <td><?php echo htmlspecialchars( $row['project_type']) ?></td>
+                        <td><?= htmlspecialchars($row['project_type']) ?></td>
                         <?php if ($user_role !== 'user'): ?>
-                            <td><?php echo htmlspecialchars($row['assigned_to']); ?></td>
-                            <td><?php echo htmlspecialchars($row['department']); ?></td>
+                            <td><?= htmlspecialchars($row['assigned_to']) ?></td>
+                            <td><?= htmlspecialchars($row['department']) ?></td>
                         <?php endif; ?>
-                        <td><?php echo htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))); ?></td>
+                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
                         <?php if ($user_role !== 'user'): ?>
                             <td>
                                 <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
                                 <form method="POST" action="delete-task.php">
-                                    <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
+                                    <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
                                     <button type="submit" class="delete-button"
                                         onclick="return confirm('Are you sure?')">Delete</button>
                                 </form>
