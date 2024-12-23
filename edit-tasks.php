@@ -38,17 +38,23 @@ try {
 
     // Handle form submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $projectName = trim($_POST['project_name']);
         $taskName = trim($_POST['task_name']);
+        $taskDescription = trim($_POST['task_description']);
+        $projectType = trim($_POST['project_type']);
         $expectedStartDate = trim($_POST['expected_start_date']);
         $expectedFinishDate = trim($_POST['expected_finish_date']);
 
         // Validate inputs
-        if (empty($taskName) || empty($expectedStartDate) || empty($expectedFinishDate)) {
+        if (empty($taskName) || empty($projectName) || empty($project_type) || empty($task_description) || empty($expectedStartDate) || empty($expectedFinishDate)) {
             $error = "All fields are required.";
         } else {
             // Update the task in the database
             $updateStmt = $pdo->prepare("UPDATE tasks SET task_name = :task_name, expected_start_date = :expected_start_date, expected_finish_date = :expected_finish_date WHERE task_id = :task_id");
+            $updateStmt->bindParam(':project_name', $projectName);
             $updateStmt->bindParam(':task_name', $taskName);
+            $updateStmt->bindParam(':task_description', $taskDescription);
+            $updateStmt->bindParam(':project_type', $projectType);
             $updateStmt->bindParam(':expected_start_date', $expectedStartDate);
             $updateStmt->bindParam(':expected_finish_date', $expectedFinishDate);
             $updateStmt->bindParam(':task_id', $taskId);
@@ -56,7 +62,10 @@ try {
             if ($updateStmt->execute()) {
                 $success = "Task updated successfully.";
                 // Refresh task details after update
+                $task['project_name'] = $projectName;
                 $task['task_name'] = $taskName;
+                $task['task_description'] = $taskDescription;
+                $task['project_type'] = $projectType;
                 $task['expected_start_date'] = $expectedStartDate;
                 $task['expected_finish_date'] = $expectedFinishDate;
             } else {
@@ -154,6 +163,20 @@ try {
             text-decoration: none;
             color: #004080;
         }
+
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 10px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ensure consistent box sizing */
+            resize: vertical; /* Allows resizing vertically */
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -167,9 +190,24 @@ try {
     <?php endif; ?>
     <form method="POST">
         <div class="form-group">
+            <label for="project_name">Project Name:</label>
+            <input type="text" id="project_name" name="project_name" value="<?= htmlspecialchars($task['project_name']) ?>" required>
+        </div>
+        <div class="form-group">
             <label for="task_name">Task Name</label>
             <input type="text" id="task_name" name="task_name" value="<?= htmlspecialchars($task['task_name']) ?>" required>
         </div>
+        <div>
+            <label for="task_description">Task Description:</label>
+            <textarea id="task_description" name="task_description" rows="4"><?= htmlspecialchars($task['task_description']) ?></textarea>
+        </div>
+        <div>
+                    <label for="project_type">Project Type:</label>
+                    <select id="project_type" name="project_type">
+                        <option value="Internal">Internal</option>
+                        <option value="External">External</option>
+                    </select>
+                </div>
         <div class="form-group">
             <label for="expected_start_date">Expected Start Date</label>
             <input type="datetime-local" id="expected_start_date" name="expected_start_date" value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($task['expected_start_date']))) ?>" required>

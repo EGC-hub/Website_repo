@@ -383,7 +383,7 @@ $result = $stmt->get_result();
             <h2>Task Management</h2>
             <form method="post" action="">
                 <div class="form-group">
-                    <label for="task_name">Project Name:</label>
+                    <label for="project_name">Project Name:</label>
                     <input type="text" id="project_name" name="project_name" required>
                 </div>
 
