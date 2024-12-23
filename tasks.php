@@ -207,6 +207,8 @@ $result = $stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tasks</title>
     <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -478,14 +480,24 @@ $result = $stmt->get_result();
                     <?php endif; ?>
                     <tr>
                         <td><?= htmlspecialchars($row['project_name']) ?></td>
-                        <td><?= htmlspecialchars($row['task_name']) ?></td>
+                        <td>
+                            <?php if ($row['status'] === 'Completed' && $user_role === 'admin'): ?>
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
+                                    data-description="<?= htmlspecialchars($row['completion_description']) ?>">
+                                    <?= htmlspecialchars($row['task_name']) ?>
+                                </a>
+                            <?php else: ?>
+                                <?= htmlspecialchars($row['task_name']) ?>
+                            <?php endif; ?>
+                        </td>
                         <td><?= htmlspecialchars($row['task_description']) ?></td>
                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
                         <td>
                             <form method="POST" action="update-status.php">
                                 <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                <select name="status" onchange="this.form.submit()">
+                                <select name="status" onchange="handleStatusChange(this, <?= $row['task_id'] ?>)"
+                                    <?= $row['status'] === 'Completed' ? 'disabled' : '' ?>>
                                     <?php
                                     $statuses = ['Pending', 'Started', 'Completed'];
                                     foreach ($statuses as $statusValue) {
@@ -519,6 +531,76 @@ $result = $stmt->get_result();
             <div class="no-tasks">No tasks available.</div>
         <?php endif; ?>
     </div>
+
+    <!-- Bootstrap modal for the user popup for writing what has been completed -->
+    <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="update-status.php">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="completionModalLabel">Task Completion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="task-id" name="task_id">
+                        <div class="mb-3">
+                            <label for="completion-description" class="form-label">What was completed?</label>
+                            <textarea class="form-control" id="completion-description" name="completion_description"
+                                rows="4" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal & script for the completion of tasks -->
+    <div class="modal fade" id="viewDescriptionModal" tabindex="-1" aria-labelledby="viewDescriptionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewDescriptionModalLabel">Completion Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="completion-description-text"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const viewDescriptionModal = document.getElementById('viewDescriptionModal');
+        viewDescriptionModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const description = button.getAttribute('data-description');
+            const descriptionText = document.getElementById('completion-description-text');
+            descriptionText.textContent = description || "No description provided.";
+        });
+    </script>
+    <!-- JS for the dropdown handling -->
+    <script>
+        function handleStatusChange(select, taskId) {
+            if (select.value === 'Completed') {
+                // Show the modal and pass the task ID
+                document.getElementById('task-id').value = taskId;
+                const modal = new bootstrap.Modal(document.getElementById('completionModal'));
+                modal.show();
+            } else {
+                // Submit the form for other status changes
+                select.form.submit();
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+        </script>
 </body>
 
 </html>

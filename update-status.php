@@ -19,22 +19,28 @@ try {
 }
 
 // Update status
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $task_id = $_POST['task_id'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $taskId = $_POST['task_id'];
     $status = $_POST['status'];
+    $completionDescription = $_POST['completion_description'] ?? null;
 
-    try {
-        // Prepare the SQL statement
-        $stmt = $pdo->prepare("UPDATE tasks SET status = ? WHERE task_id = ?");
-        $stmt->execute([$status, $task_id]);
+    if ($status === 'Completed' && $completionDescription) {
+        $stmt = $conn->prepare(
+            "UPDATE tasks SET status = ?, completion_description = ? WHERE task_id = ?"
+        );
+        $stmt->bind_param("ssi", $status, $completionDescription, $taskId);
+    } else {
+        $stmt = $conn->prepare(
+            "UPDATE tasks SET status = ? WHERE task_id = ?"
+        );
+        $stmt->bind_param("si", $status, $taskId);
+    }
 
-        if ($stmt->rowCount() > 0) {
-            echo '<script>alert("Status updated successfully."); window.location.href = "tasks.php";</script>';
-        } else {
-            echo '<script>alert("Failed to update status."); window.location.href = "tasks.php";</script>';
-        }
-    } catch (PDOException $e) {
-        echo '<script>alert("Error: ' . $e->getMessage() . '"); window.location.href = "tasks.php";</script>';
+    if ($stmt->execute()) {
+        header("Location: tasks.php");
+        exit;
+    } else {
+        echo "Error updating task.";
     }
 }
 
