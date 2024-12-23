@@ -604,12 +604,15 @@ $result = $stmt->get_result();
     <script>
         function handleStatusChange(event, taskId) {
             if (event.target.value === 'Completed') {
-                // Prevent the form from submitting
                 event.preventDefault();
 
-                // Set the task ID and status in the modal's hidden input fields
+                // Populate the hidden fields in the modal form
                 document.getElementById('task-id').value = taskId;
                 document.getElementById('status').value = event.target.value;
+
+                // Verify the values are being set
+                console.log("Task ID set:", document.getElementById('task-id').value);
+                console.log("Status set:", document.getElementById('status').value);
 
                 // Show the modal
                 const modal = new bootstrap.Modal(document.getElementById('completionModal'));
