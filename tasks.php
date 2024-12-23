@@ -114,20 +114,22 @@ function sendTaskNotification($email, $username, $task_name, $start_date, $end_d
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     $project_name = trim($_POST['project_name']);
     $task_name = trim($_POST['task_name']);
+    $task_description = trim($_POST['task_description']);
+    $project_type = trim($_POST['project_type']);
     $expected_start_date = trim($_POST['expected_start_date']);
     $expected_finish_date = trim($_POST['expected_finish_date']);
     $status = 'pending';
     $assigned_user_id = isset($_POST['assigned_user_id']) ? (int) $_POST['assigned_user_id'] : null;
     $recorded_timestamp = date("Y-m-d H:i:s");
 
-    if (empty($project_name) ||empty($task_name) || empty($expected_start_date) || empty($expected_finish_date) || !$assigned_user_id) {
+    if (empty($project_name) || empty($task_name) || empty($task_description) || empty($project_type) || empty($expected_start_date) || empty($expected_finish_date) || !$assigned_user_id) {
         echo '<script>alert("Please fill in all required fields.");</script>';
     } else {
         $stmt = $conn->prepare(
-            "INSERT INTO tasks (user_id, project_name, task_name, expected_start_date, expected_finish_date, status, recorded_timestamp) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO tasks (user_id, project_name, task_name, task_description, project_type, expected_start_date, expected_finish_date, status, recorded_timestamp) 
+            VALUES (?, ?, ?, ?, ?, ?, ? ?, ?)"
         );
-        $stmt->bind_param("issssss", $assigned_user_id, $project_name, $task_name, $expected_start_date, $expected_finish_date, $status, $recorded_timestamp);
+        $stmt->bind_param("issssssss", $assigned_user_id, $project_name, $task_name, $task_description, $project_type,  $expected_start_date, $expected_finish_date, $status, $recorded_timestamp);
 
         if ($stmt->execute()) {
             echo '<script>alert("Task added successfully.");</script>';
@@ -360,6 +362,20 @@ $result = $stmt->get_result();
                 <div class="form-group">
                     <label for="task_name">Task Name:</label>
                     <input type="text" id="task_name" name="task_name" required>
+                </div>
+
+                <div>
+                    <label for="task_description">Task Description:</label>
+                    <textarea id="task_description" name="task_description" rows="4"></textarea>
+                </div>
+    
+                <div>
+                    <label for="project_type">Project Type:</label>
+                    <select id="project_type" name="project_type">
+                        <option value="Development">Development</option>
+                        <option value="Design">Design</option>
+                        <option value="Testing">Testing</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
