@@ -608,7 +608,7 @@ $result = $stmt->get_result();
 
                 // Populate the hidden fields in the modal form
                 document.getElementById('task-id').value = taskId;
-                document.getElementById('status').value = event.target.value;
+                document.getElementById('status').value = 'Completed';
 
                 // Verify the values are being set
                 console.log("Task ID set:", document.getElementById('task-id').value);
