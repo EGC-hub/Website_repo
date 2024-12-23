@@ -496,7 +496,7 @@ $result = $stmt->get_result();
                         <td>
                             <form method="POST" action="update-status.php">
                                 <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                <select name="status" onchange="handleStatusChange(this, <?= $row['task_id'] ?>)"
+                                <select id="status" name="status" onchange="handleStatusChange(this, <?= $row['task_id'] ?>)"
                                     <?= $row['status'] === 'Completed' ? 'disabled' : '' ?>>
                                     <?php
                                     $statuses = ['Pending', 'Started', 'Completed'];
