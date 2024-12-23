@@ -383,9 +383,8 @@ $result = $stmt->get_result();
                 <div>
                     <label for="project_type">Project Type:</label>
                     <select id="project_type" name="project_type">
-                        <option value="Development">Development</option>
-                        <option value="Design">Design</option>
-                        <option value="Testing">Testing</option>
+                        <option value="Internal">Internal</option>
+                        <option value="External">External</option>
                     </select>
                 </div>
 
