@@ -112,6 +112,7 @@ function sendTaskNotification($email, $username, $task_name, $start_date, $end_d
 
 // Handle form submission for adding a task
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
+    $project_name = trim($_POST['project_name']);
     $task_name = trim($_POST['task_name']);
     $expected_start_date = trim($_POST['expected_start_date']);
     $expected_finish_date = trim($_POST['expected_finish_date']);
@@ -119,14 +120,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     $assigned_user_id = isset($_POST['assigned_user_id']) ? (int) $_POST['assigned_user_id'] : null;
     $recorded_timestamp = date("Y-m-d H:i:s");
 
-    if (empty($task_name) || empty($expected_start_date) || empty($expected_finish_date) || !$assigned_user_id) {
+    if (empty($project_name) ||empty($task_name) || empty($expected_start_date) || empty($expected_finish_date) || !$assigned_user_id) {
         echo '<script>alert("Please fill in all required fields.");</script>';
     } else {
         $stmt = $conn->prepare(
-            "INSERT INTO tasks (user_id, task_name, expected_start_date, expected_finish_date, status, recorded_timestamp) 
-            VALUES (?, ?, ?, ?, ?, ?)"
+            "INSERT INTO tasks (user_id, project_name, task_name, expected_start_date, expected_finish_date, status, recorded_timestamp) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
-        $stmt->bind_param("isssss", $assigned_user_id, $task_name, $expected_start_date, $expected_finish_date, $status, $recorded_timestamp);
+        $stmt->bind_param("isssss", $assigned_user_id, $project_name, $task_name, $expected_start_date, $expected_finish_date, $status, $recorded_timestamp);
 
         if ($stmt->execute()) {
             echo '<script>alert("Task added successfully.");</script>';
@@ -351,6 +352,11 @@ $result = $stmt->get_result();
         <div class="task-container">
             <h2>Task Management</h2>
             <form method="post" action="">
+                <div class="form-group">
+                    <label for="task_name">Project Name:</label>
+                    <input type="text" id="project_name" name="project_name" required>
+                </div>
+
                 <div class="form-group">
                     <label for="task_name">Task Name:</label>
                     <input type="text" id="task_name" name="task_name" required>
