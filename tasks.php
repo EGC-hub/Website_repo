@@ -563,6 +563,41 @@ $result = $stmt->get_result();
         </div>
     </div>
 
+    <!-- Modal for Viewing Completion Description -->
+    <div class="modal fade" id="viewDescriptionModal" tabindex="-1" aria-labelledby="viewDescriptionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewDescriptionModalLabel">Task Completion Description</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="completion-description-text">No description provided.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Attach event listener for task name links
+        const viewDescriptionModal = document.getElementById('viewDescriptionModal');
+        viewDescriptionModal.addEventListener('show.bs.modal', function (event) {
+            // Button/link that triggered the modal
+            const button = event.relatedTarget;
+
+            // Extract completion description from data attribute
+            const description = button.getAttribute('data-description');
+
+            // Update the modal content
+            const descriptionText = document.getElementById('completion-description-text');
+            descriptionText.textContent = description || "No description provided.";
+        });
+    </script>
+
     <script>
         const viewDescriptionModal = document.getElementById('viewDescriptionModal');
         viewDescriptionModal.addEventListener('show.bs.modal', function (event) {
