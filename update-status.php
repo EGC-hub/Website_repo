@@ -1,4 +1,13 @@
 <?php
+echo "<pre>";
+print_r($_POST);
+echo "</pre>";
+exit;
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $config = include '../config.php';
 
 // Database connection details
