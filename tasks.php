@@ -546,7 +546,7 @@ $result = $stmt->get_result();
                         <!-- Hidden input for Task ID -->
                         <input type="hidden" id="task-id" name="task_id">
                         <!-- Hidden input for Status -->
-                        <input type="hidden" id="status" name="status">
+                        <input type="hidden" id="modal-status" name="modal-status">
 
                         <div class="mb-3">
                             <label for="completion-description" class="form-label">What was completed?</label>
@@ -584,7 +584,7 @@ $result = $stmt->get_result();
 
                 // Populate the hidden fields
                 document.getElementById('task-id').value = taskId;
-                document.getElementById('status').value = 'Completed';
+                document.getElementById('modal-status').value = 'Completed';
 
                 // Debugging output
                 console.log("Task ID set:", document.getElementById('task-id').value);
