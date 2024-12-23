@@ -570,7 +570,11 @@ $result = $stmt->get_result();
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <!-- Hidden input for Task ID -->
                         <input type="hidden" id="task-id" name="task_id">
+                        <!-- Hidden input for Status -->
+                        <input type="hidden" name="status" value="Completed">
+
                         <div class="mb-3">
                             <label for="completion-description" class="form-label">What was completed?</label>
                             <textarea class="form-control" id="completion-description" name="completion_description"
@@ -579,7 +583,7 @@ $result = $stmt->get_result();
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" name="status" value="Completed" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </form>
             </div>
