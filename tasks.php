@@ -603,25 +603,41 @@ $result = $stmt->get_result();
     <!-- JS for the dropdown handling -->
     <script>
         function handleStatusChange(event, taskId) {
+            console.log("handleStatusChange triggered");
+            console.log("Task ID:", taskId);
+            console.log("Event target value:", event.target.value);
+
             if (event.target.value === 'Completed') {
                 event.preventDefault();
 
-                // Populate the hidden fields in the modal form
+                // Populate the hidden fields
                 document.getElementById('task-id').value = taskId;
                 document.getElementById('status').value = 'Completed';
 
-                // Verify the values are being set
+                // Debugging output
                 console.log("Task ID set:", document.getElementById('task-id').value);
-                console.log("Status set:", document.getElementById('status').value);
+                console.log("Status set to Completed");
 
                 // Show the modal
                 const modal = new bootstrap.Modal(document.getElementById('completionModal'));
                 modal.show();
             } else {
-                // Submit the form for other statuses
+                console.log("Submitting form with other status:", event.target.value);
                 event.target.form.submit();
             }
         }
+    </script>
+    <script>
+        document.querySelector("#completionModal form").addEventListener("submit", function (event) {
+            console.log("Submitting Modal Form");
+            console.log("Task ID:", document.getElementById('task-id').value);
+            console.log("Status:", document.getElementById('status').value);
+
+            if (!document.getElementById('status').value) {
+                alert("Error: Status is not set!");
+                event.preventDefault(); // Prevent form submission
+            }
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
