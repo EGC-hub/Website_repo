@@ -496,7 +496,7 @@ $result = $stmt->get_result();
                         <td>
                             <form method="POST" action="update-status.php">
                                 <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                <select id="status" name="status" onchange="handleStatusChange(this, <?= $row['task_id'] ?>)"
+                                <select id="status" name="status" onchange="handleStatusChange(event, <?= $row['task_id'] ?>)"
                                     <?= $row['status'] === 'Completed' ? 'disabled' : '' ?>>
                                     <?php
                                     $statuses = ['Pending', 'Started', 'Completed'];
@@ -560,33 +560,35 @@ $result = $stmt->get_result();
     </div>
 
     <!-- Modal & script for the completion of tasks -->
-    <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="POST" action="update-status.php">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="completionModalLabel">Task Completion</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Hidden input for Task ID -->
-                    <input type="hidden" id="task-id" name="task_id">
-                    <!-- Hidden input for Status -->
-                    <input type="hidden" id="status" name="status">
-
-                    <div class="mb-3">
-                        <label for="completion-description" class="form-label">What was completed?</label>
-                        <textarea class="form-control" id="completion-description" name="completion_description" rows="4" required></textarea>
+    <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="update-status.php">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="completionModalLabel">Task Completion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </form>
+                    <div class="modal-body">
+                        <!-- Hidden input for Task ID -->
+                        <input type="hidden" id="task-id" name="task_id">
+                        <!-- Hidden input for Status -->
+                        <input type="hidden" id="status" name="status">
+
+                        <div class="mb-3">
+                            <label for="completion-description" class="form-label">What was completed?</label>
+                            <textarea class="form-control" id="completion-description" name="completion_description"
+                                rows="4" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
     <script>
         const viewDescriptionModal = document.getElementById('viewDescriptionModal');
@@ -599,21 +601,21 @@ $result = $stmt->get_result();
     </script>
     <!-- JS for the dropdown handling -->
     <script>
-        function handleStatusChange(select, taskId) {
-            if (select.value === 'Completed') {
+        function handleStatusChange(event, taskId) {
+            if (event.target.value === 'Completed') {
                 // Prevent the form from submitting
                 event.preventDefault();
 
                 // Set the task ID and status in the modal's hidden input fields
                 document.getElementById('task-id').value = taskId;
-                document.getElementById('status').value = select.value;
+                document.getElementById('status').value = event.target.value;
 
                 // Show the modal
                 const modal = new bootstrap.Modal(document.getElementById('completionModal'));
                 modal.show();
             } else {
                 // Submit the form for other statuses
-                select.form.submit();
+                event.target.form.submit();
             }
         }
     </script>
