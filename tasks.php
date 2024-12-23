@@ -356,6 +356,20 @@ $result = $stmt->get_result();
             border-radius: 4px;
             box-sizing: border-box; /* Ensure consistent box sizing */
         }
+
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 10px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ensure consistent box sizing */
+            resize: vertical; /* Allows resizing vertically */
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 
