@@ -174,14 +174,14 @@ $taskQuery = $user_role === 'admin'
     ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
        FROM tasks 
        JOIN users ON tasks.user_id = users.id 
-       ORDER BY recorded_timestamp DESC"
+       ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp DESC"
     : ($user_role === 'manager'
         ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
        FROM tasks 
        JOIN users ON tasks.user_id = users.id 
        WHERE users.department = (SELECT department FROM users WHERE id = ?) 
-       ORDER BY recorded_timestamp DESC"
-        : "SELECT * FROM tasks WHERE user_id = ? ORDER BY recorded_timestamp DESC");
+       ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp DESC"
+        : "SELECT * FROM tasks WHERE user_id = ? ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp DESC");
 
 $stmt = $conn->prepare($taskQuery);
 if ($user_role === 'manager' || $user_role === 'user') {
