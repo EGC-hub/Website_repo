@@ -611,6 +611,7 @@ $result = $stmt->get_result();
     </div>
 
     <!-- Modal & script for the completion of tasks -->
+    <!-- Modal for Delayed Completion -->
     <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -626,10 +627,25 @@ $result = $stmt->get_result();
                         <!-- Hidden input for Status -->
                         <input type="hidden" id="modal-status" name="status">
 
+                        <!-- Completion Description -->
                         <div class="mb-3">
                             <label for="completion-description" class="form-label">What was completed?</label>
                             <textarea class="form-control" id="completion-description" name="completion_description"
-                                rows="4" required></textarea>
+                                rows="3" required></textarea>
+                        </div>
+
+                        <!-- Delayed Reason (Shown only for Delayed Completion) -->
+                        <div class="mb-3" id="delayed-reason-container" style="display: none;">
+                            <label for="delayed-reason" class="form-label">Why was it completed late?</label>
+                            <textarea class="form-control" id="delayed-reason" name="delayed_reason"
+                                rows="3"></textarea>
+                        </div>
+
+                        <!-- Actual Completion Date -->
+                        <div class="mb-3" id="completion-date-container" style="display: none;">
+                            <label for="actual-completion-date" class="form-label">Actual Completion Date</label>
+                            <input type="datetime-local" class="form-control" id="actual-completion-date"
+                                name="actual_completion_date">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -688,20 +704,39 @@ $result = $stmt->get_result();
     <!-- JS for the dropdown handling -->
     <script>
         function handleStatusChange(event, taskId) {
-            if (event.target.value === 'Completed on Time') {
-                event.preventDefault();
+            event.preventDefault();
 
-                // Populate the hidden fields
-                document.getElementById('task-id').value = taskId;
-                document.getElementById('modal-status').value = document.getElementById('status').value;
+            const status = event.target.value;
+            document.getElementById('task-id').value = taskId;
+            document.getElementById('modal-status').value = status;
 
-                // Show the modal
-                const modal = new bootstrap.Modal(document.getElementById('completionModal'));
-                modal.show();
+            const delayedReasonContainer = document.getElementById('delayed-reason-container');
+            const completionDateContainer = document.getElementById('completion-date-container');
+
+            if (status === 'Delayed Completion') {
+                delayedReasonContainer.style.display = 'block';
+                completionDateContainer.style.display = 'block';
             } else {
-                console.log("Submitting form with other status:", event.target.value);
-                event.target.form.submit();
+                delayedReasonContainer.style.display = 'none';
+                completionDateContainer.style.display = 'none';
             }
+
+            const modal = new bootstrap.Modal(document.getElementById('completionModal'));
+            modal.show();
+        }
+        if (event.target.value === 'Completed on Time') {
+            event.preventDefault();
+
+            // Populate the hidden fields
+            document.getElementById('task-id').value = taskId;
+            document.getElementById('modal-status').value = document.getElementById('status').value;
+
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('completionModal'));
+            modal.show();
+        } else {
+            console.log("Submitting form with other status:", event.target.value);
+            event.target.form.submit();
         }
     </script>
     <!-- script for the filtering -->

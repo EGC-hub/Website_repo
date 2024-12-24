@@ -28,20 +28,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $taskId = (int)$_POST['task_id'];
     $status = $_POST['status'];
     $completionDescription = $_POST['completion_description'] ?? null;
+    $delayedReason = $_POST['delayed_reason'] ?? null;
+    $actualCompletionDate = $_POST['actual_completion_date'] ?? null;
 
     try {
-        if ($status === 'Completed on Time' && $completionDescription) {
-            // Update with completion description
+        if ($status === 'Delayed Completion' && $completionDescription && $delayedReason && $actualCompletionDate) {
+            // Update for delayed completion
             $stmt = $pdo->prepare(
-                "UPDATE tasks SET status = :status, completion_description = :completion_description WHERE task_id = :task_id"
+                "UPDATE tasks 
+                 SET status = :status, 
+                     completion_description = :completion_description, 
+                     delayed_reason = :delayed_reason, 
+                     actual_completion_date = :actual_completion_date 
+                 WHERE task_id = :task_id"
+            );
+            $stmt->bindParam(':status', $status);
+            $stmt->bindParam(':completion_description', $completionDescription);
+            $stmt->bindParam(':delayed_reason', $delayedReason);
+            $stmt->bindParam(':actual_completion_date', $actualCompletionDate);
+            $stmt->bindParam(':task_id', $taskId, PDO::PARAM_INT);
+        } elseif ($status === 'Completed on Time' && $completionDescription) {
+            // Update for completed on time
+            $stmt = $pdo->prepare(
+                "UPDATE tasks 
+                 SET status = :status, 
+                     completion_description = :completion_description 
+                 WHERE task_id = :task_id"
             );
             $stmt->bindParam(':status', $status);
             $stmt->bindParam(':completion_description', $completionDescription);
             $stmt->bindParam(':task_id', $taskId, PDO::PARAM_INT);
         } else {
-            // Update without completion description
+            // Update without additional data
             $stmt = $pdo->prepare(
-                "UPDATE tasks SET status = :status WHERE task_id = :task_id"
+                "UPDATE tasks 
+                 SET status = :status 
+                 WHERE task_id = :task_id"
             );
             $stmt->bindParam(':status', $status);
             $stmt->bindParam(':task_id', $taskId, PDO::PARAM_INT);
