@@ -561,17 +561,30 @@ $result = $stmt->get_result();
                                     data-description="<?= htmlspecialchars($row['completion_description']) ?>">
                                     <?= htmlspecialchars($row['task_name']) ?>
                                 </a>
-                                <?php elseif ($row['status'] === 'Delayed Completion'): ?>
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                        data-description="'<?php echo htmlspecialchars($row['task_name'], ENT_QUOTES); ?>',
-                                            '<?php echo htmlspecialchars($row['actual_completion_date'], ENT_QUOTES); ?>',
-                                            '<?php echo htmlspecialchars($row['delayed_reason'], ENT_QUOTES); ?>',
-                                            '<?php echo htmlspecialchars($row['completion_description'], ENT_QUOTES); ?>')">
-                                        <?php echo htmlspecialchars($row['task_name']); ?>
-                                    </a>
+                            <?php elseif ($row['status'] === 'Delayed Completion'): ?>
+                                <!-- Link to Delayed Completion Modal -->
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
+                                    data-description="<?= htmlspecialchars($row['completion_description']) ?>"
+                                    data-reason="<?= htmlspecialchars($row['delayed_reason']) ?>"
+                                    data-date="<?= htmlspecialchars($row['actual_completion_date']) ?>">
+                                    <?= htmlspecialchars($row['task_name']) ?>
+                                </a>
                             <?php else: ?>
-                                <!-- Plain Text for Other Statuses -->
-                                <?php echo htmlspecialchars($row['task_name']); ?>
+                                <!-- Dropdown for Changing Status -->
+                                <form method="POST" action="update-status.php">
+                                    <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
+                                    <select id="status" name="status"
+                                        onchange="handleStatusChange(event, <?= $row['task_id'] ?>)"
+                                        <?= $row['status'] === 'Completed' ? 'disabled' : '' ?>>
+                                        <?php
+                                        $statuses = ['Pending', 'Started', 'Completed'];
+                                        foreach ($statuses as $statusValue) {
+                                            $selected = ($row['status'] === $statusValue) ? 'selected' : '';
+                                            echo "<option value='$statusValue' $selected>$statusValue</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </form>
                             <?php endif; ?>
                         </td>
                         <td><?= htmlspecialchars($row['task_description']) ?></td>
