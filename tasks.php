@@ -174,19 +174,14 @@ $taskQuery = $user_role === 'admin'
     ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
        FROM tasks 
        JOIN users ON tasks.user_id = users.id 
-       ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), 
-                recorded_timestamp DESC"
+       ORDER BY recorded_timestamp DESC"
     : ($user_role === 'manager'
-        ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
-           FROM tasks 
-           JOIN users ON tasks.user_id = users.id 
-           WHERE users.department = (SELECT department FROM users WHERE id = ?) 
-           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), 
-                    recorded_timestamp DESC"
-        : "SELECT * FROM tasks 
-           WHERE user_id = ? 
-           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Pending'), 
-                    recorded_timestamp DESC");
+    ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
+       FROM tasks 
+       JOIN users ON tasks.user_id = users.id 
+       WHERE users.department = (SELECT department FROM users WHERE id = ?) 
+       ORDER BY recorded_timestamp DESC"
+    : "SELECT * FROM tasks WHERE user_id = ? ORDER BY recorded_timestamp DESC");
 
 $stmt = $conn->prepare($taskQuery);
 if ($user_role === 'manager' || $user_role === 'user') {
@@ -560,14 +555,12 @@ $result = $stmt->get_result();
                         data-status="<?= htmlspecialchars($row['status']) ?>">
                         <td><?= htmlspecialchars($row['project_name']) ?></td>
                         <td>
-                            <?php if ($row['status'] === 'Completed on Time' && $user_role === 'admin'): ?>
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
-                                    data-description="<?= htmlspecialchars($row['completion_description']) ?>">
-                                    <?= htmlspecialchars($row['task_name']) ?>
-                                </a>
-                            <?php else: ?>
-                                <?= htmlspecialchars($row['task_name']) ?>
-                            <?php endif; ?>
+                            <a href="#" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#delayedCompletionModal" 
+                            onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['completion_date']); ?>', '<?php echo htmlspecialchars($row['delay_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
+                                <?php echo htmlspecialchars($row['task_name']); ?>
+                            </a>
                         </td>
                         <td><?= htmlspecialchars($row['task_description']) ?></td>
                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
@@ -675,7 +668,30 @@ $result = $stmt->get_result();
             </div>
         </div>
     </div>
+    <div class="modal fade" id="delayedCompletionModal" tabindex="-1" aria-labelledby="delayedCompletionModalLabel" aria-hidden="true">
+    <!-- Modal for delayed completion details viewing -->
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                    <h5 class="modal-title" id="delayedCompletionModalLabel">Delayed Completion Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+                <div class="modal-body">
+                    <p><strong>Task Name:</strong> <span id="delayed-task-name"></span></p>
+                    <p><strong>Completed On:</strong> <span id="delayed-completion-date"></span></p>
+                    <p><strong>Reason for Delay:</strong></p>
+                    <p id="delay-reason"></p>
+                    <p><strong>Completion Description:</strong></p>
+                    <p id="completion-description"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Script for opening the modal to view details of completion -->
     <script>
         // Attach event listener for task name links
         const viewDescriptionModal = document.getElementById('viewDescriptionModal');
@@ -767,6 +783,15 @@ $result = $stmt->get_result();
                     row.style.display = '';
                 }
             });
+        }
+    </script>
+    <!-- Script for viewing the delayed completion details -->
+    <script>
+        function showDelayedDetails(taskName, completionDate, delayReason, completionDescription) {
+            document.getElementById('delayed-task-name').innerText = taskName || "N/A";
+            document.getElementById('delayed-completion-date').innerText = completionDate || "N/A";
+            document.getElementById('delay-reason').innerText = delayReason || "N/A";
+            document.getElementById('completion-description').innerText = completionDescription || "N/A";
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
