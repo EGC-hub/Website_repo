@@ -691,6 +691,8 @@ $result = $stmt->get_result();
                     <p><strong>Completed On:</strong> <span id="delayed-completion-date"></span></p>
                     <p><strong>Reason for Delay:</strong></p>
                     <p id="delay-reason"></p>
+                    <p><strong>Completion Description:</strong></p>
+                    <p id="completion-description"></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -799,6 +801,7 @@ $result = $stmt->get_result();
             document.getElementById('delayed-task-name').innerText = taskName || "N/A";
             document.getElementById('delayed-completion-date').innerText = completionDate || "N/A";
             document.getElementById('delay-reason').innerText = delayReason || "N/A";
+            document.getElementById('completion-description').innerText = completionDescription || "N/A";
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
