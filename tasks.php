@@ -806,7 +806,7 @@ $result = $stmt->get_result();
 
             // Correctly set the completion description
             const completionDescriptionElement = document.getElementById('completion-description');
-            completionDescriptionElement.innerText = completionDescription || "No description provided.";
+            completionDescriptionElement.innerText = completionDescription && completionDescription.trim() ? completionDescription : "No description provided.";
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
