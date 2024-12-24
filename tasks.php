@@ -557,7 +557,7 @@ $result = $stmt->get_result();
                         <td>
                             <?php if ($row['status'] === 'Completed on Time'): ?>
                                 <!-- Link to Completed on Time Modal -->
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#completionModal"
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
                                     onclick="showCompletionDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
                                     <?php echo htmlspecialchars($row['task_name']); ?>
                                 </a>
