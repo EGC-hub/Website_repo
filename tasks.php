@@ -558,16 +558,15 @@ $result = $stmt->get_result();
                             <?php if ($row['status'] === 'Completed on Time'): ?>
                                 <!-- Link to Completed on Time Modal -->
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
-                                data-description="<?= htmlspecialchars($row['completion_description']) ?>">
-                                <?= htmlspecialchars($row['task_name']) ?>
+                                    data-description="<?= htmlspecialchars($row['completion_description']) ?>">
+                                    <?= htmlspecialchars($row['task_name']) ?>
                                 </a>
                             <?php elseif ($row['status'] === 'Delayed Completion'): ?>
-                                <!-- Link to Delayed Completion Modal -->
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                    onclick="showDelayedDetails(
-                                    '<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', 
-                                    '<?php echo htmlspecialchars($row['delayed_reason']); ?>', 
-                                    '<?php echo htmlspecialchars($row['completion_description']); ?>')">
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal" onclick="showDelayedDetails(
+                                '<?php echo htmlspecialchars($row['task_name'], ENT_QUOTES); ?>',
+                                '<?php echo htmlspecialchars($row['actual_completion_date'], ENT_QUOTES); ?>',
+                                '<?php echo htmlspecialchars($row['delayed_reason'], ENT_QUOTES); ?>',
+                                '<?php echo htmlspecialchars($row['completion_description'], ENT_QUOTES); ?>')">
                                     <?php echo htmlspecialchars($row['task_name']); ?>
                                 </a>
                             <?php else: ?>
@@ -801,10 +800,14 @@ $result = $stmt->get_result();
     <!-- Script for viewing the delayed completion details -->
     <script>
         function showDelayedDetails(taskName, completionDate, delayReason, completionDescription) {
+            // Set the modal elements with the provided values
             document.getElementById('delayed-task-name').innerText = taskName || "N/A";
             document.getElementById('delayed-completion-date').innerText = completionDate || "N/A";
             document.getElementById('delay-reason').innerText = delayReason || "N/A";
-            document.getElementById('completion-description').innerText = completionDescription || "N/A";
+
+            // Correctly set the completion description
+            const completionDescriptionElement = document.getElementById('completion-description');
+            completionDescriptionElement.innerText = completionDescription || "No description provided.";
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
