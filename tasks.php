@@ -564,7 +564,7 @@ $result = $stmt->get_result();
                             <?php elseif ($row['status'] === 'Delayed Completion'): ?>
                                 <!-- Link to Delayed Completion Modal -->
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>',)">
+                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
                                     <?php echo htmlspecialchars($row['task_name']); ?>
                                 </a>
                             <?php else: ?>
