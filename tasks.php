@@ -561,14 +561,15 @@ $result = $stmt->get_result();
                                     data-description="<?= htmlspecialchars($row['completion_description']) ?>">
                                     <?= htmlspecialchars($row['task_name']) ?>
                                 </a>
-                            <?php elseif ($row['status'] === 'Delayed Completion'): ?>
-                                <!-- Link to Delayed Completion Modal -->
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal" onclick="showDelayedDetails(
-                                    '<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', 
-                                    '<?php echo htmlspecialchars($row['delayed_reason']); ?>', 
-                                    '<?php echo htmlspecialchars($row['completion_description']); ?>')">
-                                    <?php echo htmlspecialchars($row['task_name']); ?>
-                                </a>
+                                <?php elseif ($row['status'] === 'Delayed Completion'): ?>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
+                                        onclick="showDelayedDetails(
+                                            '<?php echo htmlspecialchars($row['task_name'], ENT_QUOTES); ?>',
+                                            '<?php echo htmlspecialchars($row['actual_completion_date'], ENT_QUOTES); ?>',
+                                            '<?php echo htmlspecialchars($row['delayed_reason'], ENT_QUOTES); ?>',
+                                            '<?php echo htmlspecialchars($row['completion_description'], ENT_QUOTES); ?>')">
+                                        <?php echo htmlspecialchars($row['task_name']); ?>
+                                    </a>
                             <?php else: ?>
                                 <!-- Plain Text for Other Statuses -->
                                 <?php echo htmlspecialchars($row['task_name']); ?>
