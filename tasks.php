@@ -574,10 +574,10 @@ $result = $stmt->get_result();
                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
                         <td>
                             <form method="POST" action="update-status.php">
-                                <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                <select id="status" name="status"
-                                    onchange="handleStatusChange(event, <?= $row['task_id'] ?>)"
-                                    <?= $row['status'] === 'Completed on Time' ? 'disabled' : '' ?>>
+                                <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
+                                <select name="status" class="form-select" 
+                                    onchange="handleStatusChange(event, <?php echo $row['task_id']; ?>)" 
+                                    <?php if (in_array($row['status'], ['Completed on Time', 'Delayed Completion'])) echo 'disabled'; ?>>
                                     <?php
                                     $statuses = ['Pending', 'Started', 'Completed on Time', 'Delayed Completion'];
                                     foreach ($statuses as $statusValue) {
