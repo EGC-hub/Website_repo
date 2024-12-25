@@ -128,16 +128,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     $status = 'pending';
     $assigned_user_id = isset($_POST['assigned_user_id']) ? (int) $_POST['assigned_user_id'] : null;
     $recorded_timestamp = date("Y-m-d H:i:s");
+    $assigned_by_id = $_SESSION['user_id'];
 
     if (empty($project_name) || empty($task_name) || empty($task_description) || empty($project_type) || empty($expected_start_date) || empty($expected_finish_date) || !$assigned_user_id) {
         echo '<script>alert("Please fill in all required fields.");</script>';
     } else {
         $stmt = $conn->prepare(
-            "INSERT INTO tasks (user_id, project_name, task_name, task_description, project_type, expected_start_date, expected_finish_date, status, recorded_timestamp) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO tasks (user_id, project_name, task_name, task_description, project_type, expected_start_date, expected_finish_date, status, recorded_timestamp, assigned_by_id) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->bind_param(
-            "issssssss",
+            "issssssssi",
             $assigned_user_id,
             $project_name,
             $task_name,
@@ -146,7 +147,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
             $expected_start_date,
             $expected_finish_date,
             $status,
-            $recorded_timestamp
+            $recorded_timestamp,
+            $assigned_by_id
         );
 
         if ($stmt->execute()) {
