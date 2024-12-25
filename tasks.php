@@ -603,20 +603,21 @@ $result = $stmt->get_result();
                                 ?>
                             <?php endif; ?>
                         </td>
-                        <form method="POST" action="update-status.php">
-                            <input type="hidden" name="task_id" value="<?= $row['task_id']; ?>">
-                            <select name="status"
-                                onchange="handleStatusChange(event, <?= htmlspecialchars($row['task_id'], ENT_QUOTES); ?>)"
-                                <?php if (in_array($row['status'], ['Completed on Time', 'Delayed Completion']))
-                                    echo 'disabled'; ?>>
-                                <option value="Pending" <?= $row['status'] === 'Pending' ? 'selected' : ''; ?>>Pending
-                                </option>
-                                <option value="Started" <?= $row['status'] === 'Started' ? 'selected' : ''; ?>>Started
-                                </option>
-                                <option value="Completed on Time" <?= $row['status'] === 'Completed on Time' ? 'selected' : ''; ?>>Completed on Time</option>
-                                <option value="Delayed Completion" <?= $row['status'] === 'Delayed Completion' ? 'selected' : ''; ?>>Delayed Completion</option>
-                            </select>
-                        </form>
+                        <td>
+                            <form method="POST" action="update-status.php">
+                                <input type="hidden" name="task_id" value="<?= $row['task_id']; ?>">
+                                <select name="status"
+                                    onchange="handleStatusChange(event, <?= htmlspecialchars($row['task_id'], ENT_QUOTES); ?>)"
+                                    <?php if (in_array($row['status'], ['Completed on Time', 'Delayed Completion']))
+                                        echo 'disabled'; ?>>
+                                    <option value="Pending" <?= $row['status'] === 'Pending' ? 'selected' : ''; ?>>Pending
+                                    </option>
+                                    <option value="Started" <?= $row['status'] === 'Started' ? 'selected' : ''; ?>>Started
+                                    </option>
+                                    <option value="Completed on Time" <?= $row['status'] === 'Completed on Time' ? 'selected' : ''; ?>>Completed on Time</option>
+                                    <option value="Delayed Completion" <?= $row['status'] === 'Delayed Completion' ? 'selected' : ''; ?>>Delayed Completion</option>
+                                </select>
+                            </form>
                         </td>
                         <td><?= htmlspecialchars($row['project_type']) ?></td>
                         <?php if ($user_role !== 'user'): ?>
