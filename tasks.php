@@ -551,6 +551,20 @@ $result = $stmt->get_result();
             </thead>
             <tbody>
                 <?php foreach ($rows as $row): ?>
+                    <?php
+                    $delayInfo = '';
+                    if ($row['status'] === 'Delayed Completion') {
+                        $expectedFinishDate = strtotime($row['expected_finish_date']);
+                        $actualCompletionDate = strtotime($row['actual_completion_date']);
+
+                        if ($actualCompletionDate && $expectedFinishDate) {
+                            $delaySeconds = $actualCompletionDate - $expectedFinishDate;
+                            $delayDays = floor($delaySeconds / (60 * 60 * 24)); // Convert to days
+                            $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60)); // Remaining hours
+                            $delayInfo = "{$delayDays} days, {$delayHours} hours delayed";
+                        }
+                    }
+                    ?>
                     <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
                         data-status="<?= htmlspecialchars($row['status']) ?>">
                         <td><?= htmlspecialchars($row['project_name']) ?></td>
@@ -574,22 +588,35 @@ $result = $stmt->get_result();
                         </td>
                         <td><?= htmlspecialchars($row['task_description']) ?></td>
                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
-                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
                         <td>
-                            <form method="POST" action="update-status.php">
-                                <input type="hidden" name="task_id" value="<?= $row['task_id']; ?>">
-                                <select name="status"
-                                    onchange="handleStatusChange(event, <?= htmlspecialchars($row['task_id'], ENT_QUOTES); ?>)"
-                                    <?php if (in_array($row['status'], ['Completed on Time', 'Delayed Completion']))
-                                        echo 'disabled'; ?>>
-                                    <option value="Pending" <?= $row['status'] === 'Pending' ? 'selected' : ''; ?>>Pending
-                                    </option>
-                                    <option value="Started" <?= $row['status'] === 'Started' ? 'selected' : ''; ?>>Started
-                                    </option>
-                                    <option value="Completed on Time" <?= $row['status'] === 'Completed on Time' ? 'selected' : ''; ?>>Completed on Time</option>
-                                    <option value="Delayed Completion" <?= $row['status'] === 'Delayed Completion' ? 'selected' : ''; ?>>Delayed Completion</option>
-                                </select>
-                            </form>
+                            <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?>
+                            <?php if ($row['status'] === 'Delayed Completion'): ?>
+                                <?php
+                                $expectedFinishDate = strtotime($row['expected_finish_date']);
+                                $actualCompletionDate = strtotime($row['actual_completion_date']);
+                                if ($actualCompletionDate && $expectedFinishDate) {
+                                    $delaySeconds = $actualCompletionDate - $expectedFinishDate;
+                                    $delayDays = floor($delaySeconds / (60 * 60 * 24)); // Days
+                                    $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60)); // Hours
+                                    echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
+                                }
+                                ?>
+                            <?php endif; ?>
+                        </td>
+                        <form method="POST" action="update-status.php">
+                            <input type="hidden" name="task_id" value="<?= $row['task_id']; ?>">
+                            <select name="status"
+                                onchange="handleStatusChange(event, <?= htmlspecialchars($row['task_id'], ENT_QUOTES); ?>)"
+                                <?php if (in_array($row['status'], ['Completed on Time', 'Delayed Completion']))
+                                    echo 'disabled'; ?>>
+                                <option value="Pending" <?= $row['status'] === 'Pending' ? 'selected' : ''; ?>>Pending
+                                </option>
+                                <option value="Started" <?= $row['status'] === 'Started' ? 'selected' : ''; ?>>Started
+                                </option>
+                                <option value="Completed on Time" <?= $row['status'] === 'Completed on Time' ? 'selected' : ''; ?>>Completed on Time</option>
+                                <option value="Delayed Completion" <?= $row['status'] === 'Delayed Completion' ? 'selected' : ''; ?>>Delayed Completion</option>
+                            </select>
+                        </form>
                         </td>
                         <td><?= htmlspecialchars($row['project_type']) ?></td>
                         <?php if ($user_role !== 'user'): ?>
