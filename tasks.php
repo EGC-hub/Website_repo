@@ -789,6 +789,7 @@ $result = $stmt->get_result();
             const delayedReasonContainer = document.getElementById('delayed-reason-container');
             const completionDateContainer = document.getElementById('completion-date-container');
 
+            // Show or hide additional fields based on status
             if (status === 'Delayed Completion') {
                 delayedReasonContainer.style.display = 'block';
                 completionDateContainer.style.display = 'block';
@@ -797,22 +798,13 @@ $result = $stmt->get_result();
                 completionDateContainer.style.display = 'none';
             }
 
-            const modal = new bootstrap.Modal(document.getElementById('completionModal'));
-            modal.show();
-        }
-        if (event.target.value === 'Completed on Time') {
-            event.preventDefault();
-
-            // Populate the hidden fields
-            document.getElementById('task-id').value = taskId;
-            document.getElementById('modal-status').value = document.getElementById('status').value;
-
-            // Show the modal
-            const modal = new bootstrap.Modal(document.getElementById('completionModal'));
-            modal.show();
-        } else {
-            console.log("Submitting form with other status:", event.target.value);
-            event.target.form.submit();
+            // Trigger modal for 'Delayed Completion' or 'Completed on Time'
+            if (status === 'Delayed Completion' || status === 'Completed on Time') {
+                const modal = new bootstrap.Modal(document.getElementById('completionModal'));
+                modal.show();
+            } else {
+                event.target.form.submit();
+            }
         }
     </script>
     <!-- script for the filtering -->
