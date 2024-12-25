@@ -558,8 +558,8 @@ $result = $stmt->get_result();
                             <?php if ($row['status'] === 'Completed on Time'): ?>
                                 <!-- Link to Completed on Time Modal -->
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
-                                    onclick="showCompletionDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
-                                    <?php echo htmlspecialchars($row['task_name']); ?>
+                                    data-description="<?= htmlspecialchars($row['completion_description']); ?>">
+                                    <?= htmlspecialchars($row['task_name']); ?>
                                 </a>
                             <?php elseif ($row['status'] === 'Delayed Completion'): ?>
                                 <!-- Link to Delayed Completion Modal -->
