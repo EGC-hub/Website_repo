@@ -171,17 +171,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
 
 // Fetch tasks for the logged-in user
 $taskQuery = $user_role === 'admin'
-    ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
+    ? "SELECT tasks.*, 
+              assigned_to_user.username AS assigned_to, 
+              assigned_to_user.department AS department, 
+              assigned_by_user.username AS assigned_by 
        FROM tasks 
-       JOIN users ON tasks.user_id = users.id 
+       JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
+       JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
        ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp DESC"
     : ($user_role === 'manager'
-        ? "SELECT tasks.*, users.username AS assigned_to, users.department AS department 
-       FROM tasks 
-       JOIN users ON tasks.user_id = users.id 
-       WHERE users.department = (SELECT department FROM users WHERE id = ?) 
-       ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp DESC"
-        : "SELECT * FROM tasks WHERE user_id = ? ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp DESC");
+        ? "SELECT tasks.*, 
+                  assigned_to_user.username AS assigned_to, 
+                  assigned_to_user.department AS department, 
+                  assigned_by_user.username AS assigned_by 
+           FROM tasks 
+           JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
+           JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+           WHERE assigned_to_user.department = (SELECT department FROM users WHERE id = ?) 
+           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp DESC"
+        : "SELECT tasks.*, 
+                  assigned_by_user.username AS assigned_by 
+           FROM tasks 
+           JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+           WHERE tasks.user_id = ? 
+           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp DESC");
 
 $stmt = $conn->prepare($taskQuery);
 if ($user_role === 'manager' || $user_role === 'user') {
@@ -539,6 +552,7 @@ $result = $stmt->get_result();
                     <th>End Date</th>
                     <th>Status</th>
                     <th>Project Type</th>
+                    <th>Assigned By</th>
                     <?php if ($user_role !== 'user'): ?>
                         <th>Assigned To</th>
                         <th>Department</th>
@@ -620,6 +634,7 @@ $result = $stmt->get_result();
                             </form>
                         </td>
                         <td><?= htmlspecialchars($row['project_type']) ?></td>
+                        <td><?= htmlspecialchars($row['assigned_by']) ?></td>
                         <?php if ($user_role !== 'user'): ?>
                             <td><?= htmlspecialchars($row['assigned_to']) ?></td>
                             <td><?= htmlspecialchars($row['department']) ?></td>
