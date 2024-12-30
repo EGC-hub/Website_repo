@@ -176,7 +176,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
 }
 
 // Fetch tasks for the logged-in user
-$taskQuery = $user_role === 'admin'
+$pendingTasksQuery = $user_role === 'admin'
     ? "SELECT tasks.*, 
               assigned_to_user.username AS assigned_to, 
               assigned_to_user.department AS department, 
@@ -184,7 +184,8 @@ $taskQuery = $user_role === 'admin'
        FROM tasks 
        JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
        JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-       ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp ASC"
+       WHERE tasks.status = 'Pending' 
+       ORDER BY recorded_timestamp ASC"
     : ($user_role === 'manager'
         ? "SELECT tasks.*, 
                   assigned_to_user.username AS assigned_to, 
@@ -193,23 +194,59 @@ $taskQuery = $user_role === 'admin'
            FROM tasks 
            JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
            JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-           WHERE assigned_to_user.department = (SELECT department FROM users WHERE id = ?) 
-           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp ASC"
+           WHERE assigned_to_user.department = (SELECT department FROM users WHERE id = ?) AND tasks.status = 'Pending' 
+           ORDER BY recorded_timestamp ASC"
         : "SELECT tasks.*, 
                   assigned_by_user.username AS assigned_by 
            FROM tasks 
            JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-           WHERE tasks.user_id = ? 
-           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp ASC");
+           WHERE tasks.user_id = ? AND tasks.status = 'Pending' 
+           ORDER BY recorded_timestamp ASC");
 
-$stmt = $conn->prepare($taskQuery);
+$remainingTasksQuery = $user_role === 'admin'
+    ? "SELECT tasks.*, 
+              assigned_to_user.username AS assigned_to, 
+              assigned_to_user.department AS department, 
+              assigned_by_user.username AS assigned_by 
+       FROM tasks 
+       JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
+       JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+       WHERE tasks.status IN ('Completed on Time', 'Delayed Completion', 'Started') 
+       ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started'), recorded_timestamp ASC"
+    : ($user_role === 'manager'
+        ? "SELECT tasks.*, 
+                  assigned_to_user.username AS assigned_to, 
+                  assigned_to_user.department AS department, 
+                  assigned_by_user.username AS assigned_by 
+           FROM tasks 
+           JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
+           JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+           WHERE assigned_to_user.department = (SELECT department FROM users WHERE id = ?) AND tasks.status IN ('Completed on Time', 'Delayed Completion', 'Started') 
+           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started'), recorded_timestamp ASC"
+        : "SELECT tasks.*, 
+                  assigned_by_user.username AS assigned_by 
+           FROM tasks 
+           JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+           WHERE tasks.user_id = ? AND tasks.status IN ('Completed on Time', 'Delayed Completion', 'Started') 
+           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started'), recorded_timestamp ASC");
+
+// Fetch Pending Tasks
+$pendingStmt = $conn->prepare($pendingTasksQuery);
 if ($user_role === 'manager' || $user_role === 'user') {
-    $stmt->bind_param("i", $user_id);
+    $pendingStmt->bind_param("i", $user_id);
 }
+$pendingStmt->execute();
+$pendingTasksResult = $pendingStmt->get_result();
 
-$stmt->execute();
-$result = $stmt->get_result();
+// Fetch Remaining Tasks
+$remainingStmt = $conn->prepare($remainingTasksQuery);
+if ($user_role === 'manager' || $user_role === 'user') {
+    $remainingStmt->bind_param("i", $user_id);
+}
+$remainingStmt->execute();
+$remainingTasksResult = $remainingStmt->get_result();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -526,29 +563,8 @@ $result = $stmt->get_result();
     ?>
 
     <div class="task-container">
-        <h2>Tasks</h2>
-
-        <!-- Filter Buttons and Date Pickers -->
-        <div class="filter-container">
-            <div class="filter-buttons">
-                <button onclick="filterTasks('All')" class="btn btn-primary">All</button>
-                <?php foreach ($projects as $project): ?>
-                    <button onclick="filterTasks('<?= htmlspecialchars($project) ?>')" class="btn btn-secondary">
-                        <?= htmlspecialchars($project) ?>
-                    </button>
-                <?php endforeach; ?>
-            </div>
-
-            <div class="filter-date">
-                <label for="start-date">Start Date:</label>
-                <input type="date" id="start-date" onchange="filterByDate()">
-                <label for="end-date">End Date:</label>
-                <input type="date" id="end-date" onchange="filterByDate()">
-            </div>
-        </div>
-
-        <!-- Tasks Table -->
-        <table id="tasks-table" class="task-table">
+        <h2>Pending Tasks</h2>
+        <table id="pending-tasks-table" class="task-table">
             <thead>
                 <tr>
                     <th>Project Name</th>
@@ -570,75 +586,14 @@ $result = $stmt->get_result();
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($rows as $row): ?>
-                    <?php
-                    $delayInfo = '';
-                    if ($row['status'] === 'Delayed Completion') {
-                        $expectedFinishDate = strtotime($row['expected_finish_date']);
-                        $actualCompletionDate = strtotime($row['actual_completion_date']);
-
-                        if ($actualCompletionDate && $expectedFinishDate) {
-                            $delaySeconds = $actualCompletionDate - $expectedFinishDate;
-                            $delayDays = floor($delaySeconds / (60 * 60 * 24)); // Convert to days
-                            $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60)); // Remaining hours
-                            $delayInfo = "{$delayDays} days, {$delayHours} hours delayed";
-                        }
-                    }
-                    ?>
-                    <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
-                        data-status="<?= htmlspecialchars($row['status']) ?>">
+                <?php while ($row = $pendingTasksResult->fetch_assoc()): ?>
+                    <tr>
                         <td><?= htmlspecialchars($row['project_name']) ?></td>
-                        <td>
-                            <?php if ($row['status'] === 'Completed on Time'): ?>
-                                <!-- Link to Completed on Time Modal -->
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
-                                    data-description="<?= htmlspecialchars($row['completion_description']); ?>">
-                                    <?= htmlspecialchars($row['task_name']); ?>
-                                </a>
-                            <?php elseif ($row['status'] === 'Delayed Completion'): ?>
-                                <!-- Link to Delayed Completion Modal -->
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
-                                    <?php echo htmlspecialchars($row['task_name']); ?>
-                                </a>
-                            <?php else: ?>
-                                <!-- Plain Text for Other Statuses -->
-                                <?php echo htmlspecialchars($row['task_name']); ?>
-                            <?php endif; ?>
-                        </td>
+                        <td><?= htmlspecialchars($row['task_name']) ?></td>
                         <td><?= htmlspecialchars($row['task_description']) ?></td>
                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
-                        <td>
-                            <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?>
-                            <?php if ($row['status'] === 'Delayed Completion'): ?>
-                                <?php
-                                $expectedFinishDate = strtotime($row['expected_finish_date']);
-                                $actualCompletionDate = strtotime($row['actual_completion_date']);
-                                if ($actualCompletionDate && $expectedFinishDate) {
-                                    $delaySeconds = $actualCompletionDate - $expectedFinishDate;
-                                    $delayDays = floor($delaySeconds / (60 * 60 * 24)); // Days
-                                    $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60)); // Hours
-                                    echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
-                                }
-                                ?>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <form method="POST" action="update-status.php">
-                                <input type="hidden" name="task_id" value="<?= $row['task_id']; ?>">
-                                <select name="status"
-                                    onchange="handleStatusChange(event, <?= htmlspecialchars($row['task_id'], ENT_QUOTES); ?>)"
-                                    <?php if (in_array($row['status'], ['Completed on Time', 'Delayed Completion']))
-                                        echo 'disabled'; ?>>
-                                    <option value="Pending" <?= $row['status'] === 'Pending' ? 'selected' : ''; ?>>Pending
-                                    </option>
-                                    <option value="Started" <?= $row['status'] === 'Started' ? 'selected' : ''; ?>>Started
-                                    </option>
-                                    <option value="Completed on Time" <?= $row['status'] === 'Completed on Time' ? 'selected' : ''; ?>>Completed on Time</option>
-                                    <option value="Delayed Completion" <?= $row['status'] === 'Delayed Completion' ? 'selected' : ''; ?>>Delayed Completion</option>
-                                </select>
-                            </form>
-                        </td>
+                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
+                        <td><?= htmlspecialchars($row['status']) ?></td>
                         <td><?= htmlspecialchars($row['project_type']) ?></td>
                         <td><?= htmlspecialchars($row['assigned_by']) ?></td>
                         <?php if ($user_role !== 'user'): ?>
@@ -648,16 +603,83 @@ $result = $stmt->get_result();
                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
                         <?php if ($user_role !== 'user'): ?>
                             <td>
-                                <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
-                                <form method="POST" action="delete-task.php">
+                                <form method="POST" action="update-status.php">
                                     <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                    <button type="submit" class="delete-button"
-                                        onclick="return confirm('Are you sure?')">Delete</button>
+                                    <select name="status" onchange="this.form.submit()" <?php if (in_array($row['status'], ['Completed on Time', 'Delayed Completion']))
+                                        echo 'disabled'; ?>>
+                                        <option value="Pending" <?= $row['status'] === 'Pending' ? 'selected' : '' ?>>Pending
+                                        </option>
+                                        <option value="Started" <?= $row['status'] === 'Started' ? 'selected' : '' ?>>Started
+                                        </option>
+                                        <option value="Completed on Time" <?= $row['status'] === 'Completed on Time' ? 'selected' : '' ?>>Completed on Time</option>
+                                        <option value="Delayed Completion" <?= $row['status'] === 'Delayed Completion' ? 'selected' : '' ?>>Delayed Completion</option>
+                                    </select>
                                 </form>
                             </td>
                         <?php endif; ?>
                     </tr>
-                <?php endforeach; ?>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="task-container">
+        <h2>Remaining Tasks</h2>
+        <table id="remaining-tasks-table" class="task-table">
+            <thead>
+                <tr>
+                    <th>Project Name</th>
+                    <th>Task Name</th>
+                    <th>Task Description</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <th>Project Type</th>
+                    <th>Assigned By</th>
+                    <?php if ($user_role !== 'user'): ?>
+                        <th>Assigned To</th>
+                        <th>Department</th>
+                    <?php endif; ?>
+                    <th>Created At</th>
+                    <?php if ($user_role !== 'user'): ?>
+                        <th>Actions</th>
+                    <?php endif; ?>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($row = $remainingTasksResult->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['project_name']) ?></td>
+                        <td><?= htmlspecialchars($row['task_name']) ?></td>
+                        <td><?= htmlspecialchars($row['task_description']) ?></td>
+                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
+                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
+                        <td><?= htmlspecialchars($row['status']) ?></td>
+                        <td><?= htmlspecialchars($row['project_type']) ?></td>
+                        <td><?= htmlspecialchars($row['assigned_by']) ?></td>
+                        <?php if ($user_role !== 'user'): ?>
+                            <td><?= htmlspecialchars($row['assigned_to']) ?></td>
+                            <td><?= htmlspecialchars($row['department']) ?></td>
+                        <?php endif; ?>
+                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
+                        <?php if ($user_role !== 'user'): ?>
+                            <td>
+                                <form method="POST" action="update-status.php">
+                                    <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
+                                    <select name="status" onchange="this.form.submit()" <?php if (in_array($row['status'], ['Completed on Time', 'Delayed Completion']))
+                                        echo 'disabled'; ?>>
+                                        <option value="Pending" <?= $row['status'] === 'Pending' ? 'selected' : '' ?>>Pending
+                                        </option>
+                                        <option value="Started" <?= $row['status'] === 'Started' ? 'selected' : '' ?>>Started
+                                        </option>
+                                        <option value="Completed on Time" <?= $row['status'] === 'Completed on Time' ? 'selected' : '' ?>>Completed on Time</option>
+                                        <option value="Delayed Completion" <?= $row['status'] === 'Delayed Completion' ? 'selected' : '' ?>>Delayed Completion</option>
+                                    </select>
+                                </form>
+                            </td>
+                        <?php endif; ?>
+                    </tr>
+                <?php endwhile; ?>
             </tbody>
         </table>
     </div>
@@ -810,13 +832,17 @@ $result = $stmt->get_result();
     <!-- script for the filtering -->
     <script>
         function filterTasks(project) {
-            const rows = document.querySelectorAll('#tasks-table tbody tr');
-            rows.forEach(row => {
-                if (project === 'All' || row.dataset.project === project) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+            const pendingRows = document.querySelectorAll('#pending-tasks-table tbody tr');
+            const remainingRows = document.querySelectorAll('#remaining-tasks-table tbody tr');
+
+            [pendingRows, remainingRows].forEach(rows => {
+                rows.forEach(row => {
+                    if (project === 'All' || row.dataset.project === project) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
             });
         }
 
@@ -824,16 +850,20 @@ $result = $stmt->get_result();
             const startDate = document.getElementById('start-date').value;
             const endDate = document.getElementById('end-date').value;
 
-            const rows = document.querySelectorAll('#tasks-table tbody tr');
-            rows.forEach(row => {
-                const rowDate = row.querySelector('td:nth-child(4)').textContent.trim(); // Start Date column
-                const taskDate = new Date(rowDate);
+            const tables = ['#pending-tasks-table', '#remaining-tasks-table'];
 
-                if ((startDate && taskDate < new Date(startDate)) || (endDate && taskDate > new Date(endDate))) {
-                    row.style.display = 'none';
-                } else {
-                    row.style.display = '';
-                }
+            tables.forEach(tableSelector => {
+                const rows = document.querySelectorAll(`${tableSelector} tbody tr`);
+                rows.forEach(row => {
+                    const rowDate = row.querySelector('td:nth-child(4)').textContent.trim(); // Start Date column
+                    const taskDate = new Date(rowDate);
+
+                    if ((startDate && taskDate < new Date(startDate)) || (endDate && taskDate > new Date(endDate))) {
+                        row.style.display = 'none';
+                    } else {
+                        row.style.display = '';
+                    }
+                });
             });
         }
     </script>
