@@ -552,7 +552,7 @@ $remainingTasksResult = $remainingStmt->get_result();
     $rows = [];
 
     // Process the query result to populate $projects and $rows
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $pendingTasksResult->fetch_assoc()) {
         $rows[] = $row; // Store each row for rendering
     
         // Add project name to $projects if not already included
