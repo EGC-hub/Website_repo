@@ -551,9 +551,9 @@ $result = $stmt->get_result();
 
             <!-- Pending Tasks Table -->
             <h3>Pending Tasks</h3>
-            <table class="table table-bordered table-hover" id="pending-tasks">
+            <table class="table table-striped table-hover align-middle text-center" id="pending-tasks">
                 <thead>
-                    <tr>
+                    <tr class="align-middle">
                         <th>Project Name</th>
                         <th>Task Name</th>
                         <th>Description</th>
@@ -575,7 +575,7 @@ $result = $stmt->get_result();
                 <tbody>
                     <?php foreach ($rows as $row): ?>
                         <?php if ($row['status'] === 'Pending'): ?>
-                            <tr>
+                            <tr class="align-middle">
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td><?= htmlspecialchars($row['task_name']) ?></td>
                                 <td><?= htmlspecialchars($row['task_description']) ?></td>
@@ -606,10 +606,10 @@ $result = $stmt->get_result();
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
                                 <?php if ($user_role !== 'user'): ?>
                                     <td>
-                                        <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
+                                        <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="btn btn-warning btn-sm">Edit</a>
                                         <form method="POST" action="delete-task.php">
                                             <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                            <button type="submit" class="delete-button" onclick="return confirm('Are you sure?')">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">
                                                 Delete
                                             </button>
                                         </form>
@@ -623,9 +623,9 @@ $result = $stmt->get_result();
 
             <!-- Remaining Tasks Table -->
             <h3>Remaining Tasks</h3>
-            <table class="table table-bordered table-hover" id="remaining-tasks">
+            <table class="table table-striped table-hover align-middle text-center" id="remaining-tasks">
                 <thead>
-                    <tr>
+                    <tr class="align-middle">
                         <th>Project Name</th>
                         <th>Task Name</th>
                         <th>Description</th>
@@ -647,7 +647,7 @@ $result = $stmt->get_result();
                 <tbody>
                     <?php foreach ($rows as $row): ?>
                         <?php if ($row['status'] !== 'Pending'): ?>
-                            <tr>
+                            <tr class="align-middle">
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td><?= htmlspecialchars($row['task_name']) ?></td>
                                 <td><?= htmlspecialchars($row['task_description']) ?></td>
