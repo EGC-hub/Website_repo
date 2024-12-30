@@ -860,28 +860,30 @@ $result = $stmt->get_result();
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Get the existing table
-            const originalTable = document.querySelector("table");
+            const originalTable = document.querySelector("#tasks-table");
 
             if (!originalTable) {
                 console.error("Table not found!");
                 return;
             }
 
-            // Get all rows except the header
+            // Extract the rows and header
             const rows = Array.from(originalTable.querySelectorAll("tbody tr"));
             const header = originalTable.querySelector("thead").outerHTML;
 
-            // Separate Pending and Remaining Tasks
+            // Separate Pending Tasks and Remaining Tasks
             const pendingRows = [];
             const remainingRows = [];
 
             rows.forEach((row) => {
-                const statusCell = row.querySelector("td:nth-child(6)"); // Assuming status is the 6th column
-                if (statusCell && statusCell.textContent.trim() === "Pending") {
-                    pendingRows.push(row.outerHTML);
-                } else {
-                    remainingRows.push(row.outerHTML);
+                const statusCell = row.querySelector("td:nth-child(6)"); // Adjusted: Status is in the 6th column
+                if (statusCell) {
+                    const status = statusCell.textContent.trim();
+                    if (status === "Pending") {
+                        pendingRows.push(row.outerHTML);
+                    } else {
+                        remainingRows.push(row.outerHTML);
+                    }
                 }
             });
 
