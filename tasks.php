@@ -556,16 +556,16 @@ $result = $stmt->get_result();
                     <tr class="align-middle">
                         <th>Project Name</th>
                         <th>Task Name</th>
-                        <th>Description</th>
+                        <th>Task Description</th>
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>Status</th>
                         <th>Project Type</th>
-                        <th>Assigned To</th>
+                        <th>Assigned By</th>
                         <?php if ($user_role !== 'user'): ?>
+                            <th>Assigned To</th>
                             <th>Department</th>
                         <?php endif; ?>
-                        <th>Assigned By</th>
                         <th>Created On</th>
                         <?php if ($user_role !== 'user'): ?>
                             <th>Actions</th>
@@ -577,7 +577,24 @@ $result = $stmt->get_result();
                         <?php if ($row['status'] === 'Pending'): ?>
                             <tr class="align-middle">
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
-                                <td><?= htmlspecialchars($row['task_name']) ?></td>
+                                <td>
+                                    <?php if ($row['status'] === 'Completed on Time'): ?>
+                                        <!-- Link to Completed on Time Modal -->
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
+                                            data-description="<?= htmlspecialchars($row['completion_description']); ?>">
+                                            <?= htmlspecialchars($row['task_name']); ?>
+                                        </a>
+                                    <?php elseif ($row['status'] === 'Delayed Completion'): ?>
+                                        <!-- Link to Delayed Completion Modal -->
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
+                                            onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
+                                            <?php echo htmlspecialchars($row['task_name']); ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <!-- Plain Text for Other Statuses -->
+                                        <?php echo htmlspecialchars($row['task_name']); ?>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?= htmlspecialchars($row['task_description']) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
@@ -598,11 +615,11 @@ $result = $stmt->get_result();
                                     </form>
                                 </td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
-                                <td><?= htmlspecialchars($row['assigned_to']) ?></td>
+                                <td><?= htmlspecialchars($row['assigned_by']) ?></td>
                                 <?php if ($user_role !== 'user'): ?>
+                                    <td><?= htmlspecialchars($row['assigned_to']) ?></td>
                                     <td><?= htmlspecialchars($row['department']) ?></td>
                                 <?php endif; ?>
-                                <td><?= htmlspecialchars($row['assigned_by']) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
                                 <?php if ($user_role !== 'user'): ?>
                                     <td>
@@ -628,16 +645,16 @@ $result = $stmt->get_result();
                     <tr class="align-middle">
                         <th>Project Name</th>
                         <th>Task Name</th>
-                        <th>Description</th>
+                        <th>Task Description</th>
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>Status</th>
                         <th>Project Type</th>
-                        <th>Assigned To</th>
+                        <th>Assigned By</th>
                         <?php if ($user_role !== 'user'): ?>
+                            <th>Assigned To</th>
                             <th>Department</th>
                         <?php endif; ?>
-                        <th>Assigned By</th>
                         <th>Created On</th>
                         <?php if ($user_role !== 'user'): ?>
                             <th>Actions</th>
@@ -647,12 +664,58 @@ $result = $stmt->get_result();
                 <tbody>
                     <?php foreach ($rows as $row): ?>
                         <?php if ($row['status'] !== 'Pending'): ?>
-                            <tr class="align-middle">
+                            <?php
+                            $delayInfo = '';
+                            if ($row['status'] === 'Delayed Completion') {
+                                $expectedFinishDate = strtotime($row['expected_finish_date']);
+                                $actualCompletionDate = strtotime($row['actual_completion_date']);
+
+                                if ($actualCompletionDate && $expectedFinishDate) {
+                                    $delaySeconds = $actualCompletionDate - $expectedFinishDate;
+                                    $delayDays = floor($delaySeconds / (60 * 60 * 24)); // Convert to days
+                                    $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60)); // Remaining hours
+                                    $delayInfo = "{$delayDays} days, {$delayHours} hours delayed";
+                                }
+                            }
+                            ?>
+                            <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
+                                data-status="<?= htmlspecialchars($row['status']) ?>">
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
-                                <td><?= htmlspecialchars($row['task_name']) ?></td>
+                                <td>
+                                    <?php if ($row['status'] === 'Completed on Time'): ?>
+                                        <!-- Link to Completed on Time Modal -->
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
+                                            data-description="<?= htmlspecialchars($row['completion_description']); ?>">
+                                            <?= htmlspecialchars($row['task_name']); ?>
+                                        </a>
+                                    <?php elseif ($row['status'] === 'Delayed Completion'): ?>
+                                        <!-- Link to Delayed Completion Modal -->
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
+                                            onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
+                                            <?php echo htmlspecialchars($row['task_name']); ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <!-- Plain Text for Other Statuses -->
+                                        <?php echo htmlspecialchars($row['task_name']); ?>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?= htmlspecialchars($row['task_description']) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
-                                <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
+                                <td>
+                                    <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?>
+                                    <?php if ($row['status'] === 'Delayed Completion'): ?>
+                                        <?php
+                                        $expectedFinishDate = strtotime($row['expected_finish_date']);
+                                        $actualCompletionDate = strtotime($row['actual_completion_date']);
+                                        if ($actualCompletionDate && $expectedFinishDate) {
+                                            $delaySeconds = $actualCompletionDate - $expectedFinishDate;
+                                            $delayDays = floor($delaySeconds / (60 * 60 * 24)); // Days
+                                            $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60)); // Hours
+                                            echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
+                                        }
+                                        ?>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <form method="POST" action="update-status.php">
                                         <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
@@ -670,11 +733,11 @@ $result = $stmt->get_result();
                                     </form>
                                 </td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
-                                <td><?= htmlspecialchars($row['assigned_to']) ?></td>
+                                <td><?= htmlspecialchars($row['assigned_by']) ?></td>
                                 <?php if ($user_role !== 'user'): ?>
+                                    <td><?= htmlspecialchars($row['assigned_to']) ?></td>
                                     <td><?= htmlspecialchars($row['department']) ?></td>
                                 <?php endif; ?>
-                                <td><?= htmlspecialchars($row['assigned_by']) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
                                 <?php if ($user_role !== 'user'): ?>
                                     <td>
