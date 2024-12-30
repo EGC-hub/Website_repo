@@ -621,16 +621,17 @@ $result = $stmt->get_result();
                                     <td><?= htmlspecialchars($row['department']) ?></td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
-                                <?php if ($user_role !== 'user'): ?>
+                                <?php if ($user_role !== 'user' && $row['assigned_by'] == $_SESSION['user_id']): ?>
                                     <td>
-                                        <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
-                                        <form method="POST" action="delete-task.php">
+                                        <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="btn btn-warning btn-sm">Edit</a>
+                                        <form method="POST" action="delete-task.php" style="display:inline;">
                                             <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                            <button type="submit" class="delete-button" onclick="return confirm('Are you sure?')">
-                                                Delete
-                                            </button>
+                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Are you sure?')">Delete</button>
                                         </form>
                                     </td>
+                                <?php else: ?>
+                                    <td></td> <!-- Empty column if no actions -->
                                 <?php endif; ?>
                             </tr>
                         <?php endif; ?>
