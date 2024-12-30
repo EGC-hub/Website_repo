@@ -566,7 +566,7 @@ $result = $stmt->get_result();
                             <th>Department</th>
                         <?php endif; ?>
                         <th>Assigned By</th>
-                        <th>Created At</th>
+                        <th>Created On</th>
                         <?php if ($user_role !== 'user'): ?>
                             <th>Actions</th>
                         <?php endif; ?>
@@ -638,7 +638,7 @@ $result = $stmt->get_result();
                             <th>Department</th>
                         <?php endif; ?>
                         <th>Assigned By</th>
-                        <th>Created At</th>
+                        <th>Created On</th>
                         <?php if ($user_role !== 'user'): ?>
                             <th>Actions</th>
                         <?php endif; ?>
