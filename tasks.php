@@ -581,7 +581,22 @@ $result = $stmt->get_result();
                                 <td><?= htmlspecialchars($row['task_description']) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
-                                <td><?= htmlspecialchars($row['status']) ?></td>
+                                <td>
+                                    <form method="POST" action="update-status.php">
+                                        <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
+                                        <select id="status" name="status"
+                                            onchange="handleStatusChange(event, <?= $row['task_id'] ?>)"
+                                            <?= in_array($row['status'], ['Completed on Time', 'Delayed Completion']) ? 'disabled' : '' ?>>
+                                            <?php
+                                            $statuses = ['Pending', 'Started', 'Completed on Time', 'Delayed Completion'];
+                                            foreach ($statuses as $statusValue) {
+                                                $selected = ($row['status'] === $statusValue) ? 'selected' : '';
+                                                echo "<option value='$statusValue' $selected>$statusValue</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </form>
+                                </td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_to']) ?></td>
                                 <?php if ($user_role !== 'user'): ?>
@@ -638,7 +653,22 @@ $result = $stmt->get_result();
                                 <td><?= htmlspecialchars($row['task_description']) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
-                                <td><?= htmlspecialchars($row['status']) ?></td>
+                                <td>
+                                    <form method="POST" action="update-status.php">
+                                        <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
+                                        <select id="status" name="status"
+                                            onchange="handleStatusChange(event, <?= $row['task_id'] ?>)"
+                                            <?= in_array($row['status'], ['Completed on Time', 'Delayed Completion']) ? 'disabled' : '' ?>>
+                                            <?php
+                                            $statuses = ['Pending', 'Started', 'Completed on Time', 'Delayed Completion'];
+                                            foreach ($statuses as $statusValue) {
+                                                $selected = ($row['status'] === $statusValue) ? 'selected' : '';
+                                                echo "<option value='$statusValue' $selected>$statusValue</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </form>
+                                </td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_to']) ?></td>
                                 <?php if ($user_role !== 'user'): ?>
