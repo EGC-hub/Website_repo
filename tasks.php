@@ -528,29 +528,30 @@ $result = $stmt->get_result();
     <div class="task-container">
         <h2>Tasks</h2>
 
-        <!-- Filter Buttons and Date Pickers -->
-        <div class="filter-container">
-            <div class="filter-buttons">
-                <button onclick="filterTasks('All')" class="btn btn-primary">All</button>
-                <?php foreach ($projects as $project): ?>
-                    <button onclick="filterTasks('<?= htmlspecialchars($project) ?>')" class="btn btn-secondary">
-                        <?= htmlspecialchars($project) ?>
-                    </button>
-                <?php endforeach; ?>
-            </div>
-
-            <div class="filter-date">
-                <label for="start-date">Start Date:</label>
-                <input type="date" id="start-date" onchange="filterByDate()">
-                <label for="end-date">End Date:</label>
-                <input type="date" id="end-date" onchange="filterByDate()">
-            </div>
-        </div>
-
-        <!-- Tasks Table -->
         <div class="container mt-4">
+            <!-- Filter Buttons -->
+            <div class="filter-container">
+                <div class="filter-buttons">
+                    <button onclick="filterTasks('All')" class="btn btn-primary">All</button>
+                    <?php foreach ($projects as $project): ?>
+                        <button onclick="filterTasks('<?= htmlspecialchars($project) ?>')" class="btn btn-secondary">
+                            <?= htmlspecialchars($project) ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Date Range Inputs -->
+                <div class="filter-date">
+                    <label for="start-date">Start Date:</label>
+                    <input type="date" id="start-date" onchange="filterByDate()">
+                    <label for="end-date">End Date:</label>
+                    <input type="date" id="end-date" onchange="filterByDate()">
+                </div>
+            </div>
+
+            <!-- Pending Tasks Table -->
             <h3>Pending Tasks</h3>
-            <table class="table table-bordered table-hover">
+            <table class="table table-bordered table-hover" id="pending-tasks">
                 <thead>
                     <tr>
                         <th>Project Name</th>
@@ -580,22 +581,7 @@ $result = $stmt->get_result();
                                 <td><?= htmlspecialchars($row['task_description']) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
-                                <td>
-                                    <form method="POST" action="update-status.php">
-                                        <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                        <select id="status" name="status"
-                                            onchange="handleStatusChange(event, <?= $row['task_id'] ?>)"
-                                            <?= in_array($row['status'], ['Completed on Time', 'Delayed Completion']) ? 'disabled' : '' ?>>
-                                            <?php
-                                            $statuses = ['Pending', 'Started', 'Completed on Time', 'Delayed Completion'];
-                                            foreach ($statuses as $statusValue) {
-                                                $selected = ($row['status'] === $statusValue) ? 'selected' : '';
-                                                echo "<option value='$statusValue' $selected>$statusValue</option>";
-                                            }
-                                            ?>
-                                        </select>
-                                    </form>
-                                </td>
+                                <td><?= htmlspecialchars($row['status']) ?></td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_to']) ?></td>
                                 <?php if ($user_role !== 'user'): ?>
@@ -608,8 +594,9 @@ $result = $stmt->get_result();
                                         <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
                                         <form method="POST" action="delete-task.php">
                                             <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                            <button type="submit" class="delete-button"
-                                                onclick="return confirm('Are you sure?')">Delete</button>
+                                            <button type="submit" class="delete-button" onclick="return confirm('Are you sure?')">
+                                                Delete
+                                            </button>
                                         </form>
                                     </td>
                                 <?php endif; ?>
@@ -618,11 +605,10 @@ $result = $stmt->get_result();
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        </div>
 
-        <div class="container mt-4">
+            <!-- Remaining Tasks Table -->
             <h3>Remaining Tasks</h3>
-            <table class="table table-bordered table-hover">
+            <table class="table table-bordered table-hover" id="remaining-tasks">
                 <thead>
                     <tr>
                         <th>Project Name</th>
@@ -652,22 +638,7 @@ $result = $stmt->get_result();
                                 <td><?= htmlspecialchars($row['task_description']) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
-                                <td>
-                                    <form method="POST" action="update-status.php">
-                                        <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                        <select id="status" name="status"
-                                            onchange="handleStatusChange(event, <?= $row['task_id'] ?>)"
-                                            <?= in_array($row['status'], ['Completed on Time', 'Delayed Completion']) ? 'disabled' : '' ?>>
-                                            <?php
-                                            $statuses = ['Pending', 'Started', 'Completed on Time', 'Delayed Completion'];
-                                            foreach ($statuses as $statusValue) {
-                                                $selected = ($row['status'] === $statusValue) ? 'selected' : '';
-                                                echo "<option value='$statusValue' $selected>$statusValue</option>";
-                                            }
-                                            ?>
-                                        </select>
-                                    </form>
-                                </td>
+                                <td><?= htmlspecialchars($row['status']) ?></td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_to']) ?></td>
                                 <?php if ($user_role !== 'user'): ?>
@@ -680,8 +651,9 @@ $result = $stmt->get_result();
                                         <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
                                         <form method="POST" action="delete-task.php">
                                             <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                            <button type="submit" class="delete-button"
-                                                onclick="return confirm('Are you sure?')">Delete</button>
+                                            <button type="submit" class="delete-button" onclick="return confirm('Are you sure?')">
+                                                Delete
+                                            </button>
                                         </form>
                                     </td>
                                 <?php endif; ?>
@@ -841,30 +813,27 @@ $result = $stmt->get_result();
     <!-- script for the filtering -->
     <script>
         function filterTasks(project) {
-            const rows = document.querySelectorAll('#tasks-table tbody tr');
-            rows.forEach(row => {
-                if (project === 'All' || row.dataset.project === project) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+            const tables = ['pending-tasks', 'remaining-tasks'];
+            tables.forEach(tableId => {
+                const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+                rows.forEach(row => {
+                    const projectName = row.querySelector('td:first-child').textContent.trim();
+                    row.style.display = (project === 'All' || projectName === project) ? '' : 'none';
+                });
             });
         }
 
         function filterByDate() {
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
+            const startDate = new Date(document.getElementById('start-date').value);
+            const endDate = new Date(document.getElementById('end-date').value);
+            const tables = ['pending-tasks', 'remaining-tasks'];
 
-            const rows = document.querySelectorAll('#tasks-table tbody tr');
-            rows.forEach(row => {
-                const rowDate = row.querySelector('td:nth-child(4)').textContent.trim(); // Start Date column
-                const taskDate = new Date(rowDate);
-
-                if ((startDate && taskDate < new Date(startDate)) || (endDate && taskDate > new Date(endDate))) {
-                    row.style.display = 'none';
-                } else {
-                    row.style.display = '';
-                }
+            tables.forEach(tableId => {
+                const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+                rows.forEach(row => {
+                    const rowDate = new Date(row.querySelector('td:nth-child(4)').textContent.trim());
+                    row.style.display = (!startDate || rowDate >= startDate) && (!endDate || rowDate <= endDate) ? '' : 'none';
+                });
             });
         }
     </script>
