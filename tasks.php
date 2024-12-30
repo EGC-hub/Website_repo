@@ -457,57 +457,57 @@ $result = $stmt->get_result();
     </div>
 
     <?php if ($user_role === 'admin' || $user_role === 'manager'): ?>
-            <div class="task-container">
-                <h2>Task Management</h2>
-                <form method="post" action="">
-                    <div class="form-group">
-                        <label for="project_name">Project Name:</label>
-                        <input type="text" id="project_name" name="project_name" required>
-                    </div>
+        <div class="task-container">
+            <h2>Task Management</h2>
+            <form method="post" action="">
+                <div class="form-group">
+                    <label for="project_name">Project Name:</label>
+                    <input type="text" id="project_name" name="project_name" required>
+                </div>
 
-                    <div class="form-group">
-                        <label for="task_name">Task Name:</label>
-                        <input type="text" id="task_name" name="task_name" required>
-                    </div>
+                <div class="form-group">
+                    <label for="task_name">Task Name:</label>
+                    <input type="text" id="task_name" name="task_name" required>
+                </div>
 
-                    <div>
-                        <label for="task_description">Task Description:</label>
-                        <textarea id="task_description" name="task_description" rows="4"></textarea>
-                    </div>
+                <div>
+                    <label for="task_description">Task Description:</label>
+                    <textarea id="task_description" name="task_description" rows="4"></textarea>
+                </div>
 
-                    <div>
-                        <label for="project_type">Project Type:</label>
-                        <select id="project_type" name="project_type">
-                            <option value="Internal">Internal</option>
-                            <option value="External">External</option>
-                        </select>
-                    </div>
+                <div>
+                    <label for="project_type">Project Type:</label>
+                    <select id="project_type" name="project_type">
+                        <option value="Internal">Internal</option>
+                        <option value="External">External</option>
+                    </select>
+                </div>
 
-                    <div class="form-group">
-                        <label for="expected_start_date">Expected Start Date & Time</label>
-                        <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
-                    </div>
+                <div class="form-group">
+                    <label for="expected_start_date">Expected Start Date & Time</label>
+                    <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
+                </div>
 
-                    <div class="form-group">
-                        <label for="expected_finish_date">Expected End Date & Time</label>
-                        <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
-                    </div>
+                <div class="form-group">
+                    <label for="expected_finish_date">Expected End Date & Time</label>
+                    <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
+                </div>
 
-                    <div class="form-group">
-                        <label for="assigned_user_id">Assign to:</label>
-                        <select id="assigned_user_id" name="assigned_user_id" required>
-                            <option value="">Select a user</option>
-                            <?php foreach ($users as $user): ?>
-                                    <option value="<?= $user['id'] ?>">
-                                        <?= htmlspecialchars($user['username']) ?>
-                                    </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="assigned_user_id">Assign to:</label>
+                    <select id="assigned_user_id" name="assigned_user_id" required>
+                        <option value="">Select a user</option>
+                        <?php foreach ($users as $user): ?>
+                            <option value="<?= $user['id'] ?>">
+                                <?= htmlspecialchars($user['username']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-                    <button type="submit" class="submit-btn">Add Task</button>
-                </form>
-            </div>
+                <button type="submit" class="submit-btn">Add Task</button>
+            </form>
+        </div>
     <?php endif; ?>
     <?php
     // Initialize variables to hold unique project names and all task rows
@@ -533,9 +533,9 @@ $result = $stmt->get_result();
             <div class="filter-buttons">
                 <button onclick="filterTasks('All')" class="btn btn-primary">All</button>
                 <?php foreach ($projects as $project): ?>
-                        <button onclick="filterTasks('<?= htmlspecialchars($project) ?>')" class="btn btn-secondary">
-                            <?= htmlspecialchars($project) ?>
-                        </button>
+                    <button onclick="filterTasks('<?= htmlspecialchars($project) ?>')" class="btn btn-secondary">
+                        <?= htmlspecialchars($project) ?>
+                    </button>
                 <?php endforeach; ?>
             </div>
 
@@ -560,106 +560,114 @@ $result = $stmt->get_result();
                     <th>Project Type</th>
                     <th>Assigned By</th>
                     <?php if ($user_role !== 'user'): ?>
-                            <th>Assigned To</th>
-                            <th>Department</th>
+                        <th>Assigned To</th>
+                        <th>Department</th>
                     <?php endif; ?>
                     <th>Created At</th>
                     <?php if ($user_role !== 'user'): ?>
-                            <th>Actions</th>
+                        <th>Actions</th>
                     <?php endif; ?>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($rows as $row): ?>
-                        <?php
-                        $delayInfo = '';
-                        if ($row['status'] === 'Delayed Completion') {
-                            $expectedFinishDate = strtotime($row['expected_finish_date']);
-                            $actualCompletionDate = strtotime($row['actual_completion_date']);
+                    <?php
+                    $delayInfo = '';
+                    if ($row['status'] === 'Delayed Completion') {
+                        $expectedFinishDate = strtotime($row['expected_finish_date']);
+                        $actualCompletionDate = strtotime($row['actual_completion_date']);
 
-                            if ($actualCompletionDate && $expectedFinishDate) {
-                                $delaySeconds = $actualCompletionDate - $expectedFinishDate;
-                                $delayDays = floor($delaySeconds / (60 * 60 * 24)); // Convert to days
-                                $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60)); // Remaining hours
-                                $delayInfo = "{$delayDays} days, {$delayHours} hours delayed";
-                            }
+                        if ($actualCompletionDate && $expectedFinishDate) {
+                            $delaySeconds = $actualCompletionDate - $expectedFinishDate;
+                            $delayDays = floor($delaySeconds / (60 * 60 * 24)); // Convert to days
+                            $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60)); // Remaining hours
+                            $delayInfo = "{$delayDays} days, {$delayHours} hours delayed";
                         }
-                        ?>
-                        <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
-                            data-status="<?= htmlspecialchars($row['status']) ?>">
-                            <td><?= htmlspecialchars($row['project_name']) ?></td>
+                    }
+                    ?>
+                    <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
+                        data-status="<?= htmlspecialchars($row['status']) ?>">
+                        <td><?= htmlspecialchars($row['project_name']) ?></td>
+                        <td>
+                            <?php if ($row['status'] === 'Completed on Time'): ?>
+                                <!-- Link to Completed on Time Modal -->
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
+                                    data-description="<?= htmlspecialchars($row['completion_description']); ?>">
+                                    <?= htmlspecialchars($row['task_name']); ?>
+                                </a>
+                            <?php elseif ($row['status'] === 'Delayed Completion'): ?>
+                                <!-- Link to Delayed Completion Modal -->
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
+                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
+                                    <?php echo htmlspecialchars($row['task_name']); ?>
+                                </a>
+                            <?php else: ?>
+                                <!-- Plain Text for Other Statuses -->
+                                <?php echo htmlspecialchars($row['task_name']); ?>
+                            <?php endif; ?>
+                        </td>
+                        <td><?= htmlspecialchars($row['task_description']) ?></td>
+                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
+                        <td>
+                            <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?>
+                            <?php if ($row['status'] === 'Delayed Completion'): ?>
+                                <?php
+                                $expectedFinishDate = strtotime($row['expected_finish_date']);
+                                $actualCompletionDate = strtotime($row['actual_completion_date']);
+                                if ($actualCompletionDate && $expectedFinishDate) {
+                                    $delaySeconds = $actualCompletionDate - $expectedFinishDate;
+                                    $delayDays = floor($delaySeconds / (60 * 60 * 24)); // Days
+                                    $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60)); // Hours
+                                    echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
+                                }
+                                ?>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <form method="POST" action="update-status.php">
+                                <input type="hidden" name="task_id" value="<?= $row['task_id']; ?>">
+                                <select name="status"
+                                    onchange="handleStatusChange(event, <?= htmlspecialchars($row['task_id'], ENT_QUOTES); ?>)"
+                                    <?php if (in_array($row['status'], ['Completed on Time', 'Delayed Completion']))
+                                        echo 'disabled'; ?>>
+                                    <option value="Pending" <?= $row['status'] === 'Pending' ? 'selected' : ''; ?>>Pending
+                                    </option>
+                                    <option value="Started" <?= $row['status'] === 'Started' ? 'selected' : ''; ?>>Started
+                                    </option>
+                                    <option value="Completed on Time" <?= $row['status'] === 'Completed on Time' ? 'selected' : ''; ?>>Completed on Time</option>
+                                    <option value="Delayed Completion" <?= $row['status'] === 'Delayed Completion' ? 'selected' : ''; ?>>Delayed Completion</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td><?= htmlspecialchars($row['project_type']) ?></td>
+                        <td><?= htmlspecialchars($row['assigned_by']) ?></td>
+                        <?php if ($user_role !== 'user'): ?>
+                            <td><?= htmlspecialchars($row['assigned_to']) ?></td>
+                            <td><?= htmlspecialchars($row['department']) ?></td>
+                        <?php endif; ?>
+                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
+                        <?php if ($user_role !== 'user'): ?>
                             <td>
-                                <?php if ($row['status'] === 'Completed on Time'): ?>
-                                        <!-- Link to Completed on Time Modal -->
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
-                                            data-description="<?= htmlspecialchars($row['completion_description']); ?>">
-                                            <?= htmlspecialchars($row['task_name']); ?>
-                                        </a>
-                                <?php elseif ($row['status'] === 'Delayed Completion'): ?>
-                                        <!-- Link to Delayed Completion Modal -->
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                            onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
-                                            <?php echo htmlspecialchars($row['task_name']); ?>
-                                        </a>
-                                <?php else: ?>
-                                        <!-- Plain Text for Other Statuses -->
-                                        <?php echo htmlspecialchars($row['task_name']); ?>
-                                <?php endif; ?>
-                            </td>
-                            <td><?= htmlspecialchars($row['task_description']) ?></td>
-                            <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
-                            <td>
-                                <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?>
-                                <?php if ($row['status'] === 'Delayed Completion'): ?>
-                                        <?php
-                                        $expectedFinishDate = strtotime($row['expected_finish_date']);
-                                        $actualCompletionDate = strtotime($row['actual_completion_date']);
-                                        if ($actualCompletionDate && $expectedFinishDate) {
-                                            $delaySeconds = $actualCompletionDate - $expectedFinishDate;
-                                            $delayDays = floor($delaySeconds / (60 * 60 * 24)); // Days
-                                            $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60)); // Hours
-                                            echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
-                                        }
-                                        ?>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <form method="POST" action="update-status.php">
-                                    <input type="hidden" name="task_id" value="<?= $row['task_id']; ?>">
-                                    <select name="status"
-                                        onchange="handleStatusChange(event, <?= htmlspecialchars($row['task_id'], ENT_QUOTES); ?>)"
-                                        <?php if (in_array($row['status'], ['Completed on Time', 'Delayed Completion']))
-                                            echo 'disabled'; ?>>
-                                        <option value="Pending" <?= $row['status'] === 'Pending' ? 'selected' : ''; ?>>Pending
-                                        </option>
-                                        <option value="Started" <?= $row['status'] === 'Started' ? 'selected' : ''; ?>>Started
-                                        </option>
-                                        <option value="Completed on Time" <?= $row['status'] === 'Completed on Time' ? 'selected' : ''; ?>>Completed on Time</option>
-                                        <option value="Delayed Completion" <?= $row['status'] === 'Delayed Completion' ? 'selected' : ''; ?>>Delayed Completion</option>
-                                    </select>
+                                <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
+                                <form method="POST" action="delete-task.php">
+                                    <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
+                                    <button type="submit" class="delete-button"
+                                        onclick="return confirm('Are you sure?')">Delete</button>
                                 </form>
                             </td>
-                            <td><?= htmlspecialchars($row['project_type']) ?></td>
-                            <td><?= htmlspecialchars($row['assigned_by']) ?></td>
-                            <?php if ($user_role !== 'user'): ?>
-                                    <td><?= htmlspecialchars($row['assigned_to']) ?></td>
-                                    <td><?= htmlspecialchars($row['department']) ?></td>
-                            <?php endif; ?>
-                            <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
-                            <?php if ($user_role !== 'user'): ?>
-                                    <td>
-                                        <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
-                                        <form method="POST" action="delete-task.php">
-                                            <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                            <button type="submit" class="delete-button"
-                                                onclick="return confirm('Are you sure?')">Delete</button>
-                                        </form>
-                                    </td>
-                            <?php endif; ?>
-                        </tr>
+                        <?php endif; ?>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
+    </div>
+
+    <div class="container mt-4">
+        <h3>Pending Tasks</h3>
+        <div id="pending-tasks-table"></div>
+
+        <h3>Remaining Tasks</h3>
+        <div id="remaining-tasks-table"></div>
     </div>
 
     <!-- Modal & script for the completion of tasks -->
@@ -849,6 +857,59 @@ $result = $stmt->get_result();
             const completionDescriptionElement = document.getElementById('completion-description-delayed');
             completionDescriptionElement.innerText = completionDescription && completionDescription.trim() ? completionDescription : "No description provided.";
         }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get the existing table
+            const originalTable = document.querySelector("table");
+
+            if (!originalTable) {
+                console.error("Table not found!");
+                return;
+            }
+
+            // Get all rows except the header
+            const rows = Array.from(originalTable.querySelectorAll("tbody tr"));
+            const header = originalTable.querySelector("thead").outerHTML;
+
+            // Separate Pending and Remaining Tasks
+            const pendingRows = [];
+            const remainingRows = [];
+
+            rows.forEach((row) => {
+                const statusCell = row.querySelector("td:nth-child(6)"); // Assuming status is the 6th column
+                if (statusCell && statusCell.textContent.trim() === "Pending") {
+                    pendingRows.push(row.outerHTML);
+                } else {
+                    remainingRows.push(row.outerHTML);
+                }
+            });
+
+            // Create Pending Tasks Table
+            const pendingTableHTML = `
+        <table class="table table-bordered table-hover">
+            ${header}
+            <tbody>
+                ${pendingRows.join("")}
+            </tbody>
+        </table>
+    `;
+            document.getElementById("pending-tasks-table").innerHTML = pendingTableHTML;
+
+            // Create Remaining Tasks Table
+            const remainingTableHTML = `
+        <table class="table table-bordered table-hover">
+            ${header}
+            <tbody>
+                ${remainingRows.join("")}
+            </tbody>
+        </table>
+    `;
+            document.getElementById("remaining-tasks-table").innerHTML = remainingTableHTML;
+
+            // Hide the original table
+            originalTable.style.display = "none";
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
