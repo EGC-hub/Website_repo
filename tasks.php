@@ -553,23 +553,29 @@ $result = $stmt->get_result();
             <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
+                        <th>Project Name</th>
                         <th>Task Name</th>
                         <th>Description</th>
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>Status</th>
+                        <th>Project Type</th>
                         <th>Assigned To</th>
                         <?php if ($user_role !== 'user'): ?>
                             <th>Department</th>
                         <?php endif; ?>
-                        <th>Actions</th>
+                        <th>Assigned By</th>
+                        <th>Created At</th>
+                        <?php if ($user_role !== 'user'): ?>
+                            <th>Actions</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Pending tasks will be rendered here -->
                     <?php foreach ($rows as $row): ?>
                         <?php if ($row['status'] === 'Pending'): ?>
                             <tr>
+                                <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td><?= htmlspecialchars($row['task_name']) ?></td>
                                 <td><?= htmlspecialchars($row['task_description']) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
@@ -590,18 +596,23 @@ $result = $stmt->get_result();
                                         </select>
                                     </form>
                                 </td>
+                                <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_to']) ?></td>
                                 <?php if ($user_role !== 'user'): ?>
                                     <td><?= htmlspecialchars($row['department']) ?></td>
                                 <?php endif; ?>
-                                <td>
-                                    <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
-                                    <form method="POST" action="delete-task.php">
-                                        <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                        <button type="submit" class="delete-button"
-                                            onclick="return confirm('Are you sure?')">Delete</button>
-                                    </form>
-                                </td>
+                                <td><?= htmlspecialchars($row['assigned_by']) ?></td>
+                                <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
+                                <?php if ($user_role !== 'user'): ?>
+                                    <td>
+                                        <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
+                                        <form method="POST" action="delete-task.php">
+                                            <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
+                                            <button type="submit" class="delete-button"
+                                                onclick="return confirm('Are you sure?')">Delete</button>
+                                        </form>
+                                    </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endif; ?>
                     <?php endforeach; ?>
@@ -614,23 +625,29 @@ $result = $stmt->get_result();
             <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
+                        <th>Project Name</th>
                         <th>Task Name</th>
                         <th>Description</th>
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>Status</th>
+                        <th>Project Type</th>
                         <th>Assigned To</th>
                         <?php if ($user_role !== 'user'): ?>
                             <th>Department</th>
                         <?php endif; ?>
-                        <th>Actions</th>
+                        <th>Assigned By</th>
+                        <th>Created At</th>
+                        <?php if ($user_role !== 'user'): ?>
+                            <th>Actions</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Remaining tasks will be rendered here -->
                     <?php foreach ($rows as $row): ?>
                         <?php if ($row['status'] !== 'Pending'): ?>
                             <tr>
+                                <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td><?= htmlspecialchars($row['task_name']) ?></td>
                                 <td><?= htmlspecialchars($row['task_description']) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
@@ -651,18 +668,23 @@ $result = $stmt->get_result();
                                         </select>
                                     </form>
                                 </td>
+                                <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_to']) ?></td>
                                 <?php if ($user_role !== 'user'): ?>
                                     <td><?= htmlspecialchars($row['department']) ?></td>
                                 <?php endif; ?>
-                                <td>
-                                    <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
-                                    <form method="POST" action="delete-task.php">
-                                        <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                        <button type="submit" class="delete-button"
-                                            onclick="return confirm('Are you sure?')">Delete</button>
-                                    </form>
-                                </td>
+                                <td><?= htmlspecialchars($row['assigned_by']) ?></td>
+                                <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
+                                <?php if ($user_role !== 'user'): ?>
+                                    <td>
+                                        <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
+                                        <form method="POST" action="delete-task.php">
+                                            <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
+                                            <button type="submit" class="delete-button"
+                                                onclick="return confirm('Are you sure?')">Delete</button>
+                                        </form>
+                                    </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endif; ?>
                     <?php endforeach; ?>
