@@ -567,9 +567,6 @@ $result = $stmt->get_result();
                             <th>Department</th>
                         <?php endif; ?>
                         <th>Created On</th>
-                        <?php if ($user_role !== 'user'): ?>
-                            <th>Actions</th>
-                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -621,17 +618,6 @@ $result = $stmt->get_result();
                                     <td><?= htmlspecialchars($row['department']) ?></td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
-                                <?php if ($user_role !== 'user'): ?>
-                                    <td>
-                                        <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
-                                        <form method="POST" action="delete-task.php">
-                                            <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                            <button type="submit" class="delete-button" onclick="return confirm('Are you sure?')">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </td>
-                                <?php endif; ?>
                             </tr>
                         <?php endif; ?>
                     <?php endforeach; ?>
