@@ -621,7 +621,7 @@ $result = $stmt->get_result();
                                     <td><?= htmlspecialchars($row['department']) ?></td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
-                                <?php if ($user_role !== 'user' && $row['assigned_by_id'] == $_SESSION['user_id']): ?>
+                                <?php if (($user_role !== 'user' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'admin') : ?>
                                     <td>
                                         <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
                                         <form method="POST" action="delete-task.php" style="display:inline;">
