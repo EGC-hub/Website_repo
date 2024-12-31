@@ -640,7 +640,7 @@ $result = $stmt->get_result();
             </table>
 
             <!-- Remaining Tasks Table -->
-            <h3>Remaining Tasks</h3>
+            <h3>Completed & Started Tasks</h3>
             <table class="table table-striped table-hover align-middle text-center" id="remaining-tasks">
                 <thead>
                     <tr class="align-middle">
