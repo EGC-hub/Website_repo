@@ -585,7 +585,7 @@ $result = $stmt->get_result();
                 </thead>
                 <tbody>
                     <?php foreach ($rows as $row): ?>
-                        <?php if ($row['status'] === 'Pending'): ?>
+                        <?php if ($row['status'] === 'Pending' || 'Started'): ?>
                             <tr class="align-middle">
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td>
