@@ -184,7 +184,7 @@ $taskQuery = $user_role === 'admin'
        FROM tasks 
        JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
        JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-       ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp ASC"
+       ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Pending', 'Started'), recorded_timestamp ASC"
     : ($user_role === 'manager'
         ? "SELECT tasks.*, 
                   assigned_to_user.username AS assigned_to, 
@@ -194,13 +194,13 @@ $taskQuery = $user_role === 'admin'
            JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
            JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
            WHERE assigned_to_user.department = (SELECT department FROM users WHERE id = ?) 
-           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp ASC"
+           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Pending', 'Started'), recorded_timestamp ASC"
         : "SELECT tasks.*, 
                   assigned_by_user.username AS assigned_by 
            FROM tasks 
            JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
            WHERE tasks.user_id = ? 
-           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Started', 'Pending'), recorded_timestamp ASC");
+           ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Pending', 'Started'), recorded_timestamp ASC");
 
 $stmt = $conn->prepare($taskQuery);
 if ($user_role === 'manager' || $user_role === 'user') {
