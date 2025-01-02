@@ -449,7 +449,7 @@ $result = $stmt->get_result();
             border-radius: 5px;
         }
 
-        table tr.delayed-task {
+        .custom-table tr.delayed-task {
             background-color: #f8d7da !important;
             color: #842029 !important;
         }
@@ -646,7 +646,7 @@ $result = $stmt->get_result();
 
             <!-- Completed & Started Tasks Table -->
             <h3>Completed & Started Tasks</h3>
-            <table class="table table-striped table-hover align-middle text-center" id="remaining-tasks">
+            <table class="table table-striped table-hover align-middle text-center custom-table" id="remaining-tasks">
                 <thead>
                     <tr class="align-middle">
                         <th>Project Name</th>
