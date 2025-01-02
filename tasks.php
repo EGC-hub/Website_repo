@@ -560,8 +560,8 @@ $result = $stmt->get_result();
                 </div>
             </div>
 
-            <!-- Pending Tasks Table -->
-            <h3>Pending Tasks</h3>
+            <!-- Pending & Started Tasks Table -->
+            <h3>Pending & Started Tasks</h3>
             <table class="table table-striped table-hover align-middle text-center" id="pending-tasks">
                 <thead>
                     <tr class="align-middle">
@@ -650,8 +650,8 @@ $result = $stmt->get_result();
                 </tbody>
             </table>
 
-            <!-- Completed & Started Tasks Table -->
-            <h3>Completed & Started Tasks</h3>
+            <!-- Completed Tasks Table -->
+            <h3>Completed Tasks</h3>
             <table class="table table-striped table-hover align-middle text-center custom-table" id="remaining-tasks">
                 <thead>
                     <tr class="align-middle">
@@ -672,7 +672,7 @@ $result = $stmt->get_result();
                 </thead>
                 <tbody>
                     <?php foreach ($rows as $row): ?>
-                        <?php if ($row['status'] !== 'Pending'): ?>
+                        <?php if ($row['status'] !== 'Pending' && $row['status'] !== 'Started'): ?>
                             <?php
                             $delayInfo = '';
                             if ($row['status'] === 'Delayed Completion') {
