@@ -938,7 +938,7 @@ $result = $stmt->get_result();
 
             // Apply styles to each matching row
             rows.forEach(row => {
-                row.style.backgroundColor = '#f8d7da'; // Light red background
+                row.style.backgroundColor = '#FF0000'; // Light red background
                 row.style.color = '#842029'; // Dark red text
                 row.style.fontWeight = 'bold'; // Optional: emphasize text
             });
