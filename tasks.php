@@ -448,6 +448,13 @@ $result = $stmt->get_result();
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
+        .delayed-task {
+            background-color: #f8d7da;
+            /* Light red background */
+            color: #842029;
+            /* Dark red text */
+        }
     </style>
 </head>
 
@@ -621,7 +628,7 @@ $result = $stmt->get_result();
                                     <td><?= htmlspecialchars($row['department']) ?></td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
-                                <?php if (($user_role !== 'user' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'admin') : ?>
+                                <?php if (($user_role !== 'user' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'admin'): ?>
                                     <td>
                                         <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
                                         <form method="POST" action="delete-task.php" style="display:inline;">
@@ -639,7 +646,7 @@ $result = $stmt->get_result();
                 </tbody>
             </table>
 
-            <!-- Remaining Tasks Table -->
+            <!-- Completed & Started Tasks Table -->
             <h3>Completed & Started Tasks</h3>
             <table class="table table-striped table-hover align-middle text-center" id="remaining-tasks">
                 <thead>
@@ -677,7 +684,9 @@ $result = $stmt->get_result();
                             }
                             ?>
                             <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
-                                data-status="<?= htmlspecialchars($row['status']) ?>">
+                                data-status="<?= htmlspecialchars($row['status']) ?>"
+                                class="align-middle <?php if ($row['status'] === 'Delayed Completion')
+                                    echo 'delayed-task'; ?>">
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td>
                                     <?php if ($row['status'] === 'Completed on Time'): ?>
