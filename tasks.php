@@ -449,11 +449,9 @@ $result = $stmt->get_result();
             border-radius: 5px;
         }
 
-        .delayed-task {
-            background-color: #f8d7da;
-            /* Light red background */
-            color: #842029;
-            /* Dark red text */
+        table tr.delayed-task {
+            background-color: #f8d7da !important;
+            color: #842029 !important;
         }
     </style>
 </head>
