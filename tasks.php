@@ -684,8 +684,8 @@ $result = $stmt->get_result();
                             }
                             ?>
                             <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
-                                data-status="<?= htmlspecialchars($row['status']) ?>"
-                                style="<?= $row['status'] === 'Delayed Completion' ? 'background-color: #f8d7da; color: #842029;' : '' ?>">
+                                data-status="<?= htmlspecialchars($row['status']) ?>" class="align-middle <?php if ($row['status'] === 'Delayed Completion')
+                                      echo 'delayed-task'; ?>">
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td>
                                     <?php if ($row['status'] === 'Completed on Time'): ?>
