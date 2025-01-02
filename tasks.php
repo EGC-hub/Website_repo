@@ -448,6 +448,17 @@ $result = $stmt->get_result();
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
+        .custom-table tr.delayed-task {
+            --bs-table-bg: transparent !important;
+            --bs-table-hover-bg: transparent !important;
+            --bs-table-striped-bg: transparent !important;
+            --bs-table-border-color: var(--bs-border-color) !important;
+            background-color: #f8d7da !important;
+            /* Light red */
+            color: #842029 !important;
+            /* Dark red text */
+        }
     </style>
 </head>
 
@@ -639,9 +650,9 @@ $result = $stmt->get_result();
                 </tbody>
             </table>
 
-            <!-- Remaining Tasks Table -->
+            <!-- Completed & Started Tasks Table -->
             <h3>Completed & Started Tasks</h3>
-            <table class="table table-striped table-hover align-middle text-center" id="remaining-tasks">
+            <table class="table table-striped table-hover align-middle text-center custom-table" id="remaining-tasks">
                 <thead>
                     <tr class="align-middle">
                         <th>Project Name</th>
@@ -677,7 +688,8 @@ $result = $stmt->get_result();
                             }
                             ?>
                             <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
-                                data-status="<?= htmlspecialchars($row['status']) ?>">
+                                data-status="<?= htmlspecialchars($row['status']) ?>" class="align-middle <?php if ($row['status'] === 'Delayed Completion')
+                                      echo 'delayed-task'; ?>">
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td>
                                     <?php if ($row['status'] === 'Completed on Time'): ?>
@@ -929,20 +941,6 @@ $result = $stmt->get_result();
             const completionDescriptionElement = document.getElementById('completion-description-delayed');
             completionDescriptionElement.innerText = completionDescription && completionDescription.trim() ? completionDescription : "No description provided.";
         }
-    </script>
-    <script>
-        // Wait for the DOM to fully load
-        document.addEventListener("DOMContentLoaded", () => {
-            // Select all table rows with the 'data-status' attribute
-            const rows = document.querySelectorAll('tr[data-status="Delayed Completion"]');
-
-            // Apply styles to each matching row
-            rows.forEach(row => {
-                row.style.backgroundColor = '#FF0000'; // Light red background
-                row.style.color = '#842029'; // Dark red text
-                row.style.fontWeight = 'bold'; // Optional: emphasize text
-            });
-        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
