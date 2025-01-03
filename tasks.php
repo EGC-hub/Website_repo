@@ -746,6 +746,7 @@ function getWeekdays($start, $end)
                                             $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
                                             $delayHours = floor(($actualCompletionDate - $expectedFinishDate) % (60 * 60 * 24) / (60 * 60)); // Remaining hours
                                             echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
+                                            echo "<br><small class='text-muted'>Completed on: " . date("d M Y, h:i A", $actualCompletionDate) . "</small>";
                                         }
                                         ?>
                                     <?php endif; ?>
