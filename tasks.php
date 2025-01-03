@@ -210,6 +210,24 @@ if ($user_role === 'manager' || $user_role === 'user') {
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
+
+<!-- Delay logic -->
+<?php
+// Define the getWeekdays function once at the top of the script
+function getWeekdays($start, $end)
+{
+    $weekdays = 0;
+    $current = $start;
+    while ($current <= $end) {
+        $dayOfWeek = date('N', $current); // 1 (Monday) to 7 (Sunday)
+        if ($dayOfWeek <= 5) { // Exclude Saturday (6) and Sunday (7)
+            $weekdays++;
+        }
+        $current = strtotime('+1 day', $current);
+    }
+    return $weekdays;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
