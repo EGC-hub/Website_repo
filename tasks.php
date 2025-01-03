@@ -680,21 +680,6 @@ $result = $stmt->get_result();
                                 $actualCompletionDate = strtotime($row['actual_completion_date']);
 
                                 if ($actualCompletionDate && $expectedFinishDate) {
-                                    // Function to calculate weekdays between two dates
-                                    function getWeekdays($start, $end)
-                                    {
-                                        $weekdays = 0;
-                                        $current = $start;
-                                        while ($current <= $end) {
-                                            $dayOfWeek = date('N', $current); // 1 (Monday) to 7 (Sunday)
-                                            if ($dayOfWeek <= 5) { // Exclude Saturday (6) and Sunday (7)
-                                                $weekdays++;
-                                            }
-                                            $current = strtotime('+1 day', $current);
-                                        }
-                                        return $weekdays;
-                                    }
-
                                     // Calculate the number of weekdays between the expected finish date and actual completion date
                                     $weekdays = getWeekdays($expectedFinishDate, $actualCompletionDate);
 
@@ -736,21 +721,6 @@ $result = $stmt->get_result();
                                         $expectedFinishDate = strtotime($row['expected_finish_date']);
                                         $actualCompletionDate = strtotime($row['actual_completion_date']);
                                         if ($actualCompletionDate && $expectedFinishDate) {
-                                            // Function to calculate weekdays between two dates
-                                            function getWeekdays($start, $end)
-                                            {
-                                                $weekdays = 0;
-                                                $current = $start;
-                                                while ($current <= $end) {
-                                                    $dayOfWeek = date('N', $current); // 1 (Monday) to 7 (Sunday)
-                                                    if ($dayOfWeek <= 5) { // Exclude Saturday (6) and Sunday (7)
-                                                        $weekdays++;
-                                                    }
-                                                    $current = strtotime('+1 day', $current);
-                                                }
-                                                return $weekdays;
-                                            }
-
                                             // Calculate the number of weekdays between the expected finish date and actual completion date
                                             $weekdays = getWeekdays($expectedFinishDate, $actualCompletionDate);
 
