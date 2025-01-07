@@ -125,7 +125,6 @@ $conn->close();
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* text-align: center; */
             margin: 25px;
         }
 
@@ -135,7 +134,7 @@ $conn->close();
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
         }
 
         h1 {
@@ -210,9 +209,10 @@ $conn->close();
         }
 
         .user-info {
+            max-width: 500px;
             text-align: center;
             margin-bottom: 20px;
-            padding: 10px;
+            padding: 40px;
             background-color: #f8f9fa;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
