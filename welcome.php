@@ -29,6 +29,7 @@ $_SESSION['last_activity'] = time();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -97,16 +98,46 @@ $_SESSION['last_activity'] = time();
         .logout-btn:hover {
             background-color: #ff1a1a;
         }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .user-info .session-warning {
+            color: #dc3545;
+            /* Red color for warning */
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+        }
     </style>
 </head>
+
 <body>
+    <div class="user-info">
+        <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
+            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
+        </p>
+        <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
+    </div>
 
     <div class="welcome-container">
-        <h1>Welcome, <?php echo htmlspecialchars($username);?>!</h1>
+        <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
         <div class="button-container">
             <!-- Buttons for navigation -->
             <?php if ($userRole === 'admin'): ?>
-            <a href="data-display.php" class="btn">Data Display</a>
+                <a href="data-display.php" class="btn">Data Display</a>
             <?php endif; ?>
 
             <a href="tasks.php" class="btn">Tasks</a>
@@ -126,4 +157,5 @@ $_SESSION['last_activity'] = time();
     </div>
 
 </body>
+
 </html>
