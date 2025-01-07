@@ -12,6 +12,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
+// Retrieve the username, role, and department from the session
+$username = $_SESSION['username'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
+$department = $_SESSION['department'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
+
 // Session timeout (Optional)
 $timeout_duration = 600;
 
@@ -46,12 +50,6 @@ $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
-// Fetch logged-in user's details
-$userQuery = $conn->prepare("SELECT username, department FROM users WHERE id = ?");
-$userQuery->bind_param("i", $user_id);
-$userQuery->execute();
-$userResult = $userQuery->get_result();
 
 if ($userResult->num_rows > 0) {
     $userDetails = $userResult->fetch_assoc();
@@ -366,8 +364,8 @@ if (isset($_GET['export'])) {
 
 <body>
     <div class="user-info">
-        <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
-            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
+        <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong> | Department:
+            <strong><?= htmlspecialchars($department) ?></strong>
         </p>
         <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
     </div>
