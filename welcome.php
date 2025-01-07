@@ -2,6 +2,35 @@
 // Start session
 session_start();
 
+$config = include '../config.php';
+
+// Database connection
+$dbHost = 'localhost';
+$dbUsername = $config['dbUsername'];
+$dbPassword = $config['dbPassword'];
+$dbName = 'euro_login_system';
+
+$conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch logged-in user's details
+$userQuery = $conn->prepare("SELECT username, department FROM users WHERE id = ?");
+$userQuery->bind_param("i", $user_id);
+$userQuery->execute();
+$userResult = $userQuery->get_result();
+
+if ($userResult->num_rows > 0) {
+    $userDetails = $userResult->fetch_assoc();
+    $loggedInUsername = $userDetails['username'];
+    $loggedInDepartment = $userDetails['department'];
+} else {
+    $loggedInUsername = "Unknown";
+    $loggedInDepartment = "Unknown";
+}
+
 // Check if the user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     // Redirect to login page if not logged in
