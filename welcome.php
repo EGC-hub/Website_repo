@@ -56,6 +56,8 @@ $_SESSION['last_activity'] = time();
 
         .user-info {
             text-align: center;
+            width: 90%;
+            margin-top: 20px;
             margin-bottom: 20px;
             padding: 10px;
             background-color: #f8f9fa;
