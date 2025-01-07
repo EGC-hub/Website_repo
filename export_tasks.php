@@ -72,7 +72,7 @@ $headers = [
 ];
 
 // Write Pending Tasks Section
-fputcsv($output, ['Pending Tasks']);
+fputcsv($output, ['Pending & Started Tasks']);
 fputcsv($output, $headers); // Write headers for Pending Tasks
 
 while ($row = $result->fetch_assoc()) {
@@ -98,7 +98,7 @@ while ($row = $result->fetch_assoc()) {
 fputcsv($output, []);
 
 // Write Other Tasks Section
-fputcsv($output, ['Completed & Started Tasks']);
+fputcsv($output, ['Completed Tasks']);
 fputcsv($output, $headers); // Write headers for Other Tasks
 
 // Reset the result pointer to iterate again
