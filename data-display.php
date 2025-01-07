@@ -27,6 +27,10 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
 // Update last activity time
 $_SESSION['last_activity'] = time();
 
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 $config = include '../config.php';
 
 // Database connection
@@ -367,7 +371,7 @@ if (isset($_GET['export'])) {
         </p>
         <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
     </div>
-    
+
     <div class="table-container">
         <!-- Logout Button -->
         <div class="logout-button">
