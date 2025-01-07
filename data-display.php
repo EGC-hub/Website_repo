@@ -329,6 +329,7 @@ if (isset($_GET['export'])) {
         }
 
         .user-info {
+            max-width: 1300px;
             text-align: center;
             margin-bottom: 20px;
             padding: 10px;
