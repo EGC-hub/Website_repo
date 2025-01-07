@@ -88,8 +88,8 @@ if ($userResult->num_rows > 0) {
 
 // Fetch users for task assignment (admin and manager roles)
 $users = [];
-if ($user_role === 'admin' || $user_role === 'manager') {
-    if ($user_role === 'admin') {
+if ($user_role === 'Admin' || $user_role === 'manager') {
+    if ($user_role === 'Admin') {
         // Admin can assign tasks to users and managers
         $userQuery = "
             SELECT u.id, u.username, u.email, d.name AS department, r.name AS role 
@@ -217,7 +217,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
 }
 
 // Fetch tasks for the logged-in user
-$taskQuery = $user_role === 'admin'
+$taskQuery = $user_role === 'Admin'
     ? "
         SELECT tasks.*, 
                assigned_to_user.username AS assigned_to, 
@@ -575,7 +575,7 @@ function getWeekdays($start, $end)
         <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
     </div>
 
-    <?php if ($user_role === 'admin' || $user_role === 'manager'): ?>
+    <?php if ($user_role === 'Admin' || $user_role === 'manager'): ?>
         <div class="task-container">
             <div class="logout-button">
                 <a href="welcome.php">Back</a>
@@ -749,7 +749,7 @@ function getWeekdays($start, $end)
                                     <td><?= htmlspecialchars($row['department']) ?></td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
-                                <?php if (($user_role !== 'user' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'admin'): ?>
+                                <?php if (($user_role !== 'user' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'Admin'): ?>
                                     <td>
                                         <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
                                         <form method="POST" action="delete-task.php" style="display:inline;">
