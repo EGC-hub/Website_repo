@@ -571,7 +571,8 @@ function getWeekdays($start, $end)
 <body>
     <div class="user-info">
         <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
-            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong></p>
+            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
+        </p>
         <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
     </div>
 
@@ -969,6 +970,7 @@ function getWeekdays($start, $end)
             </div>
         </div>
     </div>
+
     <!-- Success modal for task updation -->
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -1014,6 +1016,7 @@ function getWeekdays($start, $end)
             descriptionText.textContent = description || "No description provided.";
         });
     </script>
+
     <!-- JS for the dropdown handling -->
     <script>
         function handleStatusChange(event, taskId) {
@@ -1046,15 +1049,18 @@ function getWeekdays($start, $end)
                     method: 'POST',
                     body: new FormData(form)
                 })
-                    .then(response => response.json())
+                    .then(response => response.json()) // Parse the response as JSON
                     .then(data => {
                         if (data.success) {
-                            // Show success modal with task name and message
+                            // Update the modal content with the task name and message
                             document.getElementById('success-task-name').innerText = data.task_name;
                             document.getElementById('success-message').innerText = data.message;
+
+                            // Show the success modal
                             const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                             successModal.show();
                         } else {
+                            // If the update was not successful, show an alert with the error message
                             alert(data.message);
                         }
                     })
@@ -1065,6 +1071,7 @@ function getWeekdays($start, $end)
             }
         }
     </script>
+
     <!-- script for the filtering -->
     <script>
         function filterTasks(project) {
