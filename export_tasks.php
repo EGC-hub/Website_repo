@@ -70,24 +70,57 @@ $headers = [
     'Project Name', 'Task Name', 'Task Description', 'Start Date', 'End Date', 'Status', 
     'Project Type', 'Assigned By', 'Assigned To', 'Department', 'Created On'
 ];
-fputcsv($output, $headers);
 
-// Write data rows
+// Write Pending Tasks Section
+fputcsv($output, ['Pending Tasks']);
+fputcsv($output, $headers); // Write headers for Pending Tasks
+
 while ($row = $result->fetch_assoc()) {
-    $rowData = [
-        $row['project_name'],
-        $row['task_name'],
-        $row['task_description'],
-        date("d M Y, h:i A", strtotime($row['expected_start_date'])),
-        date("d M Y, h:i A", strtotime($row['expected_finish_date'])),
-        $row['status'],
-        $row['project_type'],
-        $row['assigned_by'],
-        $row['assigned_to'] ?? '', // Handle cases where assigned_to is not available
-        $row['department'] ?? '',  // Handle cases where department is not available
-        date("d M Y, h:i A", strtotime($row['recorded_timestamp']))
-    ];
-    fputcsv($output, $rowData);
+    if ($row['status'] === 'Pending') {
+        $rowData = [
+            $row['project_name'],
+            $row['task_name'],
+            $row['task_description'],
+            date("d M Y, h:i A", strtotime($row['expected_start_date'])),
+            date("d M Y, h:i A", strtotime($row['expected_finish_date'])),
+            $row['status'],
+            $row['project_type'],
+            $row['assigned_by'],
+            $row['assigned_to'] ?? '', // Handle cases where assigned_to is not available
+            $row['department'] ?? '',  // Handle cases where department is not available
+            date("d M Y, h:i A", strtotime($row['recorded_timestamp']))
+        ];
+        fputcsv($output, $rowData);
+    }
+}
+
+// Add a blank row to separate sections
+fputcsv($output, []);
+
+// Write Other Tasks Section
+fputcsv($output, ['Completed & Started Tasks']);
+fputcsv($output, $headers); // Write headers for Other Tasks
+
+// Reset the result pointer to iterate again
+$result->data_seek(0);
+
+while ($row = $result->fetch_assoc()) {
+    if ($row['status'] !== 'Pending') {
+        $rowData = [
+            $row['project_name'],
+            $row['task_name'],
+            $row['task_description'],
+            date("d M Y, h:i A", strtotime($row['expected_start_date'])),
+            date("d M Y, h:i A", strtotime($row['expected_finish_date'])),
+            $row['status'],
+            $row['project_type'],
+            $row['assigned_by'],
+            $row['assigned_to'] ?? '', // Handle cases where assigned_to is not available
+            $row['department'] ?? '',  // Handle cases where department is not available
+            date("d M Y, h:i A", strtotime($row['recorded_timestamp']))
+        ];
+        fputcsv($output, $rowData);
+    }
 }
 
 // Close output stream
