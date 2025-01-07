@@ -3,6 +3,7 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
 // Start session
 session_start();
 
@@ -32,7 +33,7 @@ if ($conn->connect_error) {
 }
 
 // Fetch logged-in user's details
-$userQuery = $conn->prepare("SELECT username, department FROM users WHERE id = ?");
+$userQuery = $conn->prepare("SELECT username, department_id FROM users WHERE id = ?");
 $userQuery->bind_param("i", $user_id);
 $userQuery->execute();
 $userResult = $userQuery->get_result();
@@ -40,10 +41,28 @@ $userResult = $userQuery->get_result();
 if ($userResult->num_rows > 0) {
     $userDetails = $userResult->fetch_assoc();
     $loggedInUsername = $userDetails['username'];
-    $loggedInDepartment = $userDetails['department'];
+    $loggedInDepartmentId = $userDetails['department_id'];
 } else {
     $loggedInUsername = "Unknown";
-    $loggedInDepartment = "Unknown";
+    $loggedInDepartmentId = null;
+}
+
+// Fetch all roles and departments from the database
+$roles = [];
+$departments = [];
+
+$roleQuery = $conn->query("SELECT id, name FROM roles");
+if ($roleQuery) {
+    while ($row = $roleQuery->fetch_assoc()) {
+        $roles[] = $row;
+    }
+}
+
+$departmentQuery = $conn->query("SELECT id, name FROM departments");
+if ($departmentQuery) {
+    while ($row = $departmentQuery->fetch_assoc()) {
+        $departments[] = $row;
+    }
 }
 
 // Initialize error and success messages
@@ -56,14 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
-    $role = $_POST['role'];
-    $department = $_POST['department'];
+    $role_id = $_POST['role'];
+    $department_id = $_POST['department'];
 
     // Validate the inputs
-    if (empty($username) || empty($password) || empty($role) || empty($department)) {
+    if (empty($username) || empty($password) || empty($role_id) || empty($department_id)) {
         $errorMsg = "Please fill in all fields.";
-    } elseif (!in_array($role, ['manager', 'user'])) {
-        $errorMsg = "Invalid role selected.";
     } else {
         // Hash the password
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -79,9 +96,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errorMsg = "Username already taken.";
         } else {
             // Insert the new user into the database
-            $insertQuery = "INSERT INTO users (username, email, password, role, department) VALUES (?, ?, ?, ?, ?)";
+            $insertQuery = "INSERT INTO users (username, email, password, role_id, department_id) VALUES (?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($insertQuery);
-            $stmt->bind_param("sssss", $username, $email, $hashedPassword, $role, $department);
+            $stmt->bind_param("sssii", $username, $email, $hashedPassword, $role_id, $department_id);
 
             if ($stmt->execute()) {
                 $successMsg = "User created successfully.";
@@ -108,7 +125,6 @@ $conn->close();
         /* General Box Sizing */
         * {
             box-sizing: border-box;
-            /* Include padding and border in width and height */
         }
 
         /* Style for the form */
@@ -125,6 +141,7 @@ $conn->close();
             display: flex;
             flex-direction: column;
             align-items: center;
+            text-align: center;
             margin: 25px;
         }
 
@@ -134,7 +151,7 @@ $conn->close();
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 500px;
+            max-width: 400px;
         }
 
         h1 {
@@ -192,7 +209,6 @@ $conn->close();
         /* Back button style */
         .back-btn {
             display: block;
-            /* Make it a block-level element */
             width: 100%;
             margin-top: 20px;
             padding: 10px;
@@ -209,10 +225,9 @@ $conn->close();
         }
 
         .user-info {
-            max-width: 500px;
             text-align: center;
             margin-bottom: 20px;
-            padding: 10px 40px;
+            padding: 10px;
             background-color: #f8f9fa;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -226,7 +241,6 @@ $conn->close();
 
         .user-info .session-warning {
             color: #dc3545;
-            /* Red color for warning */
             font-weight: bold;
             font-size: 14px;
             margin-top: 10px;
@@ -238,7 +252,7 @@ $conn->close();
     <div class="main-container">
         <div class="user-info">
             <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
-                <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
+                <strong><?= htmlspecialchars($loggedInDepartmentId) ?></strong>
             </p>
             <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
         </div>
@@ -270,15 +284,17 @@ $conn->close();
                 <div class="form-group">
                     <label for="role">Role</label>
                     <select id="role" name="role" required>
-                        <option value="user">User</option>
-                        <option value="manager">Manager</option>
+                        <?php foreach ($roles as $role): ?>
+                            <option value="<?= $role['id'] ?>"><?= htmlspecialchars($role['name']) ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="department">Department</label>
                     <select id="department" name="department" required>
-                        <option value="HR">HR</option>
-                        <option value="IT">IT</option>
+                        <?php foreach ($departments as $department): ?>
+                            <option value="<?= $department['id'] ?>"><?= htmlspecialchars($department['name']) ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <button type="submit">Create User</button>
