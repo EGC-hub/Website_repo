@@ -67,6 +67,8 @@ try {
         }
 
         .main-container {
+            width: 90%;
+            max-width: 1200px;
             display: flex;
             flex-direction: column;
             align-items: center;
