@@ -88,7 +88,7 @@ if ($userResult->num_rows > 0) {
 
 // Fetch users for task assignment (admin and manager roles)
 $users = [];
-if ($user_role === 'Admin' || $user_role === 'manager') {
+if ($user_role === 'Admin' || $user_role === 'Manager') {
     if ($user_role === 'Admin') {
         // Admin can assign tasks to users and managers
         $userQuery = "
@@ -96,7 +96,7 @@ if ($user_role === 'Admin' || $user_role === 'manager') {
             FROM users u
             JOIN departments d ON u.department_id = d.id
             JOIN roles r ON u.role_id = r.id
-            WHERE r.name IN ('user', 'manager')
+            WHERE r.name IN ('User', 'Manager')
         ";
     } else {
         // Manager can only assign tasks to users in their department
@@ -106,7 +106,7 @@ if ($user_role === 'Admin' || $user_role === 'manager') {
             JOIN departments d ON u.department_id = d.id
             JOIN roles r ON u.role_id = r.id
             WHERE d.id = (SELECT department_id FROM users WHERE id = $user_id) 
-              AND r.name = 'user' 
+              AND r.name = 'User' 
               OR u.id = $user_id
         ";
     }
@@ -234,7 +234,7 @@ $taskQuery = $user_role === 'Admin'
             END DESC, 
             recorded_timestamp DESC
     "
-    : ($user_role === 'manager'
+    : ($user_role === 'Manager'
         ? "
             SELECT tasks.*, 
                    assigned_to_user.username AS assigned_to, 
@@ -267,7 +267,7 @@ $taskQuery = $user_role === 'Admin'
         ");
 
 $stmt = $conn->prepare($taskQuery);
-if ($user_role === 'manager' || $user_role === 'user') {
+if ($user_role === 'Manager' || $user_role === 'User') {
     $stmt->bind_param("i", $user_id);
 }
 
@@ -575,7 +575,7 @@ function getWeekdays($start, $end)
         <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
     </div>
 
-    <?php if ($user_role === 'Admin' || $user_role === 'manager'): ?>
+    <?php if ($user_role === 'Admin' || $user_role === 'Manager'): ?>
         <div class="task-container">
             <div class="logout-button">
                 <a href="welcome.php">Back</a>
@@ -690,12 +690,12 @@ function getWeekdays($start, $end)
                         <th>Status</th>
                         <th>Project Type</th>
                         <th>Assigned By</th>
-                        <?php if ($user_role !== 'user'): ?>
+                        <?php if ($user_role !== 'User'): ?>
                             <th>Assigned To</th>
                             <th>Department</th>
                         <?php endif; ?>
                         <th>Created On</th>
-                        <?php if ($user_role !== 'user'): ?>
+                        <?php if ($user_role !== 'User'): ?>
                             <th>Actions</th>
                         <?php endif; ?>
                     </tr>
@@ -744,12 +744,12 @@ function getWeekdays($start, $end)
                                 </td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_by']) ?></td>
-                                <?php if ($user_role !== 'user'): ?>
+                                <?php if ($user_role !== 'User'): ?>
                                     <td><?= htmlspecialchars($row['assigned_to']) ?></td>
                                     <td><?= htmlspecialchars($row['department']) ?></td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
-                                <?php if (($user_role !== 'user' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'Admin'): ?>
+                                <?php if (($user_role !== 'User' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'Admin'): ?>
                                     <td>
                                         <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
                                         <form method="POST" action="delete-task.php" style="display:inline;">
@@ -780,7 +780,7 @@ function getWeekdays($start, $end)
                         <th>Status</th>
                         <th>Project Type</th>
                         <th>Assigned By</th>
-                        <?php if ($user_role !== 'user'): ?>
+                        <?php if ($user_role !== 'User'): ?>
                             <th>Assigned To</th>
                             <th>Department</th>
                         <?php endif; ?>
@@ -868,7 +868,7 @@ function getWeekdays($start, $end)
                                 </td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_by']) ?></td>
-                                <?php if ($user_role !== 'user'): ?>
+                                <?php if ($user_role !== 'User'): ?>
                                     <td><?= htmlspecialchars($row['assigned_to']) ?></td>
                                     <td><?= htmlspecialchars($row['department']) ?></td>
                                 <?php endif; ?>

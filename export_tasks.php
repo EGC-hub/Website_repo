@@ -24,7 +24,7 @@ if ($conn->connect_error) {
 $user_id = $_SESSION['user_id'];
 $user_role = $_SESSION['role'];
 
-$taskQuery = $user_role === 'admin'
+$taskQuery = $user_role === 'Admin'
     ? "SELECT tasks.*, 
               assigned_to_user.username AS assigned_to, 
               assigned_to_user.department AS department, 
@@ -33,7 +33,7 @@ $taskQuery = $user_role === 'admin'
        JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
        JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
        ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Pending', 'Started'), recorded_timestamp DESC"
-    : ($user_role === 'manager'
+    : ($user_role === 'Manager'
         ? "SELECT tasks.*, 
                   assigned_to_user.username AS assigned_to, 
                   assigned_to_user.department AS department, 
@@ -51,7 +51,7 @@ $taskQuery = $user_role === 'admin'
            ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Pending', 'Started'), recorded_timestamp DESC");
 
 $stmt = $conn->prepare($taskQuery);
-if ($user_role === 'manager' || $user_role === 'user') {
+if ($user_role === 'Manager' || $user_role === 'User') {
     $stmt->bind_param("i", $user_id);
 }
 

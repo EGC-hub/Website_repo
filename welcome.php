@@ -176,7 +176,7 @@ $_SESSION['last_activity'] = time();
                 <?php endif; ?>
 
                 <!-- Display 'View Users' if user has 'admin' or 'manager' role -->
-                <?php if ($userRole === 'Admin' || $userRole === 'manager'): ?>
+                <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
                     <a href="view-users.php" class="btn">View Users</a>
                 <?php endif; ?>
             </div>
