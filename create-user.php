@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 session_start();
 
 // Check if the user is logged in and has admin role
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION['role'] !== 'Admin') {
     // Redirect to login page if not logged in or not an admin
     header("Location: portal-login.html");
     exit;
@@ -53,7 +53,7 @@ if ($userResult->num_rows > 0) {
 
 // Fetch all roles except 'admin' from the database
 $roles = [];
-$roleQuery = $conn->query("SELECT id, name FROM roles WHERE name != 'admin'");
+$roleQuery = $conn->query("SELECT id, name FROM roles WHERE name != 'Admin'");
 if ($roleQuery) {
     while ($row = $roleQuery->fetch_assoc()) {
         $roles[] = $row;
