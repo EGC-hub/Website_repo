@@ -882,13 +882,12 @@ function getWeekdays($start, $end)
         </div>
     </div>
 
-    <!-- Modal & script for the completion of tasks -->
-    <!-- Modal for Delayed Completion -->
+    <!-- Modal for Task Completion -->
     <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form method="POST" action="update-status.php">
+                <form id="completionForm" method="POST" onsubmit="handleCompletionForm(event)">
                     <div class="modal-header">
                         <h5 class="modal-title" id="completionModalLabel">Task Completion</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1115,6 +1114,50 @@ function getWeekdays($start, $end)
             // Correctly set the completion description
             const completionDescriptionElement = document.getElementById('completion-description-delayed');
             completionDescriptionElement.innerText = completionDescription && completionDescription.trim() ? completionDescription : "No description provided.";
+        }
+    </script>
+    <!-- Script for handling completion form -->
+    <script>
+        function handleCompletionForm(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch('update-status.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // Parse the response as JSON
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Close the completion modal
+                        const completionModal = bootstrap.Modal.getInstance(document.getElementById('completionModal'));
+                        completionModal.hide();
+
+                        // Show the success modal
+                        document.getElementById('success-task-name').innerText = data.task_name;
+                        document.getElementById('success-message').innerText = data.message;
+                        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                        successModal.show();
+
+                        // Optionally, refresh the task list or update the UI
+                        setTimeout(() => {
+                            window.location.reload(); // Reload the page to reflect the updated status
+                        }, 2000); // Reload after 2 seconds
+                    } else {
+                        alert(data.message); // Show an error message if the update failed
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the status.');
+                });
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
