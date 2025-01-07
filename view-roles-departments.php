@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 session_start();
 
 // Check if the user is logged in and has admin role
-if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'Admin') {
     header("Location: portal-login.html");
     exit;
 }
