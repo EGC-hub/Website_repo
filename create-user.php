@@ -51,6 +51,24 @@ if ($userResult->num_rows > 0) {
     $loggedInDepartmentName = "Unknown"; // Fallback if no department is found
 }
 
+// Fetch all roles except 'admin' from the database
+$roles = [];
+$roleQuery = $conn->query("SELECT id, name FROM roles WHERE name != 'admin'");
+if ($roleQuery) {
+    while ($row = $roleQuery->fetch_assoc()) {
+        $roles[] = $row;
+    }
+}
+
+// Fetch all departments from the database
+$departments = [];
+$departmentQuery = $conn->query("SELECT id, name FROM departments");
+if ($departmentQuery) {
+    while ($row = $departmentQuery->fetch_assoc()) {
+        $departments[] = $row;
+    }
+}
+
 // Initialize error and success messages
 $errorMsg = "";
 $successMsg = "";
@@ -243,7 +261,8 @@ $conn->close();
     <div class="main-container">
         <div class="user-info">
             <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
-                <strong><?= htmlspecialchars($loggedInDepartmentName) ?></strong></p>
+                <strong><?= htmlspecialchars($loggedInDepartmentName) ?></strong>
+            </p>
             <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
         </div>
 
@@ -274,15 +293,17 @@ $conn->close();
                 <div class="form-group">
                     <label for="role">Role</label>
                     <select id="role" name="role" required>
-                        <option value="user">User</option>
-                        <option value="manager">Manager</option>
+                        <?php foreach ($roles as $role): ?>
+                            <option value="<?= $role['id'] ?>"><?= htmlspecialchars($role['name']) ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="department">Department</label>
                     <select id="department" name="department" required>
-                        <option value="HR">HR</option>
-                        <option value="IT">IT</option>
+                        <?php foreach ($departments as $department): ?>
+                            <option value="<?= $department['id'] ?>"><?= htmlspecialchars($department['name']) ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <button type="submit">Create User</button>
