@@ -183,7 +183,7 @@ $_SESSION['last_activity'] = time();
                 <!-- Display 'Create New Role or Department' button only if user has 'admin' role -->
                 <?php if ($userRole === 'Admin'): ?>
                     <a href="create-roles-departments.php" class="btn">Create New Role or Department</a>
-                    <a href="edit-roles-departments.php" class="btn">Edit Role or Department</a>
+                    <a href="view-roles-departments.php" class="btn">View Role or Department</a>
                 <?php endif; ?>
             </div>
             <!-- Logout Button -->
