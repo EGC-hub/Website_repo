@@ -936,6 +936,24 @@ function getWeekdays($start, $end)
             </div>
         </div>
     </div>
+    <!-- Success modal for task updation -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">Status Updated</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Task ID:</strong> <span id="success-task-id"></span></p>
+                    <p><strong>Message:</strong> <span id="success-message"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Script for opening the modal to view details of completion -->
     <script>
@@ -969,27 +987,48 @@ function getWeekdays($start, $end)
             event.preventDefault();
 
             const status = event.target.value;
-            document.getElementById('task-id').value = taskId;
-            document.getElementById('modal-status').value = status;
+            const form = event.target.form;
 
-            const delayedReasonContainer = document.getElementById('delayed-reason-container');
-            const completionDateContainer = document.getElementById('completion-date-container');
-
-            // Show or hide additional fields based on status
-            if (status === 'Delayed Completion') {
-                delayedReasonContainer.style.display = 'block';
-                completionDateContainer.style.display = 'block';
-            } else {
-                delayedReasonContainer.style.display = 'none';
-                completionDateContainer.style.display = 'none';
-            }
-
-            // Trigger modal for 'Delayed Completion' or 'Completed on Time'
+            // If the status is 'Delayed Completion' or 'Completed on Time', show the modal
             if (status === 'Delayed Completion' || status === 'Completed on Time') {
+                document.getElementById('task-id').value = taskId;
+                document.getElementById('modal-status').value = status;
+
+                const delayedReasonContainer = document.getElementById('delayed-reason-container');
+                const completionDateContainer = document.getElementById('completion-date-container');
+
+                if (status === 'Delayed Completion') {
+                    delayedReasonContainer.style.display = 'block';
+                    completionDateContainer.style.display = 'block';
+                } else {
+                    delayedReasonContainer.style.display = 'none';
+                    completionDateContainer.style.display = 'none';
+                }
+
                 const modal = new bootstrap.Modal(document.getElementById('completionModal'));
                 modal.show();
             } else {
-                event.target.form.submit();
+                // For other statuses, submit the form directly
+                fetch('update-status.php', {
+                    method: 'POST',
+                    body: new FormData(form)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success modal with task ID and message
+                            document.getElementById('success-task-id').innerText = data.task_id;
+                            document.getElementById('success-message').innerText = data.message;
+                            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                            successModal.show();
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while updating the status.');
+                    });
             }
         }
     </script>

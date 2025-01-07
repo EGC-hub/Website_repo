@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: portal-login.html");
+    exit;
+}
+
 $config = include '../config.php';
 
 // Database connection details
@@ -22,7 +30,10 @@ try {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate input
     if (empty($_POST['task_id']) || empty($_POST['status'])) {
-        die("Error: Task ID and status are required.");
+        die(json_encode([
+            'success' => false,
+            'message' => 'Task ID and status are required.'
+        ]));
     }
 
     $taskId = (int)$_POST['task_id'];
@@ -71,13 +82,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Execute the query
         if ($stmt->execute()) {
-            header("Location: tasks.php");
-            exit;
+            // Return a JSON response with success message and task ID
+            echo json_encode([
+                'success' => true,
+                'task_id' => $taskId,
+                'message' => 'Status updated successfully.'
+            ]);
         } else {
-            echo "Error updating task.";
+            echo json_encode([
+                'success' => false,
+                'message' => 'Failed to update task status.'
+            ]);
         }
     } catch (PDOException $e) {
-        die("Error updating task: " . $e->getMessage());
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error updating task: ' . $e->getMessage()
+        ]);
     }
 }
 
