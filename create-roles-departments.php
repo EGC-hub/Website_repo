@@ -143,6 +143,7 @@ try {
         button {
             width: 100%;
             padding: 10px;
+            margin-bottom: 10px;
             background-color: #002c5f;
             color: white;
             border: none;
