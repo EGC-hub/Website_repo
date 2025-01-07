@@ -19,7 +19,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
 $user_id = $_SESSION['user_id'];
 $user_role = $_SESSION['role'];
 $user_department = $_SESSION['department'];
-$username = $_SESSION['username'];
+$user_username = $_SESSION['username'];
 
 // Fetch users based on role
 try {
@@ -217,7 +217,7 @@ try {
 
 <body>
     <div class="user-info">
-        <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong> | Department:
+        <p>Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong> | Department:
             <strong><?= htmlspecialchars($user_department) ?></strong>
         </p>
         <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
