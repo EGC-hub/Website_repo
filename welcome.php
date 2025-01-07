@@ -46,6 +46,36 @@ $_SESSION['last_activity'] = time();
             background-color: #f4f4f4;
         }
 
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .user-info .session-warning {
+            color: #dc3545;
+            /* Red color for warning */
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
         .welcome-container {
             text-align: center;
             background-color: #ffffff;
@@ -98,62 +128,41 @@ $_SESSION['last_activity'] = time();
         .logout-btn:hover {
             background-color: #ff1a1a;
         }
-
-        .user-info {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .user-info p {
-            margin: 5px 0;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .user-info .session-warning {
-            color: #dc3545;
-            /* Red color for warning */
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 10px;
-        }
     </style>
 </head>
 
 <body>
-    <div class="user-info">
-        <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
-            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
-        </p>
-        <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
-    </div>
-
-    <div class="welcome-container">
-        <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
-        <div class="button-container">
-            <!-- Buttons for navigation -->
-            <?php if ($userRole === 'admin'): ?>
-                <a href="data-display.php" class="btn">Data Display</a>
-            <?php endif; ?>
-
-            <a href="tasks.php" class="btn">Tasks</a>
-
-            <!-- Display 'Create User' button only if user has 'admin' role -->
-            <?php if ($userRole === 'admin'): ?>
-                <a href="create-user.php" class="btn">Create User</a>
-            <?php endif; ?>
-
-            <!-- Display 'View Users' if user has 'admin' or 'manager' role -->
-            <?php if ($userRole === 'admin' || $userRole === 'manager'): ?>
-                <a href="view-users.php" class="btn">View Users</a>
-            <?php endif; ?>
+    <div class="main-container">
+        <div class="user-info">
+            <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
+                <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
+            </p>
+            <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
         </div>
-        <!-- Logout Button -->
-        <a href="logout.php" class="logout-btn">Log Out</a>
+
+        <div class="welcome-container">
+            <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
+            <div class="button-container">
+                <!-- Buttons for navigation -->
+                <?php if ($userRole === 'admin'): ?>
+                    <a href="data-display.php" class="btn">Data Display</a>
+                <?php endif; ?>
+
+                <a href="tasks.php" class="btn">Tasks</a>
+
+                <!-- Display 'Create User' button only if user has 'admin' role -->
+                <?php if ($userRole === 'admin'): ?>
+                    <a href="create-user.php" class="btn">Create User</a>
+                <?php endif; ?>
+
+                <!-- Display 'View Users' if user has 'admin' or 'manager' role -->
+                <?php if ($userRole === 'admin' || $userRole === 'manager'): ?>
+                    <a href="view-users.php" class="btn">View Users</a>
+                <?php endif; ?>
+            </div>
+            <!-- Logout Button -->
+            <a href="logout.php" class="logout-btn">Log Out</a>
+        </div>
     </div>
 
 </body>
