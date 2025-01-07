@@ -759,7 +759,7 @@ function getWeekdays($start, $end)
                                         </form>
                                     </td>
                                 <?php else: ?>
-                                    <td></td> <!-- Empty column if no actions -->
+                                    <!-- <td></td> Empty column if no actions -->
                                 <?php endif; ?>
                             </tr>
                         <?php endif; ?>
