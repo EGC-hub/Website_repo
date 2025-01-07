@@ -683,6 +683,7 @@ function getWeekdays($start, $end)
             <table class="table table-striped table-hover align-middle text-center" id="pending-tasks">
                 <thead>
                     <tr class="align-middle">
+                        <th>#</th> <!-- New column for task count -->
                         <th>Project Name</th>
                         <th>Task Name</th>
                         <th>Task Description</th>
@@ -702,9 +703,12 @@ function getWeekdays($start, $end)
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($rows as $row): ?>
+                    <?php
+                    $taskCount = 1; // Initialize task count
+                    foreach ($rows as $row): ?>
                         <?php if ($row['status'] === 'Pending' || $row['status'] === 'Started'): ?>
                             <tr class="align-middle">
+                                <td><?= $taskCount++ ?></td> <!-- Display task count and increment -->
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td>
                                     <?php if ($row['status'] === 'Completed on Time'): ?>
@@ -773,6 +777,7 @@ function getWeekdays($start, $end)
             <table class="table table-striped table-hover align-middle text-center custom-table" id="remaining-tasks">
                 <thead>
                     <tr class="align-middle">
+                        <th>#</th> <!-- New column for task count -->
                         <th>Project Name</th>
                         <th>Task Name</th>
                         <th>Task Description</th>
@@ -789,7 +794,9 @@ function getWeekdays($start, $end)
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($rows as $row): ?>
+                    <?php
+                    $taskCount = 1; // Initialize task count
+                    foreach ($rows as $row): ?>
                         <?php if ($row['status'] !== 'Pending' && $row['status'] !== 'Started'): ?>
                             <?php
                             $delayInfo = '';
@@ -811,6 +818,7 @@ function getWeekdays($start, $end)
                             <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
                                 data-status="<?= htmlspecialchars($row['status']) ?>" class="align-middle <?php if ($row['status'] === 'Delayed Completion')
                                       echo 'delayed-task'; ?>">
+                                <td><?= $taskCount++ ?></td> <!-- Display task count and increment -->
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td>
                                     <?php if ($row['status'] === 'Completed on Time'): ?>
@@ -1166,4 +1174,4 @@ function getWeekdays($start, $end)
 </body>
 
 </html>
-<?php $conn->close(); ?>c
+<?php $conn->close(); ?>
