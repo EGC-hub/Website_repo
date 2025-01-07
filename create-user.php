@@ -125,6 +125,7 @@ $conn->close();
             flex-direction: column;
             align-items: center;
             text-align: center;
+            padding: 25px;
         }
 
         .form-container {
@@ -233,7 +234,7 @@ $conn->close();
 </head>
 
 <body>
-    <div class="main-container p4">
+    <div class="main-container">
         <div class="user-info">
             <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
                 <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
