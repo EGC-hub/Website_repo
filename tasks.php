@@ -571,8 +571,7 @@ function getWeekdays($start, $end)
 <body>
     <div class="user-info">
         <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
-            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong> | Role:
-            <strong><?= htmlspecialchars($loggedInRole) ?></strong></p>
+            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong></p>
         <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
     </div>
 
