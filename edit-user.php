@@ -45,7 +45,7 @@ try {
 
     // Fetch all roles except 'admin'
     $roles = [];
-    $roleQuery = $pdo->query("SELECT id, name FROM roles WHERE name != 'admin'");
+    $roleQuery = $pdo->query("SELECT id, name FROM roles WHERE name != 'Admin'");
     if ($roleQuery) {
         while ($row = $roleQuery->fetch(PDO::FETCH_ASSOC)) {
             $roles[] = $row;
@@ -69,7 +69,7 @@ try {
 
         if (empty($email)) {
             $error = "Email is required.";
-        } elseif ($user_role === 'admin') { // Admin can change all fields
+        } elseif ($user_role === 'Admin') { // Admin can change all fields
             // Validate role_id and department_id
             $validRoleIds = array_column($roles, 'id');
             $validDepartmentIds = array_column($departments, 'id');
@@ -94,7 +94,7 @@ try {
                     $error = "Failed to update user. Please try again.";
                 }
             }
-        } elseif ($user_role === 'manager') { // Manager can only change email
+        } elseif ($user_role === 'Manager') { // Manager can only change email
             $updateStmt = $pdo->prepare("UPDATE users SET email = :email WHERE id = :id");
             $updateStmt->bindParam(':email', $email);
             $updateStmt->bindParam(':id', $userId);
@@ -217,7 +217,7 @@ try {
             <label for="email">Email</label>
             <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
         </div>
-        <?php if ($user_role == 'admin'): ?>
+        <?php if ($user_role == 'Admin'): ?>
         <div class="form-group">
             <label for="department">Department</label>
             <select id="department" name="department" required>
