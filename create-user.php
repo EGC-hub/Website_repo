@@ -212,7 +212,7 @@ $conn->close();
             max-width: 500px;
             text-align: center;
             margin-bottom: 20px;
-            padding: 40px;
+            padding: 10px 40px;
             background-color: #f8f9fa;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
