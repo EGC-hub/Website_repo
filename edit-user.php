@@ -26,12 +26,12 @@ try {
 
     // Fetch user details with role and department names
     $stmt = $pdo->prepare("
-        SELECT u.id, u.username, u.email, r.name AS role_name, d.name AS department_name 
-        FROM users u
-        LEFT JOIN roles r ON u.role_id = r.id
-        LEFT JOIN departments d ON u.department_id = d.id
-        WHERE u.id = :id
-    ");
+SELECT u.id, u.username, u.email, u.role_id, u.department_id, r.name AS role_name, d.name AS department_name 
+FROM users u
+LEFT JOIN roles r ON u.role_id = r.id
+LEFT JOIN departments d ON u.department_id = d.id
+WHERE u.id = :id
+");
     $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -117,6 +117,7 @@ try {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -203,46 +204,48 @@ try {
         }
     </style>
 </head>
+
 <body>
 
-<div class="form-container">
-    <h1>Edit User: <?= htmlspecialchars($username) ?></h1>
-    <?php if (isset($error)): ?>
-        <div class="error"><?= htmlspecialchars($error) ?></div>
-    <?php elseif (isset($success)): ?>
-        <div class="success"><?= htmlspecialchars($success) ?></div>
-    <?php endif; ?>
-    <form method="POST">
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
-        </div>
-        <?php if ($user_role == 'Admin'): ?>
-        <div class="form-group">
-            <label for="department">Department</label>
-            <select id="department" name="department" required>
-                <?php foreach ($departments as $department): ?>
-                    <option value="<?= $department['id'] ?>" <?= $department['id'] == $user['department_id'] ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($department['name']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="role">Role</label>
-            <select id="role" name="role" required>
-                <?php foreach ($roles as $role): ?>
-                    <option value="<?= $role['id'] ?>" <?= $role['id'] == $user['role_id'] ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($role['name']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+    <div class="form-container">
+        <h1>Edit User: <?= htmlspecialchars($username) ?></h1>
+        <?php if (isset($error)): ?>
+            <div class="error"><?= htmlspecialchars($error) ?></div>
+        <?php elseif (isset($success)): ?>
+            <div class="success"><?= htmlspecialchars($success) ?></div>
         <?php endif; ?>
-        <button type="submit">Save Changes</button>
-    </form>
-    <a href="view-users.php" class="back-btn">Back</a>
-</div>
+        <form method="POST">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
+            </div>
+            <?php if ($user_role == 'Admin'): ?>
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <select id="department" name="department" required>
+                        <?php foreach ($departments as $department): ?>
+                            <option value="<?= $department['id'] ?>" <?= $department['id'] == $user['department_id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($department['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" required>
+                        <?php foreach ($roles as $role): ?>
+                            <option value="<?= $role['id'] ?>" <?= $role['id'] == $user['role_id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($role['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            <?php endif; ?>
+            <button type="submit">Save Changes</button>
+        </form>
+        <a href="view-users.php" class="back-btn">Back</a>
+    </div>
 
 </body>
+
 </html>
