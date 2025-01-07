@@ -57,6 +57,21 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Fetch logged-in user's details
+$userQuery = $conn->prepare("SELECT username, department FROM users WHERE id = ?");
+$userQuery->bind_param("i", $user_id);
+$userQuery->execute();
+$userResult = $userQuery->get_result();
+
+if ($userResult->num_rows > 0) {
+    $userDetails = $userResult->fetch_assoc();
+    $loggedInUsername = $userDetails['username'];
+    $loggedInDepartment = $userDetails['department'];
+} else {
+    $loggedInUsername = "Unknown";
+    $loggedInDepartment = "Unknown";
+}
+
 // Fetch users for task assignment (admin and manager roles)
 $users = [];
 if ($user_role === 'admin' || $user_role === 'manager') {
@@ -493,10 +508,39 @@ function getWeekdays($start, $end)
             color: #842029 !important;
             /* Dark red text */
         }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .session-warning {
+            color: #dc3545;
+            /* Red color for warning */
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 
 <body>
+    <div class="user-info">
+        <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
+            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
+        </p>
+        <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
+    </div>
     <div class="logout-button">
         <a href="welcome.php">Back</a>
     </div>
