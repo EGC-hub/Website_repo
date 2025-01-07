@@ -175,6 +175,8 @@ try {
         }
 
         .user-info {
+            width: 90%;
+            max-width: 1200px;
             text-align: center;
             margin-bottom: 20px;
             padding: 10px;
@@ -216,13 +218,13 @@ try {
 </head>
 
 <body>
+    <div class="user-info">
+        <p>Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong> | Department:
+            <strong><?= htmlspecialchars($user_department) ?></strong>
+        </p>
+        <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
+    </div>
     <div class="container">
-        <div class="user-info">
-            <p>Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong> | Department:
-                <strong><?= htmlspecialchars($user_department) ?></strong>
-            </p>
-            <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
-        </div>
         <h1>Users</h1>
 
         <?php if ($user_role === 'admin'): ?>
