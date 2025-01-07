@@ -82,10 +82,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Execute the query
         if ($stmt->execute()) {
-            // Return a JSON response with success message and task ID
+            // Fetch the task name after updating the status
+            $taskNameQuery = $pdo->prepare("SELECT task_name FROM tasks WHERE task_id = :task_id");
+            $taskNameQuery->bindParam(':task_id', $taskId, PDO::PARAM_INT);
+            $taskNameQuery->execute();
+            $taskNameResult = $taskNameQuery->fetch(PDO::FETCH_ASSOC);
+
+            if ($taskNameResult) {
+                $taskName = $taskNameResult['task_name'];
+            } else {
+                $taskName = "Unknown Task";
+            }
+
+            // Return a JSON response with success message and task name
             echo json_encode([
                 'success' => true,
-                'task_id' => $taskId,
+                'task_name' => $taskName,
                 'message' => 'Status updated successfully.'
             ]);
         } else {

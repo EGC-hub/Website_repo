@@ -945,7 +945,7 @@ function getWeekdays($start, $end)
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Task ID:</strong> <span id="success-task-id"></span></p>
+                    <p><strong>Task Name:</strong> <span id="success-task-name"></span></p>
                     <p><strong>Message:</strong> <span id="success-message"></span></p>
                 </div>
                 <div class="modal-footer">
@@ -1016,8 +1016,8 @@ function getWeekdays($start, $end)
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Show success modal with task ID and message
-                            document.getElementById('success-task-id').innerText = data.task_id;
+                            // Show success modal with task name and message
+                            document.getElementById('success-task-name').innerText = data.task_name;
                             document.getElementById('success-message').innerText = data.message;
                             const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                             successModal.show();
