@@ -26,24 +26,24 @@ try {
     $pdo = new PDO($dsn, $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    if ($user_role === 'admin') {
-        // Admin: View all users except admins
+    if ($user_role === 'Admin') {
+        // Admin: View all users except Admins
         $stmt = $pdo->prepare("
             SELECT u.id, u.username, u.email, r.name AS role_name, d.name AS department_name 
             FROM users u
             LEFT JOIN roles r ON u.role_id = r.id
             LEFT JOIN departments d ON u.department_id = d.id
-            WHERE r.name != 'admin'
+            WHERE r.name != 'Admin'
             ORDER BY d.name, u.username
         ");
-    } elseif ($user_role === 'manager') {
-        // Manager: View only users in the same department, excluding admins and their own account
+    } elseif ($user_role === 'Manager') {
+        // Manager: View only users in the same department, excluding Admins and their own account
         $stmt = $pdo->prepare("
             SELECT u.id, u.username, u.email, r.name AS role_name, d.name AS department_name 
             FROM users u
             LEFT JOIN roles r ON u.role_id = r.id
             LEFT JOIN departments d ON u.department_id = d.id
-            WHERE d.name = :department AND r.name NOT IN ('admin', 'manager') AND u.id != :user_id
+            WHERE d.name = :department AND r.name NOT IN ('Admin', 'Manager') AND u.id != :user_id
             ORDER BY u.username
         ");
         $stmt->bindParam(':department', $user_department);
@@ -249,7 +249,7 @@ try {
         <div class="container">
             <h1>Users</h1>
 
-            <?php if ($user_role === 'admin'): ?>
+            <?php if ($user_role === 'Admin'): ?>
                 <p>Viewing all users grouped by department</p>
                 <?php
                 $current_department = '';
@@ -288,7 +288,7 @@ try {
                     echo "</tbody></table>";
                 }
                 ?>
-            <?php elseif ($user_role === 'manager'): ?>
+            <?php elseif ($user_role === 'Manager'): ?>
                 <p>Viewing users in your department: <strong><?= htmlspecialchars($user_department) ?></strong></p>
                 <?php if (!empty($users)): ?>
                     <table>
