@@ -583,6 +583,8 @@ function getWeekdays($start, $end)
                             <?= htmlspecialchars($project) ?>
                         </button>
                     <?php endforeach; ?>
+                    <!-- Export Button -->
+                    <a href="export_tasks.php" class="btn btn-success">Export to CSV</a>
                 </div>
 
                 <!-- Date Range Inputs -->
