@@ -23,8 +23,12 @@
         $username = $_POST['username'];
         $password = $_POST['password'];
 
-        // Prepare the SQL query
-        $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+        // Prepare the SQL query to fetch user data
+        $stmt = $conn->prepare("SELECT users.*, roles.name as role_name, departments.name as department_name 
+                                FROM users 
+                                LEFT JOIN roles ON users.role_id = roles.id 
+                                LEFT JOIN departments ON users.department_id = departments.id 
+                                WHERE username = ?");
         $stmt->bind_param("s", $username);
 
         // Execute the query
@@ -41,9 +45,9 @@
                 session_regenerate_id(true); // Regenerate session ID for security
                 $_SESSION['loggedin'] = true;
                 $_SESSION['username'] = $username;
-                $_SESSION['role'] = $user['role'];
+                $_SESSION['role'] = $user['role_name']; // Store role name instead of role_id
                 $_SESSION['user_id'] = $user['id'];
-                $_SESSION['department'] = $user['department'];
+                $_SESSION['department'] = $user['department_name']; // Store department name instead of department_id
 
                 // Redirect to the data display page
                 header("Location: welcome.php");
@@ -66,4 +70,4 @@
     if (isset($error)) {
         echo '<script>alert("'. $error. '");</script>';
     }
-    ?>
+?>
