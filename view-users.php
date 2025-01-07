@@ -58,11 +58,13 @@ try {
     <title>View Users</title>
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             margin: 0;
-            padding: 0;
-            background-color: #f0f4f9;
-            color: #333;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
         }
 
         .container {
@@ -175,8 +177,6 @@ try {
         }
 
         .user-info {
-            width: 90%;
-            max-width: 1200px;
             text-align: center;
             margin-bottom: 20px;
             padding: 10px;
