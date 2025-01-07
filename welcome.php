@@ -173,6 +173,7 @@ $_SESSION['last_activity'] = time();
                 <!-- Display 'Create User' button only if user has 'admin' role -->
                 <?php if ($userRole === 'Admin'): ?>
                     <a href="create-user.php" class="btn">Create User</a>
+                    <a href="create-roles-departments.php" class="btn">Create New Role or Department</a>
                 <?php endif; ?>
 
                 <!-- Display 'View Users' if user has 'admin' or 'manager' role -->
