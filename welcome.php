@@ -164,19 +164,19 @@ $_SESSION['last_activity'] = time();
             <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
             <div class="button-container">
                 <!-- Buttons for navigation -->
-                <?php if ($userRole === 'admin'): ?>
+                <?php if ($userRole === 'Admin'): ?>
                     <a href="data-display.php" class="btn">Data Display</a>
                 <?php endif; ?>
 
                 <a href="tasks.php" class="btn">Tasks</a>
 
                 <!-- Display 'Create User' button only if user has 'admin' role -->
-                <?php if ($userRole === 'admin'): ?>
+                <?php if ($userRole === 'Admin'): ?>
                     <a href="create-user.php" class="btn">Create User</a>
                 <?php endif; ?>
 
                 <!-- Display 'View Users' if user has 'admin' or 'manager' role -->
-                <?php if ($userRole === 'admin' || $userRole === 'manager'): ?>
+                <?php if ($userRole === 'Admin' || $userRole === 'manager'): ?>
                     <a href="view-users.php" class="btn">View Users</a>
                 <?php endif; ?>
             </div>
