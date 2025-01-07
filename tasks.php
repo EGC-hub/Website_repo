@@ -18,12 +18,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-// Fetch departments from the database
-$departments = $conn->query("SELECT id, name FROM departments")->fetch_all(MYSQLI_ASSOC);
-
-// Fetch roles from the database
-$roles = $conn->query("SELECT id, name FROM roles")->fetch_all(MYSQLI_ASSOC);
-
 // Get user information from the session
 $user_id = $_SESSION['user_id'] ?? null;
 $user_role = $_SESSION['role'] ?? null;
@@ -62,6 +56,12 @@ $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+// Fetch departments from the database
+$departments = $conn->query("SELECT id, name FROM departments")->fetch_all(MYSQLI_ASSOC);
+
+// Fetch roles from the database
+$roles = $conn->query("SELECT id, name FROM roles")->fetch_all(MYSQLI_ASSOC);
 
 // Fetch logged-in user's details
 $userQuery = $conn->prepare("
