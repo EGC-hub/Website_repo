@@ -18,6 +18,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
+// Fetch departments from the database
+$departments = $conn->query("SELECT id, name FROM departments")->fetch_all(MYSQLI_ASSOC);
+
+// Fetch roles from the database
+$roles = $conn->query("SELECT id, name FROM roles")->fetch_all(MYSQLI_ASSOC);
+
 // Get user information from the session
 $user_id = $_SESSION['user_id'] ?? null;
 $user_role = $_SESSION['role'] ?? null;
@@ -58,7 +64,13 @@ if ($conn->connect_error) {
 }
 
 // Fetch logged-in user's details
-$userQuery = $conn->prepare("SELECT username, department FROM users WHERE id = ?");
+$userQuery = $conn->prepare("
+    SELECT u.username, d.name AS department, r.name AS role 
+    FROM users u
+    JOIN departments d ON u.department_id = d.id
+    JOIN roles r ON u.role_id = r.id
+    WHERE u.id = ?
+");
 $userQuery->bind_param("i", $user_id);
 $userQuery->execute();
 $userResult = $userQuery->get_result();
@@ -67,9 +79,11 @@ if ($userResult->num_rows > 0) {
     $userDetails = $userResult->fetch_assoc();
     $loggedInUsername = $userDetails['username'];
     $loggedInDepartment = $userDetails['department'];
+    $loggedInRole = $userDetails['role'];
 } else {
     $loggedInUsername = "Unknown";
     $loggedInDepartment = "Unknown";
+    $loggedInRole = "Unknown";
 }
 
 // Fetch users for task assignment (admin and manager roles)
@@ -77,12 +91,24 @@ $users = [];
 if ($user_role === 'admin' || $user_role === 'manager') {
     if ($user_role === 'admin') {
         // Admin can assign tasks to users and managers
-        $userQuery = "SELECT id, username, email FROM users WHERE role IN ('user', 'manager')";
+        $userQuery = "
+            SELECT u.id, u.username, u.email, d.name AS department, r.name AS role 
+            FROM users u
+            JOIN departments d ON u.department_id = d.id
+            JOIN roles r ON u.role_id = r.id
+            WHERE r.name IN ('user', 'manager')
+        ";
     } else {
         // Manager can only assign tasks to users in their department
-        $userQuery = "SELECT id, username, email 
-                      FROM users 
-                      WHERE role = 'user' AND department = (SELECT department FROM users WHERE id = $user_id) OR id = $user_id";
+        $userQuery = "
+            SELECT u.id, u.username, u.email, d.name AS department, r.name AS role 
+            FROM users u
+            JOIN departments d ON u.department_id = d.id
+            JOIN roles r ON u.role_id = r.id
+            WHERE d.id = (SELECT department_id FROM users WHERE id = $user_id) 
+              AND r.name = 'user' 
+              OR u.id = $user_id
+        ";
     }
 
     $userResult = $conn->query($userQuery);
@@ -191,47 +217,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
 }
 
 // Fetch tasks for the logged-in user
-// Fetch tasks for the logged-in user
 $taskQuery = $user_role === 'admin'
-    ? "SELECT tasks.*, 
-              assigned_to_user.username AS assigned_to, 
-              assigned_to_user.department AS department, 
-              assigned_by_user.username AS assigned_by 
-       FROM tasks 
-       JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
-       JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-       ORDER BY 
-           CASE 
-               WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
-               WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date 
-           END DESC, 
-           recorded_timestamp DESC"
+    ? "
+        SELECT tasks.*, 
+               assigned_to_user.username AS assigned_to, 
+               assigned_to_department.name AS department, 
+               assigned_by_user.username AS assigned_by 
+        FROM tasks 
+        JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
+        JOIN departments AS assigned_to_department ON assigned_to_user.department_id = assigned_to_department.id
+        JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+        ORDER BY 
+            CASE 
+                WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
+                WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date 
+            END DESC, 
+            recorded_timestamp DESC
+    "
     : ($user_role === 'manager'
-        ? "SELECT tasks.*, 
-                  assigned_to_user.username AS assigned_to, 
-                  assigned_to_user.department AS department, 
-                  assigned_by_user.username AS assigned_by 
-           FROM tasks 
-           JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
-           JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-           WHERE assigned_to_user.department = (SELECT department FROM users WHERE id = ?) 
-           ORDER BY 
-               CASE 
-                   WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
-                   WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date 
-               END DESC, 
-               recorded_timestamp DESC"
-        : "SELECT tasks.*, 
-                  assigned_by_user.username AS assigned_by 
-           FROM tasks 
-           JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-           WHERE tasks.user_id = ? 
-           ORDER BY 
-               CASE 
-                   WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
-                   WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date 
-               END DESC, 
-               recorded_timestamp DESC");
+        ? "
+            SELECT tasks.*, 
+                   assigned_to_user.username AS assigned_to, 
+                   assigned_to_department.name AS department, 
+                   assigned_by_user.username AS assigned_by 
+            FROM tasks 
+            JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
+            JOIN departments AS assigned_to_department ON assigned_to_user.department_id = assigned_to_department.id
+            JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+            WHERE assigned_to_department.id = (SELECT department_id FROM users WHERE id = ?) 
+            ORDER BY 
+                CASE 
+                    WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
+                    WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date 
+                END DESC, 
+                recorded_timestamp DESC
+        "
+        : "
+            SELECT tasks.*, 
+                   assigned_by_user.username AS assigned_by 
+            FROM tasks 
+            JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+            WHERE tasks.user_id = ? 
+            ORDER BY 
+                CASE 
+                    WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
+                    WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date 
+                END DESC, 
+                recorded_timestamp DESC
+        ");
 
 $stmt = $conn->prepare($taskQuery);
 if ($user_role === 'manager' || $user_role === 'user') {
@@ -538,8 +571,8 @@ function getWeekdays($start, $end)
 <body>
     <div class="user-info">
         <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
-            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
-        </p>
+            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong> | Role:
+            <strong><?= htmlspecialchars($loggedInRole) ?></strong></p>
         <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
     </div>
 
@@ -589,7 +622,8 @@ function getWeekdays($start, $end)
                         <option value="">Select a user</option>
                         <?php foreach ($users as $user): ?>
                             <option value="<?= $user['id'] ?>">
-                                <?= htmlspecialchars($user['username']) ?>
+                                <?= htmlspecialchars($user['username']) ?> (<?= htmlspecialchars($user['department']) ?> -
+                                <?= htmlspecialchars($user['role']) ?>)
                             </option>
                         <?php endforeach; ?>
                     </select>
