@@ -542,12 +542,12 @@ function getWeekdays($start, $end)
         </p>
         <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
     </div>
-    <div class="logout-button">
-        <a href="welcome.php">Back</a>
-    </div>
 
     <?php if ($user_role === 'admin' || $user_role === 'manager'): ?>
         <div class="task-container">
+            <div class="logout-button">
+                <a href="welcome.php">Back</a>
+            </div>
             <h2>Task Management</h2>
             <form method="post" action="">
                 <div class="form-group">
@@ -616,6 +616,9 @@ function getWeekdays($start, $end)
     ?>
 
     <div class="task-container">
+        <div class="logout-button">
+            <a href="welcome.php">Back</a>
+        </div>
         <h2>Tasks</h2>
 
         <div class="container mt-4">
