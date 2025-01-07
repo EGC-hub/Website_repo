@@ -68,11 +68,10 @@ $_SESSION['last_activity'] = time();
             text-align: center;
             width: 90%;
             /* Match the width of the welcome-container */
-            max-width: 800px;
+            max-width: 700px;
             /* Match the width of the welcome-container */
             margin-top: 20px;
             margin-bottom: 20px;
-            padding: 20px;
             /* Increase padding for better spacing */
             background-color: #f8f9fa;
             border-radius: 10px;
@@ -101,7 +100,7 @@ $_SESSION['last_activity'] = time();
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 90%;
             /* Match the width of the user-info */
-            max-width: 800px;
+            max-width: 700px;
             /* Match the width of the user-info */
         }
 
