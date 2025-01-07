@@ -524,7 +524,7 @@ function getWeekdays($start, $end)
             color: #333;
         }
 
-        .session-warning p {
+        .user-info .session-warning {
             color: #dc3545;
             /* Red color for warning */
             font-weight: bold;
