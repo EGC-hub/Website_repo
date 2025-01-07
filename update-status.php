@@ -30,10 +30,13 @@ try {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate input
     if (empty($_POST['task_id']) || empty($_POST['status'])) {
-        die(json_encode([
+        // Set the Content-Type header to JSON
+        header('Content-Type: application/json');
+        echo json_encode([
             'success' => false,
             'message' => 'Task ID and status are required.'
-        ]));
+        ]);
+        exit;
     }
 
     $taskId = (int)$_POST['task_id'];
@@ -94,6 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $taskName = "Unknown Task";
             }
 
+            // Set the Content-Type header to JSON
+            header('Content-Type: application/json');
             // Return a JSON response with success message and task name
             echo json_encode([
                 'success' => true,
@@ -101,12 +106,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'message' => 'Status updated successfully.'
             ]);
         } else {
+            // Set the Content-Type header to JSON
+            header('Content-Type: application/json');
             echo json_encode([
                 'success' => false,
                 'message' => 'Failed to update task status.'
             ]);
         }
     } catch (PDOException $e) {
+        // Set the Content-Type header to JSON
+        header('Content-Type: application/json');
         echo json_encode([
             'success' => false,
             'message' => 'Error updating task: ' . $e->getMessage()
