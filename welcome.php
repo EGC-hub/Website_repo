@@ -60,6 +60,7 @@ $_SESSION['last_activity'] = time();
         .user-info {
             text-align: center;
             width: 90%;
+            /* Match the width of the welcome-container */
             max-width: 800px;
             /* Match the width of the welcome-container */
             margin-top: 20px;
@@ -92,6 +93,7 @@ $_SESSION['last_activity'] = time();
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 90%;
+            /* Match the width of the user-info */
             max-width: 800px;
             /* Match the width of the user-info */
         }
