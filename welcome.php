@@ -133,7 +133,7 @@ $_SESSION['last_activity'] = time();
         }
 
         .logout-btn {
-            display: block;
+            display: inline-block;
             margin: 20px auto;
             padding: 10px 20px;
             font-size: 16px;
