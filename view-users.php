@@ -294,7 +294,6 @@ try {
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -303,9 +302,6 @@ try {
                                     <td><?= htmlspecialchars($user['username']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
                                     <td><?= htmlspecialchars($user['role']) ?></td>
-                                    <td>
-                                        <a href="edit-user.php?id=<?= $user['id'] ?>" class="edit-button">Edit</a>
-                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
