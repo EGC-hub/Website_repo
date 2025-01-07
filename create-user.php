@@ -126,7 +126,7 @@ $conn->close();
             align-items: center;
             text-align: center;
         }
-        
+
         .form-container {
             background-color: #ffffff;
             padding: 40px;
@@ -233,7 +233,7 @@ $conn->close();
 </head>
 
 <body>
-    <div class="main-container">
+    <div class="main-container p4">
         <div class="user-info">
             <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
                 <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
