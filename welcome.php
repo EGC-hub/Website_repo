@@ -40,11 +40,11 @@ $_SESSION['last_activity'] = time();
         body {
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
+            padding: 20px;
+            /* Add padding to the body */
         }
 
         .main-container {
@@ -52,16 +52,22 @@ $_SESSION['last_activity'] = time();
             flex-direction: column;
             align-items: center;
             text-align: center;
+            width: 100%;
+            max-width: 1200px;
+            /* Match the width of the welcome-container */
         }
 
         .user-info {
             text-align: center;
             width: 90%;
+            max-width: 800px;
+            /* Match the width of the welcome-container */
             margin-top: 20px;
             margin-bottom: 20px;
-            padding: 10px;
+            padding: 20px;
+            /* Increase padding for better spacing */
             background-color: #f8f9fa;
-            border-radius: 5px;
+            border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -85,6 +91,9 @@ $_SESSION['last_activity'] = time();
             padding: 40px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            /* Match the width of the user-info */
         }
 
         h1 {
@@ -138,7 +147,8 @@ $_SESSION['last_activity'] = time();
     <div class="main-container">
         <div class="user-info">
             <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong> | Department:
-                <strong><?= htmlspecialchars($department) ?></strong></p>
+                <strong><?= htmlspecialchars($department) ?></strong>
+            </p>
             <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
         </div>
 
