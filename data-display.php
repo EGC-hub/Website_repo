@@ -51,15 +51,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-if ($userResult->num_rows > 0) {
-    $userDetails = $userResult->fetch_assoc();
-    $loggedInUsername = $userDetails['username'];
-    $loggedInDepartment = $userDetails['department'];
-} else {
-    $loggedInUsername = "Unknown";
-    $loggedInDepartment = "Unknown";
-}
-
 // Fetch distinct services and countries
 $queryServices = "SELECT DISTINCT services FROM contact_form_submissions";
 $queryCountries = "SELECT DISTINCT country FROM contact_form_submissions";
