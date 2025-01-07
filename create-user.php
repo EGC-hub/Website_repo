@@ -41,7 +41,7 @@ $userResult = $userQuery->get_result();
 if ($userResult->num_rows > 0) {
     $userDetails = $userResult->fetch_assoc();
     $loggedInUsername = $userDetails['username'];
-    $loggedInDepartmentId = $userDetails['department_id'];
+    $loggedInDepartment = $userDetails['department'];
 } else {
     $loggedInUsername = "Unknown";
     $loggedInDepartmentId = null;
@@ -252,7 +252,7 @@ $conn->close();
     <div class="main-container">
         <div class="user-info">
             <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
-                <strong><?= htmlspecialchars($loggedInDepartmentId) ?></strong>
+                <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
             </p>
             <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
         </div>
