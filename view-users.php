@@ -64,6 +64,8 @@ try {
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
+            padding: 20px;
+            /* Add padding to the body */
         }
 
         .main-container {
@@ -75,9 +77,40 @@ try {
             text-align: center;
         }
 
+        .user-info {
+            text-align: center;
+            width: 90%;
+            /* Match the width of the container */
+            max-width: 1200px;
+            /* Match the width of the container */
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 20px;
+            /* Increase padding for better spacing */
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .user-info .session-warning {
+            color: #dc3545;
+            /* Red color for warning */
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
         .container {
             width: 90%;
+            /* Match the width of the user-info */
             max-width: 1200px;
+            /* Match the width of the user-info */
             margin: 20px auto;
             padding: 20px;
             background-color: #fff;
@@ -182,29 +215,6 @@ try {
         button.delete-button {
             font-family: 'Poppins', sans-serif;
             /* Ensures consistent font style */
-        }
-
-        .user-info {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .user-info p {
-            margin: 5px 0;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .user-info .session-warning {
-            color: #dc3545;
-            /* Red color for warning */
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 10px;
         }
 
         @media (max-width: 768px) {
