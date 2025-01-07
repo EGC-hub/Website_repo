@@ -79,40 +79,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
-    $role = $_POST['role'];
-    $department = $_POST['department'];
+    $role_id = intval($_POST['role']); // Ensure role_id is an integer
+    $department_id = intval($_POST['department']); // Ensure department_id is an integer
 
     // Validate the inputs
-    if (empty($username) || empty($password) || empty($role) || empty($department)) {
+    if (empty($username) || empty($password) || empty($role_id) || empty($department_id)) {
         $errorMsg = "Please fill in all fields.";
-    } elseif (!in_array($role, ['manager', 'user'])) {
-        $errorMsg = "Invalid role selected.";
     } else {
-        // Hash the password
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        // Validate role_id and department_id
+        $validRoleIds = array_column($roles, 'id'); // Get all valid role IDs
+        $validDepartmentIds = array_column($departments, 'id'); // Get all valid department IDs
 
-        // Check if the username already exists
-        $checkQuery = "SELECT id FROM users WHERE username = ?";
-        $stmt = $conn->prepare($checkQuery);
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows > 0) {
-            $errorMsg = "Username already taken.";
+        if (!in_array($role_id, $validRoleIds)) {
+            $errorMsg = "Invalid role selected.";
+        } elseif (!in_array($department_id, $validDepartmentIds)) {
+            $errorMsg = "Invalid department selected.";
         } else {
-            // Insert the new user into the database
-            $insertQuery = "INSERT INTO users (username, email, password, role, department) VALUES (?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($insertQuery);
-            $stmt->bind_param("sssss", $username, $email, $hashedPassword, $role, $department);
+            // Hash the password
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-            if ($stmt->execute()) {
-                $successMsg = "User created successfully.";
+            // Check if the username already exists
+            $checkQuery = "SELECT id FROM users WHERE username = ?";
+            $stmt = $conn->prepare($checkQuery);
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $stmt->store_result();
+
+            if ($stmt->num_rows > 0) {
+                $errorMsg = "Username already taken.";
             } else {
-                $errorMsg = "Failed to create user. Please try again.";
+                // Insert the new user into the database
+                $insertQuery = "INSERT INTO users (username, email, password, role_id, department_id) VALUES (?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($insertQuery);
+                $stmt->bind_param("sssii", $username, $email, $hashedPassword, $role_id, $department_id);
+
+                if ($stmt->execute()) {
+                    $successMsg = "User created successfully.";
+                } else {
+                    $errorMsg = "Failed to create user. Please try again.";
+                }
             }
+            $stmt->close();
         }
-        $stmt->close();
     }
 }
 
