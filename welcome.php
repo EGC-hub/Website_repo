@@ -2,35 +2,6 @@
 // Start session
 session_start();
 
-$config = include '../config.php';
-
-// Database connection
-$dbHost = 'localhost';
-$dbUsername = $config['dbUsername'];
-$dbPassword = $config['dbPassword'];
-$dbName = 'euro_login_system';
-
-$conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Fetch logged-in user's details
-$userQuery = $conn->prepare("SELECT username, department FROM users WHERE id = ?");
-$userQuery->bind_param("i", $user_id);
-$userQuery->execute();
-$userResult = $userQuery->get_result();
-
-if ($userResult->num_rows > 0) {
-    $userDetails = $userResult->fetch_assoc();
-    $loggedInUsername = $userDetails['username'];
-    $loggedInDepartment = $userDetails['department'];
-} else {
-    $loggedInUsername = "Unknown";
-    $loggedInDepartment = "Unknown";
-}
-
 // Check if the user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     // Redirect to login page if not logged in
@@ -38,9 +9,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-// Retrieve the username and role from the session
-$username = $_SESSION['username'];
-$userRole = $_SESSION['role']; // Assuming the role is stored in session as 'role'
+// Retrieve the username, role, and department from the session
+$username = $_SESSION['username'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
+$userRole = $_SESSION['role'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
+$department = $_SESSION['department'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
 
 // Optional: Session timeout settings
 $timeout_duration = 600;
@@ -163,9 +135,8 @@ $_SESSION['last_activity'] = time();
 <body>
     <div class="main-container">
         <div class="user-info">
-            <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
-                <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
-            </p>
+            <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong> | Department:
+                <strong><?= htmlspecialchars($department) ?></strong></p>
             <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
         </div>
 
