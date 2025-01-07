@@ -49,6 +49,11 @@ $_SESSION['last_activity'] = time();
             /* Add padding to the body */
         }
 
+        /* Apply box-sizing to all elements */
+        * {
+            box-sizing: border-box;
+        }
+
         .main-container {
             display: flex;
             flex-direction: column;
