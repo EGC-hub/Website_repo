@@ -13,6 +13,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION
     exit;
 }
 
+$user_id = $_SESSION['user_id'] ?? null;
+
 $config = include '../config.php';
 
 // Database connection
