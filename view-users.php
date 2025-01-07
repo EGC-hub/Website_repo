@@ -28,10 +28,24 @@ try {
 
     if ($user_role === 'admin') {
         // Admin: View all users except admins
-        $stmt = $pdo->prepare("SELECT id, username, email, role, department FROM users WHERE role != 'admin' ORDER BY department, username");
+        $stmt = $pdo->prepare("
+            SELECT u.id, u.username, u.email, r.name AS role_name, d.name AS department_name 
+            FROM users u
+            LEFT JOIN roles r ON u.role_id = r.id
+            LEFT JOIN departments d ON u.department_id = d.id
+            WHERE r.name != 'admin'
+            ORDER BY d.name, u.username
+        ");
     } elseif ($user_role === 'manager') {
         // Manager: View only users in the same department, excluding admins and their own account
-        $stmt = $pdo->prepare("SELECT id, username, email, role, department FROM users WHERE department = :department AND role NOT IN ('admin', 'manager') AND id != :user_id ORDER BY username");
+        $stmt = $pdo->prepare("
+            SELECT u.id, u.username, u.email, r.name AS role_name, d.name AS department_name 
+            FROM users u
+            LEFT JOIN roles r ON u.role_id = r.id
+            LEFT JOIN departments d ON u.department_id = d.id
+            WHERE d.name = :department AND r.name NOT IN ('admin', 'manager') AND u.id != :user_id
+            ORDER BY u.username
+        ");
         $stmt->bindParam(':department', $user_department);
         $stmt->bindParam(':user_id', $user_id);
     } else {
@@ -65,7 +79,6 @@ try {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             padding: 20px;
-            /* Add padding to the body */
         }
 
         .main-container {
@@ -80,13 +93,10 @@ try {
         .user-info {
             text-align: center;
             width: 90%;
-            /* Match the width of the container */
             max-width: 1200px;
-            /* Match the width of the container */
             margin-top: 20px;
             margin-bottom: 20px;
             padding: 20px;
-            /* Increase padding for better spacing */
             background-color: #f8f9fa;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -100,7 +110,6 @@ try {
 
         .user-info .session-warning {
             color: #dc3545;
-            /* Red color for warning */
             font-weight: bold;
             font-size: 14px;
             margin-top: 10px;
@@ -108,9 +117,7 @@ try {
 
         .container {
             width: 90%;
-            /* Match the width of the user-info */
             max-width: 1200px;
-            /* Match the width of the user-info */
             margin: 20px auto;
             padding: 20px;
             background-color: #fff;
@@ -196,25 +203,21 @@ try {
             display: inline-block;
             padding: 5px 10px;
             background-color: #e63946;
-            /* Red color for the delete button */
             color: white;
             text-decoration: none;
             border-radius: 5px;
             font-size: 0.9rem;
             border: none;
-            /* Removes default button border */
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
 
         .delete-button:hover {
             background-color: #d62828;
-            /* Darker red for hover effect */
         }
 
         button.delete-button {
             font-family: 'Poppins', sans-serif;
-            /* Ensures consistent font style */
         }
 
         @media (max-width: 768px) {
@@ -251,11 +254,11 @@ try {
                 <?php
                 $current_department = '';
                 foreach ($users as $user):
-                    if ($current_department !== $user['department']) {
+                    if ($current_department !== $user['department_name']) {
                         if ($current_department !== '') {
                             echo "</tbody></table>";
                         }
-                        $current_department = $user['department'];
+                        $current_department = $user['department_name'];
                         echo "<h2>Department: " . htmlspecialchars($current_department) . "</h2>";
                         echo "<table>
                     <thead>
@@ -271,7 +274,7 @@ try {
                     echo "<tr>
                         <td>" . htmlspecialchars($user['username']) . "</td>
                         <td>" . htmlspecialchars($user['email']) . "</td>
-                        <td>" . htmlspecialchars($user['role']) . "</td>
+                        <td>" . htmlspecialchars($user['role_name']) . "</td>
                         <td>
                         <a href='edit-user.php?id=" . urlencode($user['id']) . "' class='edit-button'>Edit</a>
                         <form action='delete-user.php' method='POST' style='display:inline;'>
@@ -301,7 +304,7 @@ try {
                                 <tr>
                                     <td><?= htmlspecialchars($user['username']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
-                                    <td><?= htmlspecialchars($user['role']) ?></td>
+                                    <td><?= htmlspecialchars($user['role_name']) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
