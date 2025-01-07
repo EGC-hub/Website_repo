@@ -511,7 +511,7 @@ function getWeekdays($start, $end)
 
         .user-info {
             text-align: center;
-            margin-bottom: 20px;
+            margin: 25px auto;
             padding: 10px;
             background-color: #f8f9fa;
             border-radius: 5px;
