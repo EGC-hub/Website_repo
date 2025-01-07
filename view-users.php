@@ -18,7 +18,8 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
 
 $user_id = $_SESSION['user_id'];
 $user_role = $_SESSION['role'];
-$user_department = $_SESSION['department']; // Assume this is set during login
+$user_department = $_SESSION['department'];
+$username = $_SESSION['username'];
 
 // Fetch users based on role
 try {
@@ -173,6 +174,29 @@ try {
             /* Ensures consistent font style */
         }
 
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .user-info .session-warning {
+            color: #dc3545;
+            /* Red color for warning */
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.8rem;
@@ -192,6 +216,12 @@ try {
 </head>
 
 <body>
+    <div class="user-info">
+        <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong> | Department:
+            <strong><?= htmlspecialchars($user_department) ?></strong>
+        </p>
+        <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
+    </div>
     <div class="container">
         <h1>Users</h1>
 
