@@ -120,6 +120,13 @@ $conn->close();
             margin: 0;
         }
 
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
         .form-container {
             background-color: #ffffff;
             padding: 40px;
@@ -226,58 +233,59 @@ $conn->close();
 </head>
 
 <body>
-    <div class="user-info">
-        <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
-            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
-        </p>
-        <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
+    <div class="main-container">
+        <div class="user-info">
+            <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
+                <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
+            </p>
+            <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
+        </div>
+
+        <div class="form-container">
+            <h1>Create User</h1>
+
+            <!-- Display error or success messages -->
+            <?php if (!empty($errorMsg)): ?>
+                <div class="error"><?php echo $errorMsg; ?></div>
+            <?php elseif (!empty($successMsg)): ?>
+                <div class="success"><?php echo $successMsg; ?></div>
+            <?php endif; ?>
+
+            <!-- Create User Form -->
+            <form method="POST" action="create-user.php">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" required>
+                        <option value="user">User</option>
+                        <option value="manager">Manager</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <select id="department" name="department" required>
+                        <option value="HR">HR</option>
+                        <option value="IT">IT</option>
+                    </select>
+                </div>
+                <button type="submit">Create User</button>
+            </form>
+
+            <!-- Back Button -->
+            <a href="welcome.php" class="back-btn">Back to Dashboard</a>
+        </div>
     </div>
-
-    <div class="form-container">
-        <h1>Create User</h1>
-
-        <!-- Display error or success messages -->
-        <?php if (!empty($errorMsg)): ?>
-            <div class="error"><?php echo $errorMsg; ?></div>
-        <?php elseif (!empty($successMsg)): ?>
-            <div class="success"><?php echo $successMsg; ?></div>
-        <?php endif; ?>
-
-        <!-- Create User Form -->
-        <form method="POST" action="create-user.php">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="role">Role</label>
-                <select id="role" name="role" required>
-                    <option value="user">User</option>
-                    <option value="manager">Manager</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="department">Department</label>
-                <select id="department" name="department" required>
-                    <option value="HR">HR</option>
-                    <option value="IT">IT</option>
-                </select>
-            </div>
-            <button type="submit">Create User</button>
-        </form>
-
-        <!-- Back Button -->
-        <a href="welcome.php" class="back-btn">Back to Dashboard</a>
-    </div>
-
 </body>
 
 </html>
