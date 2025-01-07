@@ -40,7 +40,22 @@ $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 
 // Check connection
 if ($conn->connect_error) {
-    die("Connection failed: ". $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch logged-in user's details
+$userQuery = $conn->prepare("SELECT username, department FROM users WHERE id = ?");
+$userQuery->bind_param("i", $user_id);
+$userQuery->execute();
+$userResult = $userQuery->get_result();
+
+if ($userResult->num_rows > 0) {
+    $userDetails = $userResult->fetch_assoc();
+    $loggedInUsername = $userDetails['username'];
+    $loggedInDepartment = $userDetails['department'];
+} else {
+    $loggedInUsername = "Unknown";
+    $loggedInDepartment = "Unknown";
 }
 
 // Fetch distinct services and countries
@@ -180,6 +195,7 @@ if (isset($_GET['export'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -227,16 +243,20 @@ if (isset($_GET['export'])) {
             border-collapse: collapse;
         }
 
-        table, th, td {
+        table,
+        th,
+        td {
             border: 1px solid #ccc;
         }
 
-        th, td {
+        th,
+        td {
             width: auto;
             padding: 10px;
             border-bottom: 1px solid #ccc;
             text-align: left;
-            background-color: #ffffff; /* Ensure each cell has a white background */
+            background-color: #ffffff;
+            /* Ensure each cell has a white background */
         }
 
         th {
@@ -314,121 +334,156 @@ if (isset($_GET['export'])) {
         .export-button a:hover {
             background-color: #00264d;
         }
-    </style>
-</head>
-<body>
 
-<div class="table-container">
-    <!-- Logout Button -->
-    <div class="logout-button">
-        <a href="welcome.php">Back</a>
-    </div>
-
-    <!-- Filter Form -->
-    <div class="filter-form">
-        <form method="GET" action="">
-            <label for="service">Service:</label>
-            <select id="service" name="service">
-                <option value="">All Services</option>
-                <?php foreach ($services as $service): ?>
-                    <option value="<?php echo htmlspecialchars($service, ENT_QUOTES, 'UTF-8'); ?>"<?php if ($selectedService === $service) echo ' selected'; ?>>
-                        <?php echo htmlspecialchars($service, ENT_QUOTES, 'UTF-8'); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <label for="country">Country:</label>
-            <select id="country" name="country">
-                <option value="">All Countries</option>
-                <?php foreach ($countries as $country): ?>
-                    <option value="<?php echo htmlspecialchars($country, ENT_QUOTES, 'UTF-8'); ?>"<?php if ($selectedCountry === $country) echo ' selected'; ?>>
-                        <?php echo htmlspecialchars($country, ENT_QUOTES, 'UTF-8'); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <button type="submit">Filter</button>
-        </form>
-    </div>
-
-    <!-- Export Button -->
-    <div class="export-button">
-        <a href="?export=true<?php echo $selectedService ? '&service=' . urlencode($selectedService) : ''; ?><?php echo $selectedCountry ? '&country=' . urlencode($selectedCountry) : ''; ?>">Export Data (CSV)</a>
-    </div>
-
-    <h2>Data Records</h2>
-
-    <?php
-    if ($result->num_rows > 0) {
-        echo '<table>';
-        echo '<tr>';
-        echo '<th>ID</th>';
-        echo '<th>First Name</th>';
-        echo '<th>Last Name</th>';
-        echo '<th>Dial Code</th>';
-        echo '<th>Phone</th>';
-        echo '<th>Country</th>';
-        echo '<th>Email</th>';
-        echo '<th>Submitted At</th>';
-        echo '<th>Services</th>';
-        echo '<th>Message</th>';
-        echo '<th>Lead Quality</th>';
-        echo '</tr>';
-
-        $counter = 1;
-
-        // Loop through and display data rows
-        while ($row = $result->fetch_assoc()) {
-            $id = htmlspecialchars($row['id'], ENT_QUOTES, 'UTF-8');
-            $firstName = htmlspecialchars($row['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
-            $lastName = htmlspecialchars($row['last_name'] ?? '', ENT_QUOTES, 'UTF-8');
-            $dialCode = htmlspecialchars($row['dial_code'] ?? '', ENT_QUOTES, 'UTF-8');
-            $phone = htmlspecialchars($row['phone'] ?? '', ENT_QUOTES, 'UTF-8');
-            $country = htmlspecialchars($row['country'] ?? '', ENT_QUOTES, 'UTF-8');
-            $email = htmlspecialchars($row['email'] ?? '', ENT_QUOTES, 'UTF-8');
-            $submittedAt = htmlspecialchars($row['submitted_at'] ?? '', ENT_QUOTES, 'UTF-8');
-            $services = htmlspecialchars($row['services'] ?? '', ENT_QUOTES, 'UTF-8');
-            $message = htmlspecialchars($row['message'] ?? '', ENT_QUOTES, 'UTF-8');
-            $leadQuality = htmlspecialchars($row['lead_quality'] ?? '', ENT_QUOTES, 'UTF-8');
-
-            echo '<tr>';
-            echo '<td>' . $counter . '</td>'; // Incremented number for display
-            echo '<td>' . $firstName . '</td>';
-            echo '<td>' . $lastName . '</td>';
-            echo '<td>' . $dialCode . '</td>';
-            echo '<td>' . $phone . '</td>';
-            echo '<td>' . $country . '</td>';
-            echo '<td>' . $email . '</td>';
-            echo '<td>' . $submittedAt . '</td>';
-            echo '<td>' . $services . '</td>';
-            echo '<td>' . $message . '</td>';
-            echo '<td>';
-            echo '<form method="POST" action="">';
-            echo '<select name="lead_quality" class="lead-quality-select">';
-            echo '<option value="">Select Quality</option>';
-            echo '<option value="High"' . ($leadQuality === 'High' ? ' selected' : '') . '>High</option>';
-            echo '<option value="Medium"' . ($leadQuality === 'Medium' ? ' selected' : '') . '>Medium</option>';
-            echo '<option value="Low"' . ($leadQuality === 'Low' ? ' selected' : '') . '>Low</option>';
-            echo '</select>';
-            echo '<input type="hidden" name="id" value="' . $id . '">';
-            echo '<button type="submit" name="update_lead_quality" value="' . $id . '" class="update-button">Update</button>';
-            echo '</form>';
-            echo '</td>';
-            echo '</tr>';
-
-            $counter++;
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        echo '</table>';
-    } else {
-        echo '<p class="no-data">No data found.</p>';
-    }
+        .user-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
 
-    // Close statement and connection
-    $stmt->close();
-    $conn->close();
-    ?>
-</div>
+        .user-info .session-warning {
+            color: #dc3545;
+            /* Red color for warning */
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="user-info">
+        <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
+            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
+        </p>
+        <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
+    </div>
+    
+    <div class="table-container">
+        <!-- Logout Button -->
+        <div class="logout-button">
+            <a href="welcome.php">Back</a>
+        </div>
+
+        <!-- Filter Form -->
+        <div class="filter-form">
+            <form method="GET" action="">
+                <label for="service">Service:</label>
+                <select id="service" name="service">
+                    <option value="">All Services</option>
+                    <?php foreach ($services as $service): ?>
+                        <option value="<?php echo htmlspecialchars($service, ENT_QUOTES, 'UTF-8'); ?>" <?php if ($selectedService === $service)
+                                 echo ' selected'; ?>>
+                            <?php echo htmlspecialchars($service, ENT_QUOTES, 'UTF-8'); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="country">Country:</label>
+                <select id="country" name="country">
+                    <option value="">All Countries</option>
+                    <?php foreach ($countries as $country): ?>
+                        <option value="<?php echo htmlspecialchars($country, ENT_QUOTES, 'UTF-8'); ?>" <?php if ($selectedCountry === $country)
+                                 echo ' selected'; ?>>
+                            <?php echo htmlspecialchars($country, ENT_QUOTES, 'UTF-8'); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <button type="submit">Filter</button>
+            </form>
+        </div>
+
+        <!-- Export Button -->
+        <div class="export-button">
+            <a
+                href="?export=true<?php echo $selectedService ? '&service=' . urlencode($selectedService) : ''; ?><?php echo $selectedCountry ? '&country=' . urlencode($selectedCountry) : ''; ?>">Export
+                Data (CSV)</a>
+        </div>
+
+        <h2>Data Records</h2>
+
+        <?php
+        if ($result->num_rows > 0) {
+            echo '<table>';
+            echo '<tr>';
+            echo '<th>ID</th>';
+            echo '<th>First Name</th>';
+            echo '<th>Last Name</th>';
+            echo '<th>Dial Code</th>';
+            echo '<th>Phone</th>';
+            echo '<th>Country</th>';
+            echo '<th>Email</th>';
+            echo '<th>Submitted At</th>';
+            echo '<th>Services</th>';
+            echo '<th>Message</th>';
+            echo '<th>Lead Quality</th>';
+            echo '</tr>';
+
+            $counter = 1;
+
+            // Loop through and display data rows
+            while ($row = $result->fetch_assoc()) {
+                $id = htmlspecialchars($row['id'], ENT_QUOTES, 'UTF-8');
+                $firstName = htmlspecialchars($row['first_name'] ?? '', ENT_QUOTES, 'UTF-8');
+                $lastName = htmlspecialchars($row['last_name'] ?? '', ENT_QUOTES, 'UTF-8');
+                $dialCode = htmlspecialchars($row['dial_code'] ?? '', ENT_QUOTES, 'UTF-8');
+                $phone = htmlspecialchars($row['phone'] ?? '', ENT_QUOTES, 'UTF-8');
+                $country = htmlspecialchars($row['country'] ?? '', ENT_QUOTES, 'UTF-8');
+                $email = htmlspecialchars($row['email'] ?? '', ENT_QUOTES, 'UTF-8');
+                $submittedAt = htmlspecialchars($row['submitted_at'] ?? '', ENT_QUOTES, 'UTF-8');
+                $services = htmlspecialchars($row['services'] ?? '', ENT_QUOTES, 'UTF-8');
+                $message = htmlspecialchars($row['message'] ?? '', ENT_QUOTES, 'UTF-8');
+                $leadQuality = htmlspecialchars($row['lead_quality'] ?? '', ENT_QUOTES, 'UTF-8');
+
+                echo '<tr>';
+                echo '<td>' . $counter . '</td>'; // Incremented number for display
+                echo '<td>' . $firstName . '</td>';
+                echo '<td>' . $lastName . '</td>';
+                echo '<td>' . $dialCode . '</td>';
+                echo '<td>' . $phone . '</td>';
+                echo '<td>' . $country . '</td>';
+                echo '<td>' . $email . '</td>';
+                echo '<td>' . $submittedAt . '</td>';
+                echo '<td>' . $services . '</td>';
+                echo '<td>' . $message . '</td>';
+                echo '<td>';
+                echo '<form method="POST" action="">';
+                echo '<select name="lead_quality" class="lead-quality-select">';
+                echo '<option value="">Select Quality</option>';
+                echo '<option value="High"' . ($leadQuality === 'High' ? ' selected' : '') . '>High</option>';
+                echo '<option value="Medium"' . ($leadQuality === 'Medium' ? ' selected' : '') . '>Medium</option>';
+                echo '<option value="Low"' . ($leadQuality === 'Low' ? ' selected' : '') . '>Low</option>';
+                echo '</select>';
+                echo '<input type="hidden" name="id" value="' . $id . '">';
+                echo '<button type="submit" name="update_lead_quality" value="' . $id . '" class="update-button">Update</button>';
+                echo '</form>';
+                echo '</td>';
+                echo '</tr>';
+
+                $counter++;
+            }
+
+            echo '</table>';
+        } else {
+            echo '<p class="no-data">No data found.</p>';
+        }
+
+        // Close statement and connection
+        $stmt->close();
+        $conn->close();
+        ?>
+    </div>
 
 </body>
+
 </html>
 
 <?php
