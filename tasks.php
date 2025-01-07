@@ -583,6 +583,7 @@ function getWeekdays($start, $end)
                             <?= htmlspecialchars($project) ?>
                         </button>
                     <?php endforeach; ?>
+                    <button onclick="exportToCSV()" class="btn btn-success">Export to CSV</button>
                 </div>
 
                 <!-- Date Range Inputs -->
@@ -981,6 +982,53 @@ function getWeekdays($start, $end)
             // Correctly set the completion description
             const completionDescriptionElement = document.getElementById('completion-description-delayed');
             completionDescriptionElement.innerText = completionDescription && completionDescription.trim() ? completionDescription : "No description provided.";
+        }
+    </script>
+    <!-- Script for the exporting of data -->
+    <script>
+        function exportToCSV() {
+            // Get the tables
+            const pendingTable = document.getElementById('pending-tasks');
+            const completedTable = document.getElementById('remaining-tasks');
+
+            // Combine the rows from both tables
+            const rows = [];
+            rows.push(...pendingTable.querySelectorAll('tbody tr'));
+            rows.push(...completedTable.querySelectorAll('tbody tr'));
+
+            // Extract headers
+            const headers = [];
+            pendingTable.querySelectorAll('thead th').forEach(header => {
+                headers.push(header.innerText.trim());
+            });
+
+            // Extract data
+            const data = [];
+            rows.forEach(row => {
+                const rowData = [];
+                row.querySelectorAll('td').forEach(cell => {
+                    rowData.push(cell.innerText.trim());
+                });
+                data.push(rowData);
+            });
+
+            // Convert to CSV
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += headers.join(",") + "\n"; // Add headers
+            data.forEach(row => {
+                csvContent += row.join(",") + "\n"; // Add rows
+            });
+
+            // Create a download link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "tasks_export.csv");
+            document.body.appendChild(link);
+
+            // Trigger the download
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
