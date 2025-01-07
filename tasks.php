@@ -1049,7 +1049,12 @@ function getWeekdays($start, $end)
                     method: 'POST',
                     body: new FormData(form)
                 })
-                    .then(response => response.json()) // Parse the response as JSON
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json(); // Parse the response as JSON
+                    })
                     .then(data => {
                         if (data.success) {
                             // Update the modal content with the task name and message
@@ -1118,4 +1123,4 @@ function getWeekdays($start, $end)
 </body>
 
 </html>
-<?php $conn->close(); ?>
+<?php $conn->close(); ?>c
