@@ -67,6 +67,13 @@ try {
             background-color: #f4f4f4;
         }
 
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
         .container {
             width: 90%;
             max-width: 1200px;
@@ -218,27 +225,28 @@ try {
 </head>
 
 <body>
-    <div class="user-info">
-        <p>Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong> | Department:
-            <strong><?= htmlspecialchars($user_department) ?></strong>
-        </p>
-        <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
-    </div>
-    <div class="container">
-        <h1>Users</h1>
+    <div class="main-container">
+        <div class="user-info">
+            <p>Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong> | Department:
+                <strong><?= htmlspecialchars($user_department) ?></strong>
+            </p>
+            <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
+        </div>
+        <div class="container">
+            <h1>Users</h1>
 
-        <?php if ($user_role === 'admin'): ?>
-            <p>Viewing all users grouped by department</p>
-            <?php
-            $current_department = '';
-            foreach ($users as $user):
-                if ($current_department !== $user['department']) {
-                    if ($current_department !== '') {
-                        echo "</tbody></table>";
-                    }
-                    $current_department = $user['department'];
-                    echo "<h2>Department: " . htmlspecialchars($current_department) . "</h2>";
-                    echo "<table>
+            <?php if ($user_role === 'admin'): ?>
+                <p>Viewing all users grouped by department</p>
+                <?php
+                $current_department = '';
+                foreach ($users as $user):
+                    if ($current_department !== $user['department']) {
+                        if ($current_department !== '') {
+                            echo "</tbody></table>";
+                        }
+                        $current_department = $user['department'];
+                        echo "<h2>Department: " . htmlspecialchars($current_department) . "</h2>";
+                        echo "<table>
                     <thead>
                         <tr>
                             <th>Username</th>
@@ -248,8 +256,8 @@ try {
                         </tr>
                     </thead>
                     <tbody>";
-                }
-                echo "<tr>
+                    }
+                    echo "<tr>
                         <td>" . htmlspecialchars($user['username']) . "</td>
                         <td>" . htmlspecialchars($user['email']) . "</td>
                         <td>" . htmlspecialchars($user['role']) . "</td>
@@ -261,42 +269,43 @@ try {
                         </form>
                         </td>
                     </tr>";
-            endforeach;
-            if ($current_department !== '') {
-                echo "</tbody></table>";
-            }
-            ?>
-        <?php elseif ($user_role === 'manager'): ?>
-            <p>Viewing users in your department: <strong><?= htmlspecialchars($user_department) ?></strong></p>
-            <?php if (!empty($users)): ?>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($users as $user): ?>
+                endforeach;
+                if ($current_department !== '') {
+                    echo "</tbody></table>";
+                }
+                ?>
+            <?php elseif ($user_role === 'manager'): ?>
+                <p>Viewing users in your department: <strong><?= htmlspecialchars($user_department) ?></strong></p>
+                <?php if (!empty($users)): ?>
+                    <table>
+                        <thead>
                             <tr>
-                                <td><?= htmlspecialchars($user['username']) ?></td>
-                                <td><?= htmlspecialchars($user['email']) ?></td>
-                                <td><?= htmlspecialchars($user['role']) ?></td>
-                                <td>
-                                    <a href="edit-user.php?id=<?= $user['id'] ?>" class="edit-button">Edit</a>
-                                </td>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Actions</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <p>No users found.</p>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($users as $user): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($user['username']) ?></td>
+                                    <td><?= htmlspecialchars($user['email']) ?></td>
+                                    <td><?= htmlspecialchars($user['role']) ?></td>
+                                    <td>
+                                        <a href="edit-user.php?id=<?= $user['id'] ?>" class="edit-button">Edit</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <p>No users found.</p>
+                <?php endif; ?>
             <?php endif; ?>
-        <?php endif; ?>
 
-        <a href="welcome.php" class="back-button">Back</a>
+            <a href="welcome.php" class="back-button">Back</a>
+        </div>
     </div>
 </body>
 
