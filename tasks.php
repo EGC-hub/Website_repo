@@ -1249,6 +1249,10 @@ function getWeekdays($start, $end)
                 width: '300px'
             });
 
+            // Remove the "All" option initially
+            $('#project-filter option[value="All"]').remove();
+            $('#department-filter option[value="All"]').remove();
+
             // Trigger combined filtering when any filter changes
             $('#project-filter, #department-filter, #start-date, #end-date').on('change', function () {
                 applyAllFilters();
@@ -1271,8 +1275,8 @@ function getWeekdays($start, $end)
                         const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
 
                         // Check if the row matches the selected projects and departments
-                        const projectMatch = selectedProjects.includes('All') || selectedProjects.includes(projectName);
-                        const departmentMatch = selectedDepartments.includes('All') || selectedDepartments.includes(departmentName);
+                        const projectMatch = selectedProjects === null || selectedProjects.includes(projectName);
+                        const departmentMatch = selectedDepartments === null || selectedDepartments.includes(departmentName);
 
                         // Check if the task falls within the selected date range
                         let dateMatch = true;
@@ -1295,6 +1299,10 @@ function getWeekdays($start, $end)
 
             // Reset filters
             function resetFilters() {
+                // Add the "All" option back to the dropdowns
+                $('#project-filter').append('<option value="All">All</option>');
+                $('#department-filter').append('<option value="All">All</option>');
+
                 // Reset project filter
                 $('#project-filter').val(['All']).trigger('change');
 
@@ -1307,6 +1315,10 @@ function getWeekdays($start, $end)
 
                 // Reapply filters to show all tasks
                 applyAllFilters();
+
+                // Remove the "All" option again after resetting
+                $('#project-filter option[value="All"]').remove();
+                $('#department-filter option[value="All"]').remove();
             }
 
             // Attach event listener for reset button
@@ -1316,4 +1328,4 @@ function getWeekdays($start, $end)
 </body>
 
 </html>
-<?php $conn->close(); ?>
+<?php $conn->close(); ?>c
