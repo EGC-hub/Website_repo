@@ -302,9 +302,7 @@ function getWeekdays($start, $end)
     <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <!-- Add these lines inside the <head> section -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -1036,6 +1034,9 @@ function getWeekdays($start, $end)
         </div>
     </div>
 
+    <!-- Jquery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+
     <!-- Script for opening the modal to view details of completion -->
     <script>
         // Attach event listener for task name links
@@ -1184,9 +1185,8 @@ function getWeekdays($start, $end)
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
         </script>
-    <!-- Jquery -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <!-- Fix for Select2 and Filtering -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function () {
             // Initialize Select2 on the project filter dropdown
@@ -1196,52 +1196,46 @@ function getWeekdays($start, $end)
                 width: '300px'
             });
 
-            // Event listener to trigger project filtering
+            // Trigger project filtering
             $('#project-filter').on('change', function () {
                 filterTasks();
             });
 
-            // Fix for filtering by project
+            // Filter by selected projects
             function filterTasks() {
-                const selectedProjects = $('#project-filter').val(); // Get selected values using Select2
+                const selectedProjects = $('#project-filter').val();
                 const tables = ['pending-tasks', 'remaining-tasks'];
 
                 tables.forEach(tableId => {
                     const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                     rows.forEach(row => {
-                        const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project Name is in the 2nd column
-
-                        // If "All" is selected, show all rows
-                        if (selectedProjects.includes('All')) {
+                        const projectName = row.querySelector('td:nth-child(2)').textContent.trim();
+                        if (selectedProjects.includes('All') || selectedProjects.includes(projectName)) {
                             row.style.display = '';
-                            return;
+                        } else {
+                            row.style.display = 'none';
                         }
-
-                        // Show rows that match the selected projects
-                        const shouldDisplay = selectedProjects.includes(projectName);
-                        row.style.display = shouldDisplay ? '' : 'none';
                     });
                 });
             }
 
-            // Fix for filtering by date range
+            // Filter by date range
             function filterByDate() {
-                const startDate = document.getElementById('start-date').value;
-                const endDate = document.getElementById('end-date').value;
+                const startDate = new Date(document.getElementById('start-date').value);
+                const endDate = new Date(document.getElementById('end-date').value);
                 const tables = ['pending-tasks', 'remaining-tasks'];
 
                 tables.forEach(tableId => {
                     const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                     rows.forEach(row => {
-                        const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date is in the 5th column
-                        const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date is in the 6th column
-
+                        const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim());
+                        const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim());
                         let shouldDisplay = true;
 
-                        if (startDate && taskStartDate < new Date(startDate)) {
+                        if (startDate && taskStartDate < startDate) {
                             shouldDisplay = false;
                         }
-                        if (endDate && taskEndDate > new Date(endDate)) {
+                        if (endDate && taskEndDate > endDate) {
                             shouldDisplay = false;
                         }
 
@@ -1250,28 +1244,22 @@ function getWeekdays($start, $end)
                 });
             }
 
-            // Attach event listeners for date range filtering
-            document.getElementById('start-date').addEventListener('change', filterByDate);
-            document.getElementById('end-date').addEventListener('change', filterByDate);
-
-            // Reset filters to show all rows
+            // Reset filters
             function resetFilters() {
-                // Reset Select2 dropdown
                 $('#project-filter').val(['All']).trigger('change');
-
-                // Reset date inputs
                 document.getElementById('start-date').value = '';
                 document.getElementById('end-date').value = '';
-
-                // Show all rows
                 filterTasks();
             }
 
-            // Attach the reset button handler
+            // Attach event listeners
+            document.getElementById('start-date').addEventListener('change', filterByDate);
+            document.getElementById('end-date').addEventListener('change', filterByDate);
             document.querySelector('.btn-primary[onclick="resetFilters()"]').onclick = resetFilters;
         });
+
     </script>
 </body>
 
 </html>
-<?php $conn->close(); ?>
+<?php $conn->close(); ?>c
