@@ -1230,7 +1230,7 @@ function getWeekdays($start, $end)
                     const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                     rows.forEach(row => {
                         const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
-                        const departmentName = row.querySelector('td:nth-child(10)').textContent.trim(); // Department column
+                        const departmentName = row.querySelector('td:nth-child(11)').textContent.trim(); // Department column
 
                         // Debugging: Log department names
                         console.log("Department Name:", departmentName);
