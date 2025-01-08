@@ -478,7 +478,7 @@ function getWeekdays($start, $end)
             line-height: 1.5;
         }
 
-        .filter-container {
+        <style>.filter-container {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -514,11 +514,33 @@ function getWeekdays($start, $end)
             background-color: #1d3557;
         }
 
+        .filter-row {
+            display: flex;
+            gap: 20px;
+            /* Adjust the gap between dropdowns and date range */
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .filter-dropdown {
+            margin-bottom: 15px;
+        }
+
+        .filter-dropdown select {
+            width: 400px;
+            /* Make the dropdowns wider */
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
         .filter-date {
             display: flex;
             gap: 10px;
             align-items: center;
-            justify-content: center;
         }
 
         .filter-date label {
@@ -531,55 +553,56 @@ function getWeekdays($start, $end)
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+    </style>
 
-        .custom-table tr.delayed-task {
-            --bs-table-bg: transparent !important;
-            --bs-table-hover-bg: transparent !important;
-            --bs-table-striped-bg: transparent !important;
-            --bs-table-border-color: var(--bs-border-color) !important;
-            background-color: #f8d7da !important;
-            /* Light red */
-            color: #842029 !important;
-            /* Dark red text */
-        }
+    .custom-table tr.delayed-task {
+    --bs-table-bg: transparent !important;
+    --bs-table-hover-bg: transparent !important;
+    --bs-table-striped-bg: transparent !important;
+    --bs-table-border-color: var(--bs-border-color) !important;
+    background-color: #f8d7da !important;
+    /* Light red */
+    color: #842029 !important;
+    /* Dark red text */
+    }
 
-        .user-info {
-            text-align: center;
-            margin: 25px auto;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 1400px;
-        }
+    .user-info {
+    text-align: center;
+    margin: 25px auto;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 1400px;
+    }
 
-        .user-info p {
-            margin: 5px 0;
-            font-size: 16px;
-            color: #333;
-        }
+    .user-info p {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #333;
+    }
 
-        .user-info .session-warning {
-            color: #dc3545;
-            /* Red color for warning */
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 10px;
-        }
+    .user-info .session-warning {
+    color: #dc3545;
+    /* Red color for warning */
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 10px;
+    }
 
-        .filter-dropdown {
-            margin-bottom: 15px;
-            text-align: center;
-        }
+    .filter-dropdown {
+    margin-bottom: 15px;
+    text-align: center;
+    }
 
-        .filter-dropdown select {
-            width: 300px;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
+    .filter-dropdown select {
+    width: 300px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+    }
     </style>
 </head>
 
@@ -682,6 +705,7 @@ function getWeekdays($start, $end)
 
         <div class="container mt-4">
             <!-- Filter Buttons -->
+            <!-- Filter Container -->
             <div class="filter-container">
                 <div class="filter-buttons">
                     <?php if ($user_role === 'Admin' || $user_role === 'Manager'): ?>
@@ -690,41 +714,43 @@ function getWeekdays($start, $end)
                             Create New Task
                         </button>
                     <?php endif; ?>
-
                     <button onclick="resetFilters()" class="btn btn-primary">Reset</button>
                     <a href="export_tasks.php" class="btn btn-success">Export to CSV</a>
                 </div>
 
-                <!-- Multi-select dropdown for filtering by project -->
-                <div class="filter-dropdown">
-                    <label for="project-filter">Filter by Project:</label>
-                    <select id="project-filter" multiple="multiple">
-                        <option value="All">All</option>
-                        <?php foreach ($projects as $project): ?>
-                            <option value="<?= htmlspecialchars($project) ?>"><?= htmlspecialchars($project) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                <!-- Filter Dropdowns and Date Range -->
+                <div class="filter-row">
+                    <!-- Multi-select dropdown for filtering by project -->
+                    <div class="filter-dropdown">
+                        <label for="project-filter">Filter by Project:</label>
+                        <select id="project-filter" multiple="multiple">
+                            <option value="All">All</option>
+                            <?php foreach ($projects as $project): ?>
+                                <option value="<?= htmlspecialchars($project) ?>"><?= htmlspecialchars($project) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-                <!-- Multi-select dropdown for filtering by department -->
-                <div class="filter-dropdown">
-                    <label for="department-filter">Filter by Department:</label>
-                    <select id="department-filter" multiple="multiple">
-                        <option value="All">All</option>
-                        <?php foreach ($departments as $department): ?>
-                            <option value="<?= htmlspecialchars($department['name']) ?>">
-                                <?= htmlspecialchars($department['name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                    <!-- Multi-select dropdown for filtering by department -->
+                    <div class="filter-dropdown">
+                        <label for="department-filter">Filter by Department:</label>
+                        <select id="department-filter" multiple="multiple">
+                            <option value="All">All</option>
+                            <?php foreach ($departments as $department): ?>
+                                <option value="<?= htmlspecialchars($department['name']) ?>">
+                                    <?= htmlspecialchars($department['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-                <!-- Date Range Inputs -->
-                <div class="filter-date">
-                    <label for="start-date">Start Date:</label>
-                    <input type="date" id="start-date" onchange="filterByDate()">
-                    <label for="end-date">End Date:</label>
-                    <input type="date" id="end-date" onchange="filterByDate()">
+                    <!-- Date Range Inputs -->
+                    <div class="filter-date">
+                        <label for="start-date">Start Date:</label>
+                        <input type="date" id="start-date" onchange="filterByDate()">
+                        <label for="end-date">End Date:</label>
+                        <input type="date" id="end-date" onchange="filterByDate()">
+                    </div>
                 </div>
             </div>
 
