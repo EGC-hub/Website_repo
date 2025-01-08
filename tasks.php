@@ -1275,8 +1275,8 @@ function getWeekdays($start, $end)
                         const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
 
                         // Check if the row matches the selected projects and departments
-                        const projectMatch = selectedProjects === null || selectedProjects.includes(projectName);
-                        const departmentMatch = selectedDepartments === null || selectedDepartments.includes(departmentName);
+                        const projectMatch = selectedProjects === null || selectedProjects.length === 0 || selectedProjects.includes(projectName);
+                        const departmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.includes(departmentName);
 
                         // Check if the task falls within the selected date range
                         let dateMatch = true;
@@ -1299,15 +1299,9 @@ function getWeekdays($start, $end)
 
             // Reset filters
             function resetFilters() {
-                // Add the "All" option back to the dropdowns
-                $('#project-filter').append('<option value="All">All</option>');
-                $('#department-filter').append('<option value="All">All</option>');
-
-                // Reset project filter
-                $('#project-filter').val(['All']).trigger('change');
-
-                // Reset department filter
-                $('#department-filter').val(['All']).trigger('change');
+                // Clear the selected values in the dropdowns
+                $('#project-filter').val(null).trigger('change');
+                $('#department-filter').val(null).trigger('change');
 
                 // Clear date inputs
                 document.getElementById('start-date').value = '';
@@ -1315,10 +1309,6 @@ function getWeekdays($start, $end)
 
                 // Reapply filters to show all tasks
                 applyAllFilters();
-
-                // Remove the "All" option again after resetting
-                $('#project-filter option[value="All"]').remove();
-                $('#department-filter option[value="All"]').remove();
             }
 
             // Attach event listener for reset button
