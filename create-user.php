@@ -3,6 +3,7 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
 // Start session
 session_start();
 
@@ -29,6 +30,19 @@ $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
+}
+
+// Function to validate password complexity
+function validatePassword($password) {
+    // Password must contain at least one uppercase letter, one number, and one special character
+    $uppercase = preg_match('@[A-Z]@', $password);
+    $number = preg_match('@\d@', $password);
+    $specialChar = preg_match('@[^\w]@', $password); // Matches any non-word character
+
+    if (!$uppercase || !$number || !$specialChar || strlen($password) < 8) {
+        return false;
+    }
+    return true;
 }
 
 // Fetch logged-in user's details
@@ -85,6 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate the inputs
     if (empty($username) || empty($password) || empty($role_id) || empty($department_id)) {
         $errorMsg = "Please fill in all fields.";
+    } elseif (!validatePassword($password)) {
+        $errorMsg = "Password must contain at least one uppercase letter, one number, one special character, and be at least 8 characters long.";
     } else {
         // Validate role_id and department_id
         $validRoleIds = array_column($roles, 'id'); // Get all valid role IDs
@@ -139,7 +155,6 @@ $conn->close();
         /* General Box Sizing */
         * {
             box-sizing: border-box;
-            /* Include padding and border in width and height */
         }
 
         /* Style for the form */
@@ -223,7 +238,6 @@ $conn->close();
         /* Back button style */
         .back-btn {
             display: block;
-            /* Make it a block-level element */
             width: 100%;
             margin-top: 20px;
             padding: 10px;
@@ -257,7 +271,6 @@ $conn->close();
 
         .user-info .session-warning {
             color: #dc3545;
-            /* Red color for warning */
             font-weight: bold;
             font-size: 14px;
             margin-top: 10px;
