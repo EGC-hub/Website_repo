@@ -576,63 +576,73 @@ function getWeekdays($start, $end)
         <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
     </div>
 
-    <?php if ($user_role === 'Admin' || $user_role === 'Manager'): ?>
-        <div class="task-container">
-            <div class="logout-button">
-                <a href="welcome.php">Back</a>
+    <!-- Task Management Modal -->
+    <div class="modal fade" id="taskManagementModal" tabindex="-1" aria-labelledby="taskManagementModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskManagementModalLabel">Create New Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="">
+                        <div class="form-group">
+                            <label for="project_name">Project Name:</label>
+                            <input type="text" id="project_name" name="project_name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="task_name">Task Name:</label>
+                            <input type="text" id="task_name" name="task_name" required>
+                        </div>
+
+                        <div>
+                            <label for="task_description">Task Description:</label>
+                            <textarea id="task_description" name="task_description" rows="4"></textarea>
+                        </div>
+
+                        <div>
+                            <label for="project_type">Project Type:</label>
+                            <select id="project_type" name="project_type">
+                                <option value="Internal">Internal</option>
+                                <option value="External">External</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expected_start_date">Expected Start Date & Time</label>
+                            <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expected_finish_date">Expected End Date & Time</label>
+                            <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="assigned_user_id">Assign to:</label>
+                            <select id="assigned_user_id" name="assigned_user_id" required>
+                                <option value="">Select a user</option>
+                                <?php foreach ($users as $user): ?>
+                                    <option value="<?= $user['id'] ?>">
+                                        <?= htmlspecialchars($user['username']) ?>
+                                        (<?= htmlspecialchars($user['department']) ?> -
+                                        <?= htmlspecialchars($user['role']) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="submit-btn">Add Task</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
-            <h2>Task Management</h2>
-            <form method="post" action="">
-                <div class="form-group">
-                    <label for="project_name">Project Name:</label>
-                    <input type="text" id="project_name" name="project_name" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="task_name">Task Name:</label>
-                    <input type="text" id="task_name" name="task_name" required>
-                </div>
-
-                <div>
-                    <label for="task_description">Task Description:</label>
-                    <textarea id="task_description" name="task_description" rows="4"></textarea>
-                </div>
-
-                <div>
-                    <label for="project_type">Project Type:</label>
-                    <select id="project_type" name="project_type">
-                        <option value="Internal">Internal</option>
-                        <option value="External">External</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="expected_start_date">Expected Start Date & Time</label>
-                    <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="expected_finish_date">Expected End Date & Time</label>
-                    <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="assigned_user_id">Assign to:</label>
-                    <select id="assigned_user_id" name="assigned_user_id" required>
-                        <option value="">Select a user</option>
-                        <?php foreach ($users as $user): ?>
-                            <option value="<?= $user['id'] ?>">
-                                <?= htmlspecialchars($user['username']) ?> (<?= htmlspecialchars($user['department']) ?> -
-                                <?= htmlspecialchars($user['role']) ?>)
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <button type="submit" class="submit-btn">Add Task</button>
-            </form>
         </div>
-    <?php endif; ?>
+    </div>
     <?php
     // Initialize variables to hold unique project names and all task rows
     $projects = [];
@@ -659,13 +669,20 @@ function getWeekdays($start, $end)
             <!-- Filter Buttons -->
             <div class="filter-container">
                 <div class="filter-buttons">
+                    <!-- Add this button to open the modal -->
+                    <?php if ($user_role === 'Admin' || $user_role === 'Manager'): ?>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#taskManagementModal">
+                            Create New Task
+                        </button>
+                    <?php endif; ?>
+
                     <button onclick="filterTasks('All')" class="btn btn-primary">All</button>
                     <?php foreach ($projects as $project): ?>
                         <button onclick="filterTasks('<?= htmlspecialchars($project) ?>')" class="btn btn-secondary">
                             <?= htmlspecialchars($project) ?>
                         </button>
                     <?php endforeach; ?>
-                    <!-- Export Button -->
                     <a href="export_tasks.php" class="btn btn-success">Export to CSV</a>
                 </div>
 
