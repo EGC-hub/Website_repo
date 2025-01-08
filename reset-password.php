@@ -15,10 +15,36 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Function to validate password complexity
+function validatePassword($password) {
+    // Password must contain at least one uppercase letter, one number, and one special character
+    $uppercase = preg_match('@[A-Z]@', $password);
+    $number = preg_match('@\d@', $password);
+    $specialChar = preg_match('@[^\w]@', $password); // Matches any non-word character
+
+    if (!$uppercase || !$number || !$specialChar || strlen($password) < 8) {
+        return false;
+    }
+    return true;
+}
+
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $newPassword = $_POST['new_password'];
+    $confirmPassword = $_POST['confirm_password'];
+
+    // Check if new password and confirm password match
+    if ($newPassword !== $confirmPassword) {
+        echo "<script>alert('New password and confirm password do not match.'); window.location.href = 'reset-password.php';</script>";
+        exit;
+    }
+
+    // Validate password complexity
+    if (!validatePassword($newPassword)) {
+        echo "<script>alert('Password must contain at least one uppercase letter, one number, one special character, and be at least 8 characters long.'); window.location.href = 'reset-password.php';</script>";
+        exit;
+    }
 
     // Fetch the current hashed password from the database for the given username
     $stmt = $conn->prepare("SELECT password FROM users WHERE username = ?");
@@ -33,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Verify that the new password is different from the current one
         if (password_verify($newPassword, $currentHashedPassword)) {
             // If the new password matches the old one, show an error message
-            echo "<script>alert('The new password cannot be the same as the previous password.'); window.location.href = 'reset-password.php';</script>";
+            echo "<script>alert('The new password cannot be the same as the current password.'); window.location.href = 'reset-password.php';</script>";
             exit;
         } else {
             // Hash the new password
@@ -63,7 +89,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->close();
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
