@@ -1232,6 +1232,10 @@ function getWeekdays($start, $end)
                         const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
                         const departmentName = row.querySelector('td:nth-child(10)').textContent.trim(); // Department column
 
+                        // Debugging: Log department names
+                        console.log("Department Name:", departmentName);
+                        console.log("Selected Departments:", selectedDepartments);
+
                         // Check if the row matches the selected projects and departments
                         const projectMatch = selectedProjects.includes('All') || selectedProjects.includes(projectName);
                         const departmentMatch = selectedDepartments.includes('All') || selectedDepartments.includes(departmentName);
@@ -1242,40 +1246,6 @@ function getWeekdays($start, $end)
                         } else {
                             row.style.display = 'none';
                         }
-                    });
-                });
-            }
-
-            // Filter by date range
-            function filterByDate() {
-                const startDate = new Date(document.getElementById('start-date').value);
-                const endDate = new Date(document.getElementById('end-date').value);
-                const tables = ['pending-tasks', 'remaining-tasks'];
-
-                tables.forEach(tableId => {
-                    const rows = document.querySelectorAll(`#${tableId} tbody tr`);
-                    rows.forEach(row => {
-                        const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim());
-                        const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim());
-                        let shouldDisplay = true;
-
-                        if (startDate && taskStartDate < startDate) {
-                            shouldDisplay = false;
-                        }
-                        if (endDate && taskEndDate > endDate) {
-                            shouldDisplay = false;
-                        }
-
-                        // Only display the row if it also matches the project and department filters
-                        const projectName = row.querySelector('td:nth-child(2)').textContent.trim();
-                        const departmentName = row.querySelector('td:nth-child(10)').textContent.trim();
-                        const selectedProjects = $('#project-filter').val();
-                        const selectedDepartments = $('#department-filter').val();
-
-                        const projectMatch = selectedProjects.includes('All') || selectedProjects.includes(projectName);
-                        const departmentMatch = selectedDepartments.includes('All') || selectedDepartments.includes(departmentName);
-
-                        row.style.display = (shouldDisplay && projectMatch && departmentMatch) ? '' : 'none';
                     });
                 });
             }
@@ -1298,4 +1268,4 @@ function getWeekdays($start, $end)
 </body>
 
 </html>
-<?php $conn->close(); ?>cc
+<?php $conn->close(); ?>ccc
