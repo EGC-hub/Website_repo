@@ -54,18 +54,16 @@ try {
     }
 
     // Fetch logged-in user's details
-    $userQuery = $conn->prepare("
+    $userQuery = $pdo->prepare("
     SELECT u.username, d.name AS department_name 
     FROM users u
     LEFT JOIN departments d ON u.department_id = d.id
     WHERE u.id = ?
 ");
-    $userQuery->bind_param("i", $user_id);
-    $userQuery->execute();
-    $userResult = $userQuery->get_result();
+    $userQuery->execute([$_SESSION['id']]); // Assuming the user ID is stored in the session
+    $userDetails = $userQuery->fetch(PDO::FETCH_ASSOC);
 
-    if ($userResult->num_rows > 0) {
-        $userDetails = $userResult->fetch_assoc();
+    if ($userDetails) {
         $loggedInUsername = $userDetails['username'];
         $loggedInDepartmentName = $userDetails['department_name']; // Fetch department name
     } else {
@@ -221,6 +219,7 @@ try {
             font-size: 14px;
             margin-top: 10px;
         }
+
         .main-container {
             display: flex;
             flex-direction: column;
