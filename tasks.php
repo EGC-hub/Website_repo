@@ -1155,6 +1155,36 @@ function getWeekdays($start, $end)
                 });
             });
         }
+
+        function filterByDate() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const tables = ['pending-tasks', 'remaining-tasks'];
+
+            tables.forEach(tableId => {
+                const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+                rows.forEach(row => {
+                    const taskStartDate = row.querySelector('td:nth-child(5)').textContent.trim(); // Start Date is in the 5th column
+                    const taskEndDate = row.querySelector('td:nth-child(6)').textContent.trim(); // End Date is in the 6th column
+
+                    const taskStart = new Date(taskStartDate);
+                    const taskEnd = new Date(taskEndDate);
+                    const filterStart = startDate ? new Date(startDate) : null;
+                    const filterEnd = endDate ? new Date(endDate) : null;
+
+                    let shouldDisplay = true;
+
+                    if (filterStart && taskStart < filterStart) {
+                        shouldDisplay = false;
+                    }
+                    if (filterEnd && taskEnd > filterEnd) {
+                        shouldDisplay = false;
+                    }
+
+                    row.style.display = shouldDisplay ? '' : 'none';
+                });
+            });
+        }
     </script>
 
     <!-- Script for viewing the delayed completion details -->
