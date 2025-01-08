@@ -479,54 +479,40 @@ function getWeekdays($start, $end)
 
         .filter-container {
             display: flex;
-            flex-direction: column;
+            gap: 20px;
             align-items: center;
             margin-bottom: 20px;
         }
 
-        .filter-buttons {
-            margin-bottom: 15px;
-            text-align: center;
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        .filter-buttons .btn {
-            margin: 5px;
-            padding: 10px 20px;
-            background-color: #002c5f;
-            color: white;
-            border: none;
+        .filter-group label {
+            font-weight: bold;
+        }
+
+        .filter-group select {
+            width: 200px;
+            padding: 5px;
             border-radius: 5px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .filter-buttons .btn:hover {
-            background-color: #004080;
-        }
-
-        .filter-buttons .btn-secondary {
-            background-color: #457b9d;
-        }
-
-        .filter-buttons .btn-secondary:hover {
-            background-color: #1d3557;
+            border: 1px solid #ccc;
         }
 
         .filter-date {
             display: flex;
             gap: 10px;
             align-items: center;
-            justify-content: center;
         }
 
         .filter-date label {
             font-weight: bold;
-            color: #333;
         }
 
         .filter-date input {
-            padding: 5px 10px;
+            padding: 5px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
@@ -666,32 +652,40 @@ function getWeekdays($start, $end)
         <h2>Tasks</h2>
 
         <div class="container mt-4">
-            <!-- Filter Buttons -->
+            <!-- Filter Container -->
             <div class="filter-container">
-                <div class="filter-buttons">
-                    <!-- Add this button to open the modal -->
-                    <?php if ($user_role === 'Admin' || $user_role === 'Manager'): ?>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#taskManagementModal">
-                            Create New Task
-                        </button>
-                    <?php endif; ?>
+                <!-- Multi-select dropdown for Project Name -->
+                <div class="filter-group">
+                    <label for="project-filter">Filter by Project:</label>
+                    <select id="project-filter" multiple>
+                        <option value="All">All</option>
+                        <?php foreach ($projects as $project): ?>
+                            <option value="<?= htmlspecialchars($project) ?>"><?= htmlspecialchars($project) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-                    <button onclick="filterTasks('All')" class="btn btn-primary">Reset</button>
-                    <?php foreach ($projects as $project): ?>
-                        <button onclick="filterTasks('<?= htmlspecialchars($project) ?>')" class="btn btn-secondary">
-                            <?= htmlspecialchars($project) ?>
-                        </button>
-                    <?php endforeach; ?>
-                    <a href="export_tasks.php" class="btn btn-success">Export to CSV</a>
+                <!-- Multi-select dropdown for Department -->
+                <div class="filter-group">
+                    <label for="department-filter">Filter by Department:</label>
+                    <select id="department-filter" multiple>
+                        <option value="All">All</option>
+                        <?php
+                        // Fetch unique departments from the database
+                        $departmentQuery = $conn->query("SELECT DISTINCT name FROM departments");
+                        while ($dept = $departmentQuery->fetch_assoc()): ?>
+                            <option value="<?= htmlspecialchars($dept['name']) ?>"><?= htmlspecialchars($dept['name']) ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
                 </div>
 
                 <!-- Date Range Inputs -->
                 <div class="filter-date">
                     <label for="start-date">Start Date:</label>
-                    <input type="date" id="start-date" onchange="filterByDate()">
+                    <input type="date" id="start-date" onchange="applyFilters()">
                     <label for="end-date">End Date:</label>
-                    <input type="date" id="end-date" onchange="filterByDate()">
+                    <input type="date" id="end-date" onchange="applyFilters()">
                 </div>
             </div>
 
@@ -1103,44 +1097,42 @@ function getWeekdays($start, $end)
 
     <!-- script for the filtering -->
     <script>
-        function filterTasks(project) {
+        // Function to apply all filters
+        function applyFilters() {
+            const selectedProjects = Array.from(document.getElementById('project-filter').selectedOptions).map(opt => opt.value);
+            const selectedDepartments = Array.from(document.getElementById('department-filter').selectedOptions).map(opt => opt.value);
+            const startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
+            const endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value) : null;
+
             const tables = ['pending-tasks', 'remaining-tasks'];
             tables.forEach(tableId => {
                 const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                 rows.forEach(row => {
                     const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project Name is in the 2nd column
-                    row.style.display = (project === 'All' || projectName === project) ? '' : 'none';
-                });
-            });
-
-            // Reset the date inputs when "All" is selected
-            if (project === 'All') {
-                resetDateFilters();
-            }
-        }
-
-        function resetDateFilters() {
-            document.getElementById('start-date').value = '';
-            document.getElementById('end-date').value = '';
-        }
-
-        function filterByDate() {
-            const startDate = new Date(document.getElementById('start-date').value);
-            const endDate = new Date(document.getElementById('end-date').value);
-            const tables = ['pending-tasks', 'remaining-tasks'];
-
-            tables.forEach(tableId => {
-                const rows = document.querySelectorAll(`#${tableId} tbody tr`);
-                rows.forEach(row => {
+                    const departmentName = row.querySelector('td:nth-child(10)').textContent.trim(); // Department is in the 10th column
                     const rowStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date is in the 5th column
                     const rowEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date is in the 6th column
 
-                    // Check if the task's start and end dates fall within the selected range
-                    const isWithinRange = (!startDate || rowStartDate >= startDate) && (!endDate || rowEndDate <= endDate);
-                    row.style.display = isWithinRange ? '' : 'none';
+                    // Check if the row matches the selected projects
+                    const matchesProject = selectedProjects.includes('All') || selectedProjects.includes(projectName);
+
+                    // Check if the row matches the selected departments
+                    const matchesDepartment = selectedDepartments.includes('All') || selectedDepartments.includes(departmentName);
+
+                    // Check if the row falls within the selected date range
+                    const isWithinDateRange = (!startDate || rowStartDate >= startDate) && (!endDate || rowEndDate <= endDate);
+
+                    // Show or hide the row based on all filters
+                    row.style.display = (matchesProject && matchesDepartment && isWithinDateRange) ? '' : 'none';
                 });
             });
         }
+
+        // Add event listeners to the multi-select dropdowns and date inputs
+        document.getElementById('project-filter').addEventListener('change', applyFilters);
+        document.getElementById('department-filter').addEventListener('change', applyFilters);
+        document.getElementById('start-date').addEventListener('change', applyFilters);
+        document.getElementById('end-date').addEventListener('change', applyFilters);
     </script>
 
     <!-- Script for viewing the delayed completion details -->
