@@ -565,6 +565,20 @@ function getWeekdays($start, $end)
             font-size: 14px;
             margin-top: 10px;
         }
+
+        .filter-dropdown {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .filter-dropdown select {
+            width: 300px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -669,7 +683,6 @@ function getWeekdays($start, $end)
             <!-- Filter Buttons -->
             <div class="filter-container">
                 <div class="filter-buttons">
-                    <!-- Add this button to open the modal -->
                     <?php if ($user_role === 'Admin' || $user_role === 'Manager'): ?>
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                             data-bs-target="#taskManagementModal">
@@ -677,13 +690,19 @@ function getWeekdays($start, $end)
                         </button>
                     <?php endif; ?>
 
-                    <button onclick="filterTasks('All')" class="btn btn-primary">Reset</button>
-                    <?php foreach ($projects as $project): ?>
-                        <button onclick="filterTasks('<?= htmlspecialchars($project) ?>')" class="btn btn-secondary">
-                            <?= htmlspecialchars($project) ?>
-                        </button>
-                    <?php endforeach; ?>
+                    <button onclick="resetFilters()" class="btn btn-primary">Reset</button>
                     <a href="export_tasks.php" class="btn btn-success">Export to CSV</a>
+                </div>
+
+                <!-- Multi-select dropdown for filtering by project -->
+                <div class="filter-dropdown">
+                    <label for="project-filter">Filter by Project:</label>
+                    <select id="project-filter" multiple="multiple">
+                        <option value="All">All</option>
+                        <?php foreach ($projects as $project): ?>
+                            <option value="<?= htmlspecialchars($project) ?>"><?= htmlspecialchars($project) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <!-- Date Range Inputs -->
@@ -1103,20 +1122,30 @@ function getWeekdays($start, $end)
 
     <!-- script for the filtering -->
     <script>
-        function filterTasks(project) {
+        function filterTasks() {
+            const selectedProjects = Array.from(document.getElementById('project-filter').selectedOptions).map(option => option.value);
             const tables = ['pending-tasks', 'remaining-tasks'];
+
             tables.forEach(tableId => {
                 const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                 rows.forEach(row => {
                     const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project Name is in the 2nd column
-                    row.style.display = (project === 'All' || projectName === project) ? '' : 'none';
+                    const shouldDisplay = selectedProjects.includes('All') || selectedProjects.includes(projectName);
+                    row.style.display = shouldDisplay ? '' : 'none';
                 });
             });
+        }
 
-            // Reset the date inputs when "All" is selected
-            if (project === 'All') {
-                resetDateFilters();
-            }
+        function resetFilters() {
+            // Reset the multi-select dropdown to 'All'
+            const projectFilter = document.getElementById('project-filter');
+            Array.from(projectFilter.options).forEach(option => option.selected = option.value === 'All');
+
+            // Reset the date inputs
+            resetDateFilters();
+
+            // Reapply the filter to show all tasks
+            filterTasks();
         }
 
         function resetDateFilters() {
@@ -1141,6 +1170,9 @@ function getWeekdays($start, $end)
                 });
             });
         }
+
+        // Attach event listener to the multi-select dropdown
+        document.getElementById('project-filter').addEventListener('change', filterTasks);
     </script>
 
     <!-- Script for viewing the delayed completion details -->
@@ -1203,6 +1235,19 @@ function getWeekdays($start, $end)
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
         </script>
+
+    <!-- Script for Select2 library -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#project-filter').select2({
+                placeholder: "Select projects to filter",
+                allowClear: true
+            });
+        });
+    </script>
 </body>
 
 </html>
