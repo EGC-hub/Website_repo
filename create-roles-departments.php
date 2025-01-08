@@ -62,7 +62,7 @@ try {
     LEFT JOIN departments d ON u.department_id = d.id
     WHERE u.id = ?
 ");
-    $userQuery->execute([$_SESSION['id']]); // Assuming the user ID is stored in the session
+    $userQuery->execute([$_SESSION['user_id']]); // Assuming the user ID is stored in the session
     $userDetails = $userQuery->fetch(PDO::FETCH_ASSOC);
 
     if ($userDetails) {
