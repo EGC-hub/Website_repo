@@ -31,21 +31,23 @@ $user_role = $_SESSION['role'];
 $taskQuery = $user_role === 'Admin'
     ? "SELECT tasks.*, 
               assigned_to_user.username AS assigned_to, 
-              assigned_to_user.department AS department, 
+              departments.name AS department, 
               assigned_by_user.username AS assigned_by 
        FROM tasks 
        JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
+       JOIN departments ON assigned_to_user.department_id = departments.id
        JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
        ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Pending', 'Started'), recorded_timestamp DESC"
     : ($user_role === 'Manager'
         ? "SELECT tasks.*, 
                   assigned_to_user.username AS assigned_to, 
-                  assigned_to_user.department AS department, 
+                  departments.name AS department, 
                   assigned_by_user.username AS assigned_by 
            FROM tasks 
            JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
+           JOIN departments ON assigned_to_user.department_id = departments.id
            JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-           WHERE assigned_to_user.department = (SELECT department FROM users WHERE id = ?) 
+           WHERE assigned_to_user.department_id = (SELECT department_id FROM users WHERE id = ?) 
            ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Pending', 'Started'), recorded_timestamp DESC"
         : "SELECT tasks.*, 
                   assigned_by_user.username AS assigned_by 
@@ -80,7 +82,7 @@ fputcsv($output, ['Pending & Started Tasks']);
 fputcsv($output, $headers); // Write headers for Pending Tasks
 
 while ($row = $result->fetch_assoc()) {
-    if ($row['status'] === 'Pending') {
+    if ($row['status'] === 'Pending' || $row['status'] === 'Started') {
         $rowData = [
             $row['project_name'],
             $row['task_name'],
@@ -101,15 +103,15 @@ while ($row = $result->fetch_assoc()) {
 // Add a blank row to separate sections
 fputcsv($output, []);
 
-// Write Other Tasks Section
+// Write Completed Tasks Section
 fputcsv($output, ['Completed Tasks']);
-fputcsv($output, $headers); // Write headers for Other Tasks
+fputcsv($output, $headers); // Write headers for Completed Tasks
 
 // Reset the result pointer to iterate again
 $result->data_seek(0);
 
 while ($row = $result->fetch_assoc()) {
-    if ($row['status'] !== 'Pending') {
+    if ($row['status'] === 'Completed on Time' || $row['status'] === 'Delayed Completion') {
         $rowData = [
             $row['project_name'],
             $row['task_name'],
