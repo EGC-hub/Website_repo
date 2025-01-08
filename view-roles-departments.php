@@ -92,7 +92,7 @@ try {
         }
 
         .user-info .session-warning {
-            color: #dc3545;
+            color: grey;
             font-weight: bold;
             font-size: 14px;
             margin-top: 10px;
@@ -219,7 +219,7 @@ try {
             <p>Logged in as: <strong><?= htmlspecialchars($_SESSION['username']) ?></strong> | Department:
                 <strong><?= htmlspecialchars($_SESSION['department']) ?></strong>
             </p>
-            <p class="session-warning">Warning: Your session will timeout after 20 minutes of inactivity.</p>
+            <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
         </div>
         <div class="container">
             <h1>Roles & Departments</h1>

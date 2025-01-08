@@ -601,7 +601,7 @@ function getWeekdays($start, $end)
         }
 
         .user-info .session-warning {
-            color: #dc3545;
+            color: grey;
             /* Red color for warning */
             font-weight: bold;
             font-size: 14px;
@@ -615,7 +615,7 @@ function getWeekdays($start, $end)
         <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
             <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
         </p>
-        <p class="session-warning">Warning: Your session will timeout after 20 minutes of inactivity.</p>
+        <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
     </div>
 
     <!-- Task Management Modal -->

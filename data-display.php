@@ -345,7 +345,7 @@ if (isset($_GET['export'])) {
         }
 
         .user-info .session-warning {
-            color: #dc3545;
+            color: grey;
             /* Red color for warning */
             font-weight: bold;
             font-size: 14px;
@@ -359,7 +359,7 @@ if (isset($_GET['export'])) {
         <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong> | Department:
             <strong><?= htmlspecialchars($department) ?></strong>
         </p>
-        <p class="session-warning">Warning: Your session will timeout after 20 minutes of inactivity.</p>
+        <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
     </div>
 
     <div class="table-container">
