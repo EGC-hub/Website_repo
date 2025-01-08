@@ -706,6 +706,19 @@ function getWeekdays($start, $end)
                     </select>
                 </div>
 
+                <!-- Multi-select dropdown for filtering by department -->
+                <div class="filter-dropdown">
+                    <label for="department-filter">Filter by Department:</label>
+                    <select id="department-filter" multiple="multiple">
+                        <option value="All">All</option>
+                        <?php foreach ($departments as $department): ?>
+                            <option value="<?= htmlspecialchars($department['name']) ?>">
+                                <?= htmlspecialchars($department['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
                 <!-- Date Range Inputs -->
                 <div class="filter-date">
                     <label for="start-date">Start Date:</label>
@@ -1189,28 +1202,42 @@ function getWeekdays($start, $end)
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function () {
-            // Initialize Select2 on the project filter dropdown
+            // Initialize Select2 on the project and department filter dropdowns
             $('#project-filter').select2({
                 placeholder: "Select projects to filter",
                 allowClear: true,
                 width: '300px'
             });
 
-            // Trigger project filtering
-            $('#project-filter').on('change', function () {
+            $('#department-filter').select2({
+                placeholder: "Select departments to filter",
+                allowClear: true,
+                width: '300px'
+            });
+
+            // Trigger combined filtering when either project or department filter changes
+            $('#project-filter, #department-filter').on('change', function () {
                 filterTasks();
             });
 
-            // Filter by selected projects
+            // Combined filter function for projects and departments
             function filterTasks() {
                 const selectedProjects = $('#project-filter').val();
+                const selectedDepartments = $('#department-filter').val();
                 const tables = ['pending-tasks', 'remaining-tasks'];
 
                 tables.forEach(tableId => {
                     const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                     rows.forEach(row => {
-                        const projectName = row.querySelector('td:nth-child(2)').textContent.trim();
-                        if (selectedProjects.includes('All') || selectedProjects.includes(projectName)) {
+                        const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
+                        const departmentName = row.querySelector('td:nth-child(10)').textContent.trim(); // Department column
+
+                        // Check if the row matches the selected projects and departments
+                        const projectMatch = selectedProjects.includes('All') || selectedProjects.includes(projectName);
+                        const departmentMatch = selectedDepartments.includes('All') || selectedDepartments.includes(departmentName);
+
+                        // Display the row only if it matches both filters
+                        if (projectMatch && departmentMatch) {
                             row.style.display = '';
                         } else {
                             row.style.display = 'none';
@@ -1239,7 +1266,16 @@ function getWeekdays($start, $end)
                             shouldDisplay = false;
                         }
 
-                        row.style.display = shouldDisplay ? '' : 'none';
+                        // Only display the row if it also matches the project and department filters
+                        const projectName = row.querySelector('td:nth-child(2)').textContent.trim();
+                        const departmentName = row.querySelector('td:nth-child(10)').textContent.trim();
+                        const selectedProjects = $('#project-filter').val();
+                        const selectedDepartments = $('#department-filter').val();
+
+                        const projectMatch = selectedProjects.includes('All') || selectedProjects.includes(projectName);
+                        const departmentMatch = selectedDepartments.includes('All') || selectedDepartments.includes(departmentName);
+
+                        row.style.display = (shouldDisplay && projectMatch && departmentMatch) ? '' : 'none';
                     });
                 });
             }
@@ -1247,9 +1283,10 @@ function getWeekdays($start, $end)
             // Reset filters
             function resetFilters() {
                 $('#project-filter').val(['All']).trigger('change');
+                $('#department-filter').val(['All']).trigger('change');
                 document.getElementById('start-date').value = '';
                 document.getElementById('end-date').value = '';
-                filterTasks();
+                filterTasks(); // Apply the reset filters
             }
 
             // Attach event listeners
@@ -1257,9 +1294,8 @@ function getWeekdays($start, $end)
             document.getElementById('end-date').addEventListener('change', filterByDate);
             document.querySelector('.btn-primary[onclick="resetFilters()"]').onclick = resetFilters;
         });
-
     </script>
 </body>
 
 </html>
-<?php $conn->close(); ?>c
+<?php $conn->close(); ?>cc
