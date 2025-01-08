@@ -478,7 +478,7 @@ function getWeekdays($start, $end)
             line-height: 1.5;
         }
 
-        <style>.filter-container {
+        .filter-container {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -527,9 +527,17 @@ function getWeekdays($start, $end)
             margin-bottom: 15px;
         }
 
-        .filter-dropdown select {
+        .filter-dropdown label {
+            font-weight: bold;
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .filter-dropdown select,
+        .filter-dropdown input {
             width: 400px;
-            /* Make the dropdowns wider */
+            /* Make the dropdowns and inputs wider */
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -543,66 +551,59 @@ function getWeekdays($start, $end)
             align-items: center;
         }
 
-        .filter-date label {
-            font-weight: bold;
+        .filter-date .filter-dropdown {
+            margin-bottom: 0;
+            /* Remove bottom margin for date range dropdowns */
+        }
+
+        .custom-table tr.delayed-task {
+            --bs-table-bg: transparent !important;
+            --bs-table-hover-bg: transparent !important;
+            --bs-table-striped-bg: transparent !important;
+            --bs-table-border-color: var(--bs-border-color) !important;
+            background-color: #f8d7da !important;
+            /* Light red */
+            color: #842029 !important;
+            /* Dark red text */
+        }
+
+        .user-info {
+            text-align: center;
+            margin: 25px auto;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 1400px;
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            font-size: 16px;
             color: #333;
         }
 
-        .filter-date input {
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        .user-info .session-warning {
+            color: #dc3545;
+            /* Red color for warning */
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
         }
-    </style>
 
-    .custom-table tr.delayed-task {
-    --bs-table-bg: transparent !important;
-    --bs-table-hover-bg: transparent !important;
-    --bs-table-striped-bg: transparent !important;
-    --bs-table-border-color: var(--bs-border-color) !important;
-    background-color: #f8d7da !important;
-    /* Light red */
-    color: #842029 !important;
-    /* Dark red text */
-    }
+        .filter-dropdown {
+            margin-bottom: 15px;
+            text-align: center;
+        }
 
-    .user-info {
-    text-align: center;
-    margin: 25px auto;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 1400px;
-    }
-
-    .user-info p {
-    margin: 5px 0;
-    font-size: 16px;
-    color: #333;
-    }
-
-    .user-info .session-warning {
-    color: #dc3545;
-    /* Red color for warning */
-    font-weight: bold;
-    font-size: 14px;
-    margin-top: 10px;
-    }
-
-    .filter-dropdown {
-    margin-bottom: 15px;
-    text-align: center;
-    }
-
-    .filter-dropdown select {
-    width: 300px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 14px;
-    }
+        .filter-dropdown select {
+            width: 300px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -746,10 +747,14 @@ function getWeekdays($start, $end)
 
                     <!-- Date Range Inputs -->
                     <div class="filter-date">
-                        <label for="start-date">Start Date:</label>
-                        <input type="date" id="start-date" onchange="filterByDate()">
-                        <label for="end-date">End Date:</label>
-                        <input type="date" id="end-date" onchange="filterByDate()">
+                        <div class="filter-dropdown">
+                            <label for="start-date">Start Date:</label>
+                            <input type="date" id="start-date" onchange="filterByDate()">
+                        </div>
+                        <div class="filter-dropdown">
+                            <label for="end-date">End Date:</label>
+                            <input type="date" id="end-date" onchange="filterByDate()">
+                        </div>
                     </div>
                 </div>
             </div>
