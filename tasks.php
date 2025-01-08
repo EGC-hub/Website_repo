@@ -302,6 +302,9 @@ function getWeekdays($start, $end)
     <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Add these lines inside the <head> section -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -1033,6 +1036,9 @@ function getWeekdays($start, $end)
         </div>
     </div>
 
+    <!-- Jquery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+
     <!-- Script for opening the modal to view details of completion -->
     <script>
         // Attach event listener for task name links
@@ -1123,56 +1129,32 @@ function getWeekdays($start, $end)
     <!-- script for the filtering -->
     <script>
         function filterTasks() {
-            const selectedProjects = Array.from(document.getElementById('project-filter').selectedOptions).map(option => option.value);
+            const selectedProjects = $('#project-filter').val(); // Get selected values using Select2
             const tables = ['pending-tasks', 'remaining-tasks'];
 
             tables.forEach(tableId => {
                 const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                 rows.forEach(row => {
                     const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project Name is in the 2nd column
-                    const shouldDisplay = selectedProjects.includes('All') || selectedProjects.includes(projectName);
+
+                    // If "All" is selected, show all rows
+                    if (selectedProjects.includes('All')) {
+                        row.style.display = '';
+                        return;
+                    }
+
+                    // If no projects are selected, hide all rows
+                    if (selectedProjects.length === 0) {
+                        row.style.display = 'none';
+                        return;
+                    }
+
+                    // Show rows that match the selected projects
+                    const shouldDisplay = selectedProjects.includes(projectName);
                     row.style.display = shouldDisplay ? '' : 'none';
                 });
             });
         }
-
-        function resetFilters() {
-            // Reset the multi-select dropdown to 'All'
-            const projectFilter = document.getElementById('project-filter');
-            Array.from(projectFilter.options).forEach(option => option.selected = option.value === 'All');
-
-            // Reset the date inputs
-            resetDateFilters();
-
-            // Reapply the filter to show all tasks
-            filterTasks();
-        }
-
-        function resetDateFilters() {
-            document.getElementById('start-date').value = '';
-            document.getElementById('end-date').value = '';
-        }
-
-        function filterByDate() {
-            const startDate = new Date(document.getElementById('start-date').value);
-            const endDate = new Date(document.getElementById('end-date').value);
-            const tables = ['pending-tasks', 'remaining-tasks'];
-
-            tables.forEach(tableId => {
-                const rows = document.querySelectorAll(`#${tableId} tbody tr`);
-                rows.forEach(row => {
-                    const rowStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date is in the 5th column
-                    const rowEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date is in the 6th column
-
-                    // Check if the task's start and end dates fall within the selected range
-                    const isWithinRange = (!startDate || rowStartDate >= startDate) && (!endDate || rowEndDate <= endDate);
-                    row.style.display = isWithinRange ? '' : 'none';
-                });
-            });
-        }
-
-        // Attach event listener to the multi-select dropdown
-        document.getElementById('project-filter').addEventListener('change', filterTasks);
     </script>
 
     <!-- Script for viewing the delayed completion details -->
@@ -1232,6 +1214,45 @@ function getWeekdays($start, $end)
                 });
         }
     </script>
+
+    <!-- script for reset button -->
+    <script>
+        function resetFilters() {
+            // Reset the Select2 dropdown to 'All'
+            $('#project-filter').val(['All']).trigger('change'); // Set 'All' as selected and trigger change event
+
+            // Reset the date inputs
+            resetDateFilters();
+
+            // Reapply the filter to show all tasks
+            filterTasks();
+        }
+
+        function resetDateFilters() {
+            document.getElementById('start-date').value = '';
+            document.getElementById('end-date').value = '';
+        }
+    </script>
+
+    <!-- Select 2 script -->
+    <script>
+        $(document).ready(function () {
+            // Initialize Select2 on the project filter dropdown
+            $('#project-filter').select2({
+                placeholder: "Select projects to filter", // Placeholder text
+                allowClear: true, // Allow clearing the selection
+                width: '300px', // Set the width of the dropdown
+                tags: true, // Enable tagging (pillbox) functionality
+                tokenSeparators: [',', ' '] // Allow comma and space as separators
+            });
+
+            // Add an event listener to trigger filtering when the selection changes
+            $('#project-filter').on('change', function () {
+                filterTasks();
+            });
+        });
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
         </script>
