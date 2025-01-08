@@ -17,7 +17,7 @@ $username = $_SESSION['username'] ?? 'Unknown'; // Fallback to 'Unknown' if not 
 $department = $_SESSION['department'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
 
 // Session timeout (Optional)
-$timeout_duration = 600;
+$timeout_duration = 1200;
 
 // Check if 'last_activity' is set and if it has exceeded the timeout
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {

@@ -16,6 +16,17 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
     exit;
 }
 
+$timeout_duration = 10;
+
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
+    session_unset();
+    session_destroy();
+    header("Location: portal-login.html");
+    exit;
+}
+
+$_SESSION['last_activity'] = time();
+
 $user_id = $_SESSION['user_id'];
 $user_role = $_SESSION['role'];
 $user_department = $_SESSION['department'];

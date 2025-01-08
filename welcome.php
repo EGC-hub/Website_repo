@@ -15,7 +15,7 @@ $userRole = $_SESSION['role'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
 $department = $_SESSION['department'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
 
 // Optional: Session timeout settings
-$timeout_duration = 600;
+$timeout_duration = 1200;
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
     // If the session is expired, destroy it and redirect to login page
     session_unset();

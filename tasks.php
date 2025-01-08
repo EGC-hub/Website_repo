@@ -28,7 +28,7 @@ if ($user_id === null || $user_role === null) {
 }
 
 // Session timeout (Optional)
-$timeout_duration = 600;
+$timeout_duration = 1200;
 
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
     session_unset();
