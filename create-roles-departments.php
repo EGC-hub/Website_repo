@@ -53,6 +53,26 @@ try {
         }
     }
 
+    // Fetch logged-in user's details
+    $userQuery = $conn->prepare("
+    SELECT u.username, d.name AS department_name 
+    FROM users u
+    LEFT JOIN departments d ON u.department_id = d.id
+    WHERE u.id = ?
+");
+    $userQuery->bind_param("i", $user_id);
+    $userQuery->execute();
+    $userResult = $userQuery->get_result();
+
+    if ($userResult->num_rows > 0) {
+        $userDetails = $userResult->fetch_assoc();
+        $loggedInUsername = $userDetails['username'];
+        $loggedInDepartmentName = $userDetails['department_name']; // Fetch department name
+    } else {
+        $loggedInUsername = "Unknown";
+        $loggedInDepartmentName = "Unknown"; // Fallback if no department is found
+    }
+
     // Handle form submission for creating a new department
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_department'])) {
         $departmentName = trim($_POST['department_name']);
@@ -88,6 +108,7 @@ try {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -176,41 +197,79 @@ try {
             text-decoration: none;
             color: #004080;
         }
+
+        .user-info {
+            max-width: 500px;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px 40px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .user-info .session-warning {
+            color: #dc3545;
+            /* Red color for warning */
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 25px;
+        }
     </style>
 </head>
+
 <body>
-
-<div class="form-container">
-    <h1>Create Roles & Departments</h1>
-
-    <!-- Display error or success messages -->
-    <?php if (!empty($errorMsg)): ?>
-        <div class="error"><?= htmlspecialchars($errorMsg) ?></div>
-    <?php elseif (!empty($successMsg)): ?>
-        <div class="success"><?= htmlspecialchars($successMsg) ?></div>
-    <?php endif; ?>
-
-    <!-- Form for creating a new role -->
-    <form method="POST" action="create-roles-departments.php">
-        <div class="form-group">
-            <label for="role_name">Role Name</label>
-            <input type="text" id="role_name" name="role_name" required>
+    <div class="main-container">
+        <div class="user-info">
+            <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
+                <strong><?= htmlspecialchars($loggedInDepartmentName) ?></strong>
+            </p>
+            <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
         </div>
-        <button type="submit" name="create_role">Create Role</button>
-    </form>
+        <div class="form-container">
+            <h1>Create Roles & Departments</h1>
 
-    <!-- Form for creating a new department -->
-    <form method="POST" action="create-roles-departments.php">
-        <div class="form-group">
-            <label for="department_name">Department Name</label>
-            <input type="text" id="department_name" name="department_name" required>
+            <!-- Display error or success messages -->
+            <?php if (!empty($errorMsg)): ?>
+                <div class="error"><?= htmlspecialchars($errorMsg) ?></div>
+            <?php elseif (!empty($successMsg)): ?>
+                <div class="success"><?= htmlspecialchars($successMsg) ?></div>
+            <?php endif; ?>
+
+            <!-- Form for creating a new role -->
+            <form method="POST" action="create-roles-departments.php">
+                <div class="form-group">
+                    <label for="role_name">Role Name</label>
+                    <input type="text" id="role_name" name="role_name" required>
+                </div>
+                <button type="submit" name="create_role">Create Role</button>
+            </form>
+
+            <!-- Form for creating a new department -->
+            <form method="POST" action="create-roles-departments.php">
+                <div class="form-group">
+                    <label for="department_name">Department Name</label>
+                    <input type="text" id="department_name" name="department_name" required>
+                </div>
+                <button type="submit" name="create_department">Create Department</button>
+            </form>
+
+            <!-- Back Button -->
+            <a href="welcome.php" class="back-btn">Back to Dashboard</a>
         </div>
-        <button type="submit" name="create_department">Create Department</button>
-    </form>
-
-    <!-- Back Button -->
-    <a href="welcome.php" class="back-btn">Back to Dashboard</a>
-</div>
-
+    </div>
 </body>
+
 </html>
