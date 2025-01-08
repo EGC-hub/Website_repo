@@ -521,7 +521,9 @@ function getWeekdays($start, $end)
 
         .filter-row {
             display: flex;
-            gap: 20px;
+            flex-wrap: wrap;
+            /* Allow wrapping of filter elements */
+            gap: 10px;
             /* Adjust the gap between dropdowns and date range */
             align-items: center;
             justify-content: center;
@@ -530,6 +532,10 @@ function getWeekdays($start, $end)
 
         .filter-dropdown {
             margin-bottom: 15px;
+            flex: 1 1 300px;
+            /* Allow flexible sizing with a minimum width of 300px */
+            max-width: 100%;
+            /* Ensure it doesn't exceed the parent container */
         }
 
         .filter-dropdown label {
@@ -541,8 +547,8 @@ function getWeekdays($start, $end)
 
         .filter-dropdown select,
         .filter-dropdown input {
-            width: 400px;
-            /* Make the dropdowns and inputs wider */
+            width: 100%;
+            /* Make the dropdowns and inputs take full width of their container */
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -554,11 +560,17 @@ function getWeekdays($start, $end)
             display: flex;
             gap: 10px;
             align-items: center;
+            flex: 1 1 300px;
+            /* Allow flexible sizing with a minimum width of 300px */
+            max-width: 100%;
+            /* Ensure it doesn't exceed the parent container */
         }
 
         .filter-date .filter-dropdown {
             margin-bottom: 0;
             /* Remove bottom margin for date range dropdowns */
+            flex: 1 1 150px;
+            /* Allow flexible sizing for date inputs */
         }
 
         .custom-table tr.delayed-task {
@@ -594,20 +606,6 @@ function getWeekdays($start, $end)
             font-weight: bold;
             font-size: 14px;
             margin-top: 10px;
-        }
-
-        .filter-dropdown {
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .filter-dropdown select {
-            width: 300px;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 14px;
         }
     </style>
 </head>
