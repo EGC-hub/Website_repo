@@ -1108,7 +1108,7 @@ function getWeekdays($start, $end)
             tables.forEach(tableId => {
                 const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                 rows.forEach(row => {
-                    const projectName = row.querySelector('td:first-child').textContent.trim();
+                    const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project Name is in the 2nd column
                     row.style.display = (project === 'All' || projectName === project) ? '' : 'none';
                 });
             });
@@ -1122,12 +1122,17 @@ function getWeekdays($start, $end)
             tables.forEach(tableId => {
                 const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                 rows.forEach(row => {
-                    const rowDate = new Date(row.querySelector('td:nth-child(4)').textContent.trim());
-                    row.style.display = (!startDate || rowDate >= startDate) && (!endDate || rowDate <= endDate) ? '' : 'none';
+                    const rowStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date is in the 5th column
+                    const rowEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date is in the 6th column
+
+                    // Check if the task's start and end dates fall within the selected range
+                    const isWithinRange = (!startDate || rowStartDate >= startDate) && (!endDate || rowEndDate <= endDate);
+                    row.style.display = isWithinRange ? '' : 'none';
                 });
             });
         }
     </script>
+
     <!-- Script for viewing the delayed completion details -->
     <script>
         function showDelayedDetails(taskName, completionDate, delayReason, completionDescription) {
