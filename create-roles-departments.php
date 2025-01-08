@@ -12,6 +12,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['role'] !== 'Admin') {
     exit;
 }
 
+$user_id = $_SESSION['user_id'] ?? null;
+
 $config = include '../config.php';
 $dsn = "mysql:host=localhost;dbname=euro_login_system;charset=utf8mb4";
 $username = $config['dbUsername'];
