@@ -1250,13 +1250,49 @@ function getWeekdays($start, $end)
                 });
             }
 
+            // Filter by date range
+            function filterByDate() {
+                const startDate = new Date(document.getElementById('start-date').value);
+                const endDate = new Date(document.getElementById('end-date').value);
+                const tables = ['pending-tasks', 'remaining-tasks'];
+
+                tables.forEach(tableId => {
+                    const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+                    rows.forEach(row => {
+                        const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
+                        const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
+
+                        let shouldDisplay = true;
+
+                        // Check if the task falls within the selected date range
+                        if (startDate && taskStartDate < startDate) {
+                            shouldDisplay = false;
+                        }
+                        if (endDate && taskEndDate > endDate) {
+                            shouldDisplay = false;
+                        }
+
+                        // Only display the row if it matches the date range
+                        row.style.display = shouldDisplay ? '' : 'none';
+                    });
+                });
+            }
+
             // Reset filters
             function resetFilters() {
+                // Reset project filter
                 $('#project-filter').val(['All']).trigger('change');
+
+                // Reset department filter
                 $('#department-filter').val(['All']).trigger('change');
+
+                // Clear date inputs
                 document.getElementById('start-date').value = '';
                 document.getElementById('end-date').value = '';
-                filterTasks(); // Apply the reset filters
+
+                // Reapply filters to show all tasks
+                filterTasks();
+                filterByDate(); // Ensure date filter is also reset
             }
 
             // Attach event listeners
