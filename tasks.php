@@ -677,7 +677,7 @@ function getWeekdays($start, $end)
                         </button>
                     <?php endif; ?>
 
-                    <button onclick="filterTasks('All')" class="btn btn-primary">All</button>
+                    <button onclick="filterTasks('All')" class="btn btn-primary">Reset</button>
                     <?php foreach ($projects as $project): ?>
                         <button onclick="filterTasks('<?= htmlspecialchars($project) ?>')" class="btn btn-secondary">
                             <?= htmlspecialchars($project) ?>
