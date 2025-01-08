@@ -1112,6 +1112,16 @@ function getWeekdays($start, $end)
                     row.style.display = (project === 'All' || projectName === project) ? '' : 'none';
                 });
             });
+
+            // Reset the date inputs when "All" is selected
+            if (project === 'All') {
+                resetDateFilters();
+            }
+        }
+
+        function resetDateFilters() {
+            document.getElementById('start-date').value = '';
+            document.getElementById('end-date').value = '';
         }
 
         function filterByDate() {
