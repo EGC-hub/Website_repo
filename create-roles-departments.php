@@ -199,7 +199,7 @@ try {
         }
 
         .user-info {
-            max-width: 500px;
+            max-width: 400px;
             text-align: center;
             margin-bottom: 20px;
             padding: 10px 40px;
