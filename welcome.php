@@ -157,7 +157,7 @@ $_SESSION['last_activity'] = time();
             <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong> | Department:
                 <strong><?= htmlspecialchars($department) ?></strong>
             </p>
-            <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
+            <p class="session-warning">Warning: Your session will timeout after 20 minutes of inactivity.</p>
         </div>
 
         <div class="welcome-container">

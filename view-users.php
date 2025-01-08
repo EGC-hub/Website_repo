@@ -16,7 +16,8 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
     exit;
 }
 
-$timeout_duration = 10;
+// Session timeout for 20 mins
+$timeout_duration = 1200;
 
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
     session_unset();
@@ -255,7 +256,7 @@ try {
             <p>Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong> | Department:
                 <strong><?= htmlspecialchars($user_department) ?></strong>
             </p>
-            <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
+            <p class="session-warning">Warning: Your session will timeout after 20 minutes of inactivity.</p>
         </div>
         <div class="container">
             <h1>Users</h1>

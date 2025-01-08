@@ -573,7 +573,7 @@ function getWeekdays($start, $end)
         <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
             <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
         </p>
-        <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
+        <p class="session-warning">Warning: Your session will timeout after 20 minutes of inactivity.</p>
     </div>
 
     <!-- Task Management Modal -->

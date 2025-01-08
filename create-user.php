@@ -16,6 +16,18 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION
 
 $user_id = $_SESSION['user_id'] ?? null;
 
+// Session timeout for 20 mins
+$timeout_duration = 1200;
+
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
+    session_unset();
+    session_destroy();
+    header("Location: portal-login.html");
+    exit;
+}
+
+$_SESSION['last_activity'] = time();
+
 $config = include '../config.php';
 
 // Database connection
@@ -284,7 +296,7 @@ $conn->close();
             <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
                 <strong><?= htmlspecialchars($loggedInDepartmentName) ?></strong>
             </p>
-            <p class="session-warning">Warning: Your session will timeout after 10 minutes of inactivity.</p>
+            <p class="session-warning">Warning: Your session will timeout after 20 minutes of inactivity.</p>
         </div>
 
         <div class="form-container">
