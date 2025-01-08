@@ -311,6 +311,11 @@ function getWeekdays($start, $end)
             padding: 20px;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
+
         .task-container {
             width: 100%;
             max-width: 1400px;
