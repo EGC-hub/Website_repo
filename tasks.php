@@ -551,6 +551,22 @@ function getWeekdays($start, $end)
             font-size: 14px;
             margin-top: 10px;
         }
+
+        .filter-container button {
+            padding: 5px 10px;
+            background-color: #dc3545;
+            /* Red color for reset button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .filter-container button:hover {
+            background-color: #c82333;
+            /* Darker red on hover */
+        }
     </style>
 </head>
 
@@ -687,6 +703,9 @@ function getWeekdays($start, $end)
                     <label for="end-date">End Date:</label>
                     <input type="date" id="end-date" onchange="applyFilters()">
                 </div>
+
+                <!-- Reset Button -->
+                <button onclick="resetFilters()" class="btn btn-secondary">Reset</button>
             </div>
 
             <!-- Pending & Started Tasks Table -->
@@ -694,7 +713,7 @@ function getWeekdays($start, $end)
             <table class="table table-striped table-hover align-middle text-center" id="pending-tasks">
                 <thead>
                     <tr class="align-middle">
-                        <th>#</th> <!-- New column for task count -->
+                        <th>#</th>
                         <th>Project Name</th>
                         <th>Task Name</th>
                         <th>Task Description</th>
@@ -716,26 +735,23 @@ function getWeekdays($start, $end)
                 <tbody>
                     <?php
                     $taskCount = 1; // Initialize task count
-                    foreach ($rows as $row): ?>
+                    while ($row = $result->fetch_assoc()): ?>
                         <?php if ($row['status'] === 'Pending' || $row['status'] === 'Started'): ?>
-                            <tr class="align-middle">
-                                <td><?= $taskCount++ ?></td> <!-- Display task count and increment -->
+                            <tr data-department="<?= htmlspecialchars($row['department'] ?? 'Unknown') ?>">
+                                <td><?= $taskCount++ ?></td>
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td>
                                     <?php if ($row['status'] === 'Completed on Time'): ?>
-                                        <!-- Link to Completed on Time Modal -->
                                         <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
                                             data-description="<?= htmlspecialchars($row['completion_description']); ?>">
                                             <?= htmlspecialchars($row['task_name']); ?>
                                         </a>
                                     <?php elseif ($row['status'] === 'Delayed Completion'): ?>
-                                        <!-- Link to Delayed Completion Modal -->
                                         <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
                                             onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
                                             <?php echo htmlspecialchars($row['task_name']); ?>
                                         </a>
                                     <?php else: ?>
-                                        <!-- Plain Text for Other Statuses -->
                                         <?php echo htmlspecialchars($row['task_name']); ?>
                                     <?php endif; ?>
                                 </td>
@@ -779,7 +795,7 @@ function getWeekdays($start, $end)
                                 <?php endif; ?>
                             </tr>
                         <?php endif; ?>
-                    <?php endforeach; ?>
+                    <?php endwhile; ?>
                 </tbody>
             </table>
 
@@ -788,7 +804,7 @@ function getWeekdays($start, $end)
             <table class="table table-striped table-hover align-middle text-center custom-table" id="remaining-tasks">
                 <thead>
                     <tr class="align-middle">
-                        <th>#</th> <!-- New column for task count -->
+                        <th>#</th>
                         <th>Project Name</th>
                         <th>Task Name</th>
                         <th>Task Description</th>
@@ -807,45 +823,23 @@ function getWeekdays($start, $end)
                 <tbody>
                     <?php
                     $taskCount = 1; // Initialize task count
-                    foreach ($rows as $row): ?>
+                    while ($row = $result->fetch_assoc()): ?>
                         <?php if ($row['status'] !== 'Pending' && $row['status'] !== 'Started'): ?>
-                            <?php
-                            $delayInfo = '';
-                            if ($row['status'] === 'Delayed Completion') {
-                                $expectedFinishDate = strtotime($row['expected_finish_date']);
-                                $actualCompletionDate = strtotime($row['actual_completion_date']);
-
-                                if ($actualCompletionDate && $expectedFinishDate) {
-                                    // Calculate the number of weekdays between the expected finish date and actual completion date
-                                    $weekdays = getWeekdays($expectedFinishDate, $actualCompletionDate);
-
-                                    // Convert the delay into days and hours, excluding weekends
-                                    $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
-                                    $delayHours = floor(($actualCompletionDate - $expectedFinishDate) % (60 * 60 * 24) / (60 * 60)); // Remaining hours
-                                    $delayInfo = "{$delayDays} days, {$delayHours} hours delayed";
-                                }
-                            }
-                            ?>
-                            <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
-                                data-status="<?= htmlspecialchars($row['status']) ?>" class="align-middle <?php if ($row['status'] === 'Delayed Completion')
-                                      echo 'delayed-task'; ?>">
-                                <td><?= $taskCount++ ?></td> <!-- Display task count and increment -->
+                            <tr data-department="<?= htmlspecialchars($row['department'] ?? 'Unknown') ?>">
+                                <td><?= $taskCount++ ?></td>
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td>
                                     <?php if ($row['status'] === 'Completed on Time'): ?>
-                                        <!-- Link to Completed on Time Modal -->
                                         <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
                                             data-description="<?= htmlspecialchars($row['completion_description']); ?>">
                                             <?= htmlspecialchars($row['task_name']); ?>
                                         </a>
                                     <?php elseif ($row['status'] === 'Delayed Completion'): ?>
-                                        <!-- Link to Delayed Completion Modal -->
                                         <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
                                             onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
                                             <?php echo htmlspecialchars($row['task_name']); ?>
                                         </a>
                                     <?php else: ?>
-                                        <!-- Plain Text for Other Statuses -->
                                         <?php echo htmlspecialchars($row['task_name']); ?>
                                     <?php endif; ?>
                                 </td>
@@ -895,7 +889,7 @@ function getWeekdays($start, $end)
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
                             </tr>
                         <?php endif; ?>
-                    <?php endforeach; ?>
+                    <?php endwhile; ?>
                 </tbody>
             </table>
         </div>
@@ -1109,7 +1103,7 @@ function getWeekdays($start, $end)
                 const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                 rows.forEach(row => {
                     const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project Name is in the 2nd column
-                    const departmentName = row.querySelector('td:nth-child(10)').textContent.trim(); // Department is in the 10th column
+                    const departmentName = row.getAttribute('data-department'); // Department is stored in a data attribute
                     const rowStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date is in the 5th column
                     const rowEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date is in the 6th column
 
@@ -1126,6 +1120,24 @@ function getWeekdays($start, $end)
                     row.style.display = (matchesProject && matchesDepartment && isWithinDateRange) ? '' : 'none';
                 });
             });
+        }
+
+        // Function to reset all filters
+        function resetFilters() {
+            // Reset project filter
+            const projectFilter = document.getElementById('project-filter');
+            Array.from(projectFilter.options).forEach(opt => opt.selected = opt.value === 'All');
+
+            // Reset department filter
+            const departmentFilter = document.getElementById('department-filter');
+            Array.from(departmentFilter.options).forEach(opt => opt.selected = opt.value === 'All');
+
+            // Reset date inputs
+            document.getElementById('start-date').value = '';
+            document.getElementById('end-date').value = '';
+
+            // Reapply filters to show all rows
+            applyFilters();
         }
 
         // Add event listeners to the multi-select dropdowns and date inputs
