@@ -857,11 +857,11 @@ function getWeekdays($start, $end)
                                 </td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_by']) ?>
-                                    (<?= htmlspecialchars($row['assigned_by_departments']) ?>)
+                                    (<?= htmlspecialchars($row['assigned_by_department']) ?>)
                                 </td>
                                 <?php if ($user_role !== 'User'): ?>
                                     <td><?= htmlspecialchars($row['assigned_to']) ?>
-                                        (<?= htmlspecialchars($row['assigned_to_departments']) ?>)
+                                        (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                     </td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
@@ -992,11 +992,11 @@ function getWeekdays($start, $end)
                                 </td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_by']) ?>
-                                    (<?= htmlspecialchars($row['assigned_by_departments']) ?>)
+                                    (<?= htmlspecialchars($row['assigned_by_department']) ?>)
                                 </td>
                                 <?php if ($user_role !== 'User'): ?>
                                     <td><?= htmlspecialchars($row['assigned_to']) ?>
-                                        (<?= htmlspecialchars($row['assigned_to_departments']) ?>)
+                                        (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                     </td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
