@@ -1272,8 +1272,8 @@ function getWeekdays($start, $end)
             function applyAllFilters() {
                 const selectedProjects = $('#project-filter').val();
                 const selectedDepartments = $('#department-filter').val();
-                const startDate = new Date(document.getElementById('start-date').value);
-                const endDate = new Date(document.getElementById('end-date').value);
+                const startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
+                const endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value) : null;
                 const tables = ['pending-tasks', 'remaining-tasks'];
 
                 tables.forEach(tableId => {
@@ -1304,9 +1304,9 @@ function getWeekdays($start, $end)
 
                         // Display the row only if it matches all filters
                         if (projectMatch && departmentMatch && dateMatch) {
-                            row.style.display = '';
+                            row.style.display = ''; // Show the row
                         } else {
-                            row.style.display = 'none';
+                            row.style.display = 'none'; // Hide the row
                         }
                     });
                 });
