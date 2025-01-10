@@ -841,7 +841,7 @@ function getWeekdays($start, $end)
                                     (<?= htmlspecialchars($row['assigned_by_department']) ?>)
                                 </td>
                                 <?php if ($user_role !== 'User'): ?>
-                                    <td><?= htmlspecialchars($row['assigned_to']) ?> (<?= htmlspecialchars($row['department']) ?>)
+                                    <td><?= htmlspecialchars($row['assigned_to']) ?> (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                     </td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
