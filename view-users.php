@@ -47,31 +47,30 @@ try {
             WHERE r.name != 'Admin'
             ORDER BY u.username
         ");
+        $stmt->execute();
     } elseif ($user_role === 'Manager') {
         // Manager: View only users in the same department(s), excluding Admins and their own account
+        $departmentPlaceholders = implode(',', array_fill(0, count($user_departments), '?'));
         $stmt = $pdo->prepare("
             SELECT DISTINCT u.id, u.username, u.email, r.name AS role_name 
             FROM users u
             LEFT JOIN roles r ON u.role_id = r.id
             LEFT JOIN user_departments ud ON u.id = ud.user_id
             LEFT JOIN departments d ON ud.department_id = d.id
-            WHERE d.name IN (" . implode(',', array_fill(0, count($user_departments), '?')) . ") 
+            WHERE d.name IN ($departmentPlaceholders) 
               AND r.name NOT IN ('Admin', 'Manager') 
-              AND u.id != :user_id
+              AND u.id != ?
             ORDER BY u.username
         ");
-        // Bind department names to the query
-        foreach ($user_departments as $index => $department) {
-            $stmt->bindValue($index + 1, $department);
-        }
-        $stmt->bindParam(':user_id', $user_id);
+        // Bind department names and user ID to the query
+        $params = array_merge($user_departments, [$user_id]);
+        $stmt->execute($params);
     } else {
         // Unauthorized access
         echo "You do not have the required permissions to view this page.";
         exit;
     }
 
-    $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Fetch departments for each user
