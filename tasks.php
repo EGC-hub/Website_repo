@@ -1371,6 +1371,24 @@ function getWeekdays($start, $end)
                     }
                 });
             }
+
+            // Reset filters
+            function resetFilters() {
+                // Clear the selected values in the dropdowns
+                $('#project-filter').val(null).trigger('change');
+                $('#department-filter').val(null).trigger('change');
+
+                // Clear date inputs
+                document.getElementById('start-date').value = '';
+                document.getElementById('end-date').value = '';
+
+                // Reapply filters to show all tasks
+                applyAllFilters();
+            }
+
+            // Attach event listener for reset button
+            document.querySelector('.btn-primary[onclick="resetFilters()"]').onclick = resetFilters;
+        });
     </script>
 </body>
 
