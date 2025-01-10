@@ -865,6 +865,11 @@ function getWeekdays($start, $end)
                 </tbody>
             </table>
 
+            <!-- Alert for Pending & Started Tasks -->
+            <div id="no-data-alert-pending" class="alert alert-warning mt-3" style="display: none;">
+                No data found in Pending & Started Tasks matching the selected filters.
+            </div>
+
             <!-- Completed Tasks Table -->
             <h3>Completed Tasks</h3>
             <table class="table table-striped table-hover align-middle text-center custom-table" id="remaining-tasks">
@@ -983,6 +988,11 @@ function getWeekdays($start, $end)
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <!-- Alert for Completed Tasks -->
+    <div id="no-data-alert-completed" class="alert alert-warning mt-3" style="display: none;">
+        No data found in Completed Tasks matching the selected filters.
     </div>
 
     <!-- Modal for Task Completion -->
@@ -1284,10 +1294,17 @@ function getWeekdays($start, $end)
                 const selectedDepartments = $('#department-filter').val();
                 const startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
                 const endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value) : null;
-                const tables = ['pending-tasks', 'remaining-tasks'];
 
-                tables.forEach(tableId => {
-                    const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+                // Define tables and their corresponding alerts
+                const tables = [
+                    { id: 'pending-tasks', alertId: 'no-data-alert-pending' },
+                    { id: 'remaining-tasks', alertId: 'no-data-alert-completed' }
+                ];
+
+                tables.forEach(table => {
+                    const rows = document.querySelectorAll(`#${table.id} tbody tr`);
+                    let hasVisibleRows = false; // Flag to track if any rows are visible in this table
+
                     rows.forEach(row => {
                         const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
                         const assignedToText = row.querySelector('td:nth-child(9)').textContent.trim(); // Assigned To column (9th column)
@@ -1320,10 +1337,19 @@ function getWeekdays($start, $end)
                         // Display the row only if it matches all filters
                         if (projectMatch && isDepartmentMatch && dateMatch) {
                             row.style.display = ''; // Show the row
+                            hasVisibleRows = true; // At least one row is visible in this table
                         } else {
                             row.style.display = 'none'; // Hide the row
                         }
                     });
+
+                    // Show/hide the "No data found" alert for this table
+                    const noDataAlert = document.getElementById(table.alertId);
+                    if (hasVisibleRows) {
+                        noDataAlert.style.display = 'none'; // Hide the alert if rows are visible
+                    } else {
+                        noDataAlert.style.display = 'block'; // Show the alert if no rows are visible
+                    }
                 });
             }
 
