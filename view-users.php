@@ -41,10 +41,11 @@ try {
     if ($user_role === 'Admin') {
         // Admin: View all users except Admins
         $stmt = $pdo->prepare("
-            SELECT DISTINCT u.id, u.username, u.email, r.name AS role_name 
+            SELECT u.id, u.username, u.email, r.name AS role_name 
             FROM users u
             LEFT JOIN roles r ON u.role_id = r.id
             WHERE r.name != 'Admin'
+            GROUP BY u.id
             ORDER BY u.username
         ");
         $stmt->execute();
