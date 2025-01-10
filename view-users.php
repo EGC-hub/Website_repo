@@ -77,8 +77,57 @@ try {
 
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Fetch roles and departments for the modal
+    $roles = [];
+    $roleQuery = $pdo->query("SELECT id, name FROM roles WHERE name != 'Admin'");
+    if ($roleQuery) {
+        $roles = $roleQuery->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $departments = [];
+    $departmentQuery = $pdo->query("SELECT id, name FROM departments");
+    if ($departmentQuery) {
+        $departments = $departmentQuery->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
+}
+
+// Handle form submission for creating a user
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
+    $role_id = intval($_POST['role']);
+    $department_id = intval($_POST['department']);
+
+    // Validate inputs
+    if (empty($username) || empty($email) || empty($password) || empty($role_id) || empty($department_id)) {
+        $errorMsg = "Please fill in all fields.";
+    } else {
+        // Hash the password
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        try {
+            // Insert the user into the `users` table
+            $insertUserQuery = "INSERT INTO users (username, email, password, role_id) VALUES (?, ?, ?, ?)";
+            $stmt = $pdo->prepare($insertUserQuery);
+            $stmt->execute([$username, $email, $hashedPassword, $role_id]);
+
+            // Get the last inserted user ID
+            $newUserId = $pdo->lastInsertId();
+
+            // Insert the user-department relationship into the `user_departments` table
+            $insertUserDepartmentQuery = "INSERT INTO user_departments (user_id, department_id) VALUES (?, ?)";
+            $stmt = $pdo->prepare($insertUserDepartmentQuery);
+            $stmt->execute([$newUserId, $department_id]);
+
+            $successMsg = "User created successfully.";
+        } catch (PDOException $e) {
+            $errorMsg = "Failed to create user: " . $e->getMessage();
+        }
+    }
 }
 ?>
 
@@ -100,11 +149,6 @@ try {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             padding: 20px;
-        }
-
-        /* Apply box-sizing to all elements */
-        * {
-            box-sizing: border-box;
         }
 
         .main-container {
@@ -431,7 +475,7 @@ try {
     <div class="overlay" id="overlay"></div>
     <div class="modal" id="createUserModal">
         <h2>Create User</h2>
-        <form id="createUserForm">
+        <form id="createUserForm" method="POST" action="view-users.php">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required>
@@ -475,26 +519,6 @@ try {
             document.getElementById('createUserModal').style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
         }
-
-        // Handle form submission via AJAX
-        document.getElementById('createUserForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-
-            fetch('create-user.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(data => {
-                alert(data); // Show success or error message
-                closeModal();
-                location.reload(); // Refresh the page to show the new user
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        });
     </script>
 </body>
 
