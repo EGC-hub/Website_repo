@@ -841,7 +841,8 @@ function getWeekdays($start, $end)
                                     (<?= htmlspecialchars($row['assigned_by_department']) ?>)
                                 </td>
                                 <?php if ($user_role !== 'User'): ?>
-                                    <td><?= htmlspecialchars($row['assigned_to']) ?> (<?= htmlspecialchars($row['assigned_to_department']) ?>)
+                                    <td><?= htmlspecialchars($row['assigned_to']) ?>
+                                        (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                     </td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
@@ -970,7 +971,8 @@ function getWeekdays($start, $end)
                                     (<?= htmlspecialchars($row['assigned_by_department']) ?>)
                                 </td>
                                 <?php if ($user_role !== 'User'): ?>
-                                    <td><?= htmlspecialchars($row['assigned_to']) ?> (<?= htmlspecialchars($row['assigned_to_department']) ?>)
+                                    <td><?= htmlspecialchars($row['assigned_to']) ?>
+                                        (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                     </td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
@@ -1278,7 +1280,12 @@ function getWeekdays($start, $end)
                     const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                     rows.forEach(row => {
                         const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
-                        const departmentName = row.querySelector('td:nth-child(11)').textContent.trim(); // Department column
+                        const assignedToText = row.querySelector('td:nth-child(9)').textContent.trim(); // Assigned To column (9th column)
+
+                        // Extract the department name from the "Assigned To" column
+                        const departmentMatch = assignedToText.match(/\(([^)]+)\)/);
+                        const departmentName = departmentMatch ? departmentMatch[1].trim() : '';
+
                         const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
                         const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
 
