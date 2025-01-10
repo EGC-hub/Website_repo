@@ -151,6 +151,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 20px;
         }
 
+        /* Apply box-sizing to all elements */
+        * {
+            box-sizing: border-box;
+        }
+
         .main-container {
             width: 90%;
             max-width: 1200px;
