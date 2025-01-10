@@ -33,6 +33,68 @@ try {
     $pdo = new PDO($dsn, $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    // Handle form submission for creating a new role
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_role'])) {
+        $roleName = trim($_POST['role_name']);
+
+        if (empty($roleName)) {
+            $errorMsg = "Role name is required.";
+        } else {
+            // Check if the role already exists
+            $checkStmt = $pdo->prepare("SELECT id FROM roles WHERE name = :name");
+            $checkStmt->bindParam(':name', $roleName);
+            $checkStmt->execute();
+
+            if ($checkStmt->rowCount() > 0) {
+                $errorMsg = "Role already exists.";
+            } else {
+                // Insert the new role into the database
+                $insertStmt = $pdo->prepare("INSERT INTO roles (name) VALUES (:name)");
+                $insertStmt->bindParam(':name', $roleName);
+
+                if ($insertStmt->execute()) {
+                    $successMsg = "Role created successfully.";
+                    // Refresh the roles list
+                    header("Location: view-roles-departments.php");
+                    exit;
+                } else {
+                    $errorMsg = "Failed to create role. Please try again.";
+                }
+            }
+        }
+    }
+
+    // Handle form submission for creating a new department
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_department'])) {
+        $departmentName = trim($_POST['department_name']);
+
+        if (empty($departmentName)) {
+            $errorMsg = "Department name is required.";
+        } else {
+            // Check if the department already exists
+            $checkStmt = $pdo->prepare("SELECT id FROM departments WHERE name = :name");
+            $checkStmt->bindParam(':name', $departmentName);
+            $checkStmt->execute();
+
+            if ($checkStmt->rowCount() > 0) {
+                $errorMsg = "Department already exists.";
+            } else {
+                // Insert the new department into the database
+                $insertStmt = $pdo->prepare("INSERT INTO departments (name) VALUES (:name)");
+                $insertStmt->bindParam(':name', $departmentName);
+
+                if ($insertStmt->execute()) {
+                    $successMsg = "Department created successfully.";
+                    // Refresh the departments list
+                    header("Location: view-roles-departments.php");
+                    exit;
+                } else {
+                    $errorMsg = "Failed to create department. Please try again.";
+                }
+            }
+        }
+    }
+
     // Fetch all roles
     $rolesQuery = $pdo->query("SELECT id, name FROM roles");
     $roles = $rolesQuery->fetchAll(PDO::FETCH_ASSOC);
@@ -215,9 +277,13 @@ try {
         <div class="container">
             <h1>Roles & Departments</h1>
 
-            <!-- Button to trigger modal for creating new role or department -->
-            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModal">
-                Create New Role/Department
+            <!-- Buttons to trigger modals -->
+            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createRoleModal">
+                Create New Role
+            </button>
+            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal"
+                data-bs-target="#createDepartmentModal">
+                Create New Department
             </button>
 
             <!-- Roles Table -->
@@ -292,24 +358,39 @@ try {
         </div>
     </div>
 
-    <!-- Modal for creating new role or department -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <!-- Modal for creating new role -->
+    <div class="modal fade" id="createRoleModal" tabindex="-1" aria-labelledby="createRoleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createModalLabel">Create New Role/Department</h5>
+                    <h5 class="modal-title" id="createRoleModalLabel">Create New Role</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="create-roles-departments.php">
+                    <form method="POST" action="">
                         <div class="mb-3">
                             <label for="role_name" class="form-label">Role Name</label>
                             <input type="text" class="form-control" id="role_name" name="role_name" required>
                         </div>
                         <button type="submit" name="create_role" class="btn btn-primary">Create Role</button>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <form method="POST" action="create-roles-departments.php" class="mt-3">
+    <!-- Modal for creating new department -->
+    <div class="modal fade" id="createDepartmentModal" tabindex="-1" aria-labelledby="createDepartmentModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createDepartmentModalLabel">Create New Department</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="">
                         <div class="mb-3">
                             <label for="department_name" class="form-label">Department Name</label>
                             <input type="text" class="form-control" id="department_name" name="department_name"
