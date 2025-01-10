@@ -41,7 +41,7 @@ try {
     if ($user_role === 'Admin') {
         // Admin: View all users except Admins
         $stmt = $pdo->prepare("
-            SELECT u.id, u.username, u.email, r.name AS role_name 
+            SELECT DISTINCT u.id, u.username, u.email, r.name AS role_name 
             FROM users u
             LEFT JOIN roles r ON u.role_id = r.id
             WHERE r.name != 'Admin'
@@ -50,7 +50,7 @@ try {
     } elseif ($user_role === 'Manager') {
         // Manager: View only users in the same department(s), excluding Admins and their own account
         $stmt = $pdo->prepare("
-            SELECT u.id, u.username, u.email, r.name AS role_name 
+            SELECT DISTINCT u.id, u.username, u.email, r.name AS role_name 
             FROM users u
             LEFT JOIN roles r ON u.role_id = r.id
             LEFT JOIN user_departments ud ON u.id = ud.user_id
@@ -272,7 +272,7 @@ try {
     <div class="main-container">
         <div class="user-info">
             <p>Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong></p>
-            <p>Departments: 
+            <p>Departments:
                 <strong>
                     <?= !empty($user_departments) ? htmlspecialchars(implode(', ', $user_departments)) : 'None' ?>
                 </strong>
@@ -301,12 +301,14 @@ try {
                                     <td><?= htmlspecialchars($user['username']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
                                     <td><?= htmlspecialchars($user['role_name']) ?></td>
-                                    <td><?= !empty($user['departments']) ? htmlspecialchars(implode(', ', $user['departments'])) : 'None' ?></td>
+                                    <td><?= !empty($user['departments']) ? htmlspecialchars(implode(', ', $user['departments'])) : 'None' ?>
+                                    </td>
                                     <td>
                                         <a href='edit-user.php?id=<?= urlencode($user['id']) ?>' class='edit-button'>Edit</a>
                                         <form action='delete-user.php' method='POST' style='display:inline;'>
                                             <input type='hidden' name='user_id' value='<?= htmlspecialchars($user['id']) ?>'>
-                                            <button type='submit' class='delete-button' onclick='return confirm("Are you sure you want to delete this user?")'>Delete</button>
+                                            <button type='submit' class='delete-button'
+                                                onclick='return confirm("Are you sure you want to delete this user?")'>Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -317,7 +319,8 @@ try {
                     <p>No users found.</p>
                 <?php endif; ?>
             <?php elseif ($user_role === 'Manager'): ?>
-                <p>Viewing users in your department(s): <strong><?= htmlspecialchars(implode(', ', $user_departments)) ?></strong></p>
+                <p>Viewing users in your department(s):
+                    <strong><?= htmlspecialchars(implode(', ', $user_departments)) ?></strong></p>
                 <?php if (!empty($users)): ?>
                     <table>
                         <thead>
@@ -334,7 +337,8 @@ try {
                                     <td><?= htmlspecialchars($user['username']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
                                     <td><?= htmlspecialchars($user['role_name']) ?></td>
-                                    <td><?= !empty($user['departments']) ? htmlspecialchars(implode(', ', $user['departments'])) : 'None' ?></td>
+                                    <td><?= !empty($user['departments']) ? htmlspecialchars(implode(', ', $user['departments'])) : 'None' ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
