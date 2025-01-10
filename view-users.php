@@ -91,7 +91,202 @@ try {
     <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
     <title>View Users</title>
     <style>
-        /* Your existing CSS styles remain unchanged */
+        /* General Box Sizing */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Body and Main Container */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .main-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* User Info Section */
+        .user-info {
+            text-align: center;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .user-info .session-warning {
+            color: grey;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #1d3557;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Buttons */
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #002c5f;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #004080;
+        }
+
+        .edit-button {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #457b9d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-button:hover {
+            background-color: #1d3557;
+        }
+
+        .delete-button {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #e63946;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-button:hover {
+            background-color: #d62828;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal h2 {
+            margin-top: 0;
+        }
+
+        .modal .form-group {
+            margin-bottom: 15px;
+        }
+
+        .modal label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .modal input[type="text"],
+        .modal input[type="password"],
+        .modal input[type="email"],
+        .modal select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .modal button {
+            width: 100%;
+            padding: 10px;
+            background-color: #002c5f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .modal button:hover {
+            background-color: #004080;
+        }
+
+        .modal .cancel-btn {
+            background-color: #e63946;
+            margin-top: 10px;
+        }
+
+        .modal .cancel-btn:hover {
+            background-color: #d62828;
+        }
+
+        /* Overlay for Modal */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
     </style>
 </head>
 
@@ -110,7 +305,9 @@ try {
             <h1>Users</h1>
 
             <!-- Add a "Create User" button -->
-            <button onclick="openModal()" style="margin-bottom: 20px;">Create User</button>
+            <button onclick="openModal()" style="margin-bottom: 20px; padding: 10px 20px; background-color: #002c5f; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Create User
+            </button>
 
             <?php if ($user_role === 'Admin'): ?>
                 <p>Viewing all users</p>
@@ -181,7 +378,8 @@ try {
     </div>
 
     <!-- Modal for Create User -->
-    <div id="createUserModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); z-index: 1000;">
+    <div class="overlay" id="overlay"></div>
+    <div class="modal" id="createUserModal">
         <h2>Create User</h2>
         <form id="createUserForm">
             <div class="form-group">
@@ -213,17 +411,19 @@ try {
                 </select>
             </div>
             <button type="submit">Create User</button>
-            <button type="button" onclick="closeModal()">Cancel</button>
+            <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
         </form>
     </div>
 
     <script>
         function openModal() {
             document.getElementById('createUserModal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
         }
 
         function closeModal() {
             document.getElementById('createUserModal').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
         }
 
         // Handle form submission via AJAX
