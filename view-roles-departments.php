@@ -33,67 +33,17 @@ try {
     $pdo = new PDO($dsn, $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Handle form submission for creating a new role
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_role'])) {
-        $roleName = trim($_POST['role_name']);
-
-        if (empty($roleName)) {
-            $errorMsg = "Role name is required.";
-        } else {
-            // Check if the role already exists
-            $checkStmt = $pdo->prepare("SELECT id FROM roles WHERE name = :name");
-            $checkStmt->bindParam(':name', $roleName);
-            $checkStmt->execute();
-
-            if ($checkStmt->rowCount() > 0) {
-                $errorMsg = "Role already exists.";
-            } else {
-                // Insert the new role into the database
-                $insertStmt = $pdo->prepare("INSERT INTO roles (name) VALUES (:name)");
-                $insertStmt->bindParam(':name', $roleName);
-
-                if ($insertStmt->execute()) {
-                    $successMsg = "Role created successfully.";
-                    // Refresh the roles list
-                    header("Location: view-roles-departments.php");
-                    exit;
-                } else {
-                    $errorMsg = "Failed to create role. Please try again.";
-                }
-            }
-        }
-    }
-
-    // Handle form submission for creating a new department
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_department'])) {
-        $departmentName = trim($_POST['department_name']);
-
-        if (empty($departmentName)) {
-            $errorMsg = "Department name is required.";
-        } else {
-            // Check if the department already exists
-            $checkStmt = $pdo->prepare("SELECT id FROM departments WHERE name = :name");
-            $checkStmt->bindParam(':name', $departmentName);
-            $checkStmt->execute();
-
-            if ($checkStmt->rowCount() > 0) {
-                $errorMsg = "Department already exists.";
-            } else {
-                // Insert the new department into the database
-                $insertStmt = $pdo->prepare("INSERT INTO departments (name) VALUES (:name)");
-                $insertStmt->bindParam(':name', $departmentName);
-
-                if ($insertStmt->execute()) {
-                    $successMsg = "Department created successfully.";
-                    // Refresh the departments list
-                    header("Location: view-roles-departments.php");
-                    exit;
-                } else {
-                    $errorMsg = "Failed to create department. Please try again.";
-                }
-            }
-        }
-    }
+    // Fetch the logged-in user's departments from the user_departments table
+    $user_id = $_SESSION['user_id'];
+    $stmt = $pdo->prepare("
+        SELECT d.name 
+        FROM user_departments ud
+        JOIN departments d ON ud.department_id = d.id
+        WHERE ud.user_id = :user_id
+    ");
+    $stmt->bindParam(':user_id', $user_id);
+    $stmt->execute();
+    $user_departments = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
     // Fetch all roles
     $rolesQuery = $pdo->query("SELECT id, name FROM roles");
@@ -269,8 +219,8 @@ try {
 <body>
     <div class="main-container">
         <div class="user-info">
-            <p>Logged in as: <strong><?= htmlspecialchars($_SESSION['username']) ?></strong> | Department:
-                <strong><?= htmlspecialchars($_SESSION['department']) ?></strong>
+            <p>Logged in as: <strong><?= htmlspecialchars($_SESSION['username']) ?></strong> | Department(s):
+                <strong><?= htmlspecialchars(implode(', ', $user_departments)) ?></strong>
             </p>
             <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
         </div>
