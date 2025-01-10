@@ -778,7 +778,6 @@ function getWeekdays($start, $end)
                         <th>Assigned By</th>
                         <?php if ($user_role !== 'User'): ?>
                             <th>Assigned To</th>
-                            <th>Department</th>
                         <?php endif; ?>
                         <th>Created On</th>
                         <?php if ($user_role !== 'User'): ?>
@@ -834,8 +833,7 @@ function getWeekdays($start, $end)
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_by']) ?></td>
                                 <?php if ($user_role !== 'User'): ?>
-                                    <td><?= htmlspecialchars($row['assigned_to']) ?> - <?= htmlspecialchars($row ['department']) ?></td>
-                                    <td><?= htmlspecialchars($row['department']) ?></td>
+                                    <td><?= htmlspecialchars($row['assigned_to']) ?> ( <?= htmlspecialchars($row ['department']) ) ?></td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
                                 <?php if (($user_role !== 'User' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'Admin'): ?>
@@ -872,7 +870,6 @@ function getWeekdays($start, $end)
                         <th>Assigned By</th>
                         <?php if ($user_role !== 'User'): ?>
                             <th>Assigned To</th>
-                            <th>Department</th>
                         <?php endif; ?>
                         <th>Created On</th>
                     </tr>
@@ -963,7 +960,6 @@ function getWeekdays($start, $end)
                                 <td><?= htmlspecialchars($row['assigned_by']) ?></td>
                                 <?php if ($user_role !== 'User'): ?>
                                     <td><?= htmlspecialchars($row['assigned_to']) ?></td>
-                                    <td><?= htmlspecialchars($row['department']) ?></td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
                             </tr>
