@@ -80,6 +80,17 @@ $userResult = $userQuery->get_result();
 if ($userResult->num_rows > 0) {
     $userDetails = $userResult->fetch_assoc();
     $loggedInUsername = $userDetails['username'];
+    $loggedInDepartment = $userDetails['departments']; // Change 'department' to 'departments'
+    $loggedInRole = $userDetails['role'];
+} else {
+    $loggedInUsername = "Unknown";
+    $loggedInDepartment = "Unknown";
+    $loggedInRole = "Unknown";
+}
+
+if ($userResult->num_rows > 0) {
+    $userDetails = $userResult->fetch_assoc();
+    $loggedInUsername = $userDetails['username'];
     $loggedInDepartment = $userDetails['department'];
     $loggedInRole = $userDetails['role'];
 } else {
@@ -637,7 +648,7 @@ function getWeekdays($start, $end)
 <body>
     <div class="user-info">
         <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
-            <strong><?= htmlspecialchars($loggedInDepartment) ?></strong>
+            <strong><?= htmlspecialchars($loggedInDepartment ?? 'Unknown') ?></strong>
         </p>
         <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
     </div>
