@@ -282,7 +282,7 @@ $conn->close();
         }
 
         .user-info .session-warning {
-            color: grey;
+            color: #dc3545;
             font-weight: bold;
             font-size: 14px;
             margin-top: 10px;
