@@ -91,32 +91,29 @@ try {
     <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
     <title>View Users</title>
     <style>
-        /* General Box Sizing */
-        * {
-            box-sizing: border-box;
-        }
-
-        /* Body and Main Container */
+        /* Your original styling */
         body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
             padding: 20px;
         }
 
         .main-container {
             width: 90%;
             max-width: 1200px;
-            margin: 0 auto;
             display: flex;
             flex-direction: column;
             align-items: center;
+            text-align: center;
         }
 
-        /* User Info Section */
         .user-info {
             text-align: center;
-            width: 100%;
+            width: 90%;
             max-width: 1200px;
             margin-top: 20px;
             margin-bottom: 20px;
@@ -139,7 +136,36 @@ try {
             margin-top: 10px;
         }
 
-        /* Table Styling */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            color: #1d3557;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #457b9d;
+            margin-top: 30px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 1rem;
+            color: #457b9d;
+            margin-bottom: 30px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -163,7 +189,6 @@ try {
             background-color: #f9f9f9;
         }
 
-        /* Buttons */
         .back-button {
             display: inline-block;
             margin-top: 20px;
@@ -210,6 +235,26 @@ try {
 
         .delete-button:hover {
             background-color: #d62828;
+        }
+
+        button.delete-button {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            table th,
+            table td {
+                font-size: 0.9rem;
+                padding: 8px;
+            }
+
+            .back-button {
+                font-size: 0.9rem;
+            }
         }
 
         /* Modal Styling */
