@@ -221,12 +221,14 @@ $taskQuery = $user_role === 'Admin'
     ? "
         SELECT tasks.*, 
                assigned_to_user.username AS assigned_to, 
-               assigned_to_department.name AS department, 
-               assigned_by_user.username AS assigned_by 
+               assigned_to_department.name AS assigned_to_department, 
+               assigned_by_user.username AS assigned_by,
+               assigned_by_department.name AS assigned_by_department 
         FROM tasks 
         JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
         JOIN departments AS assigned_to_department ON assigned_to_user.department_id = assigned_to_department.id
         JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+        JOIN departments AS assigned_by_department ON assigned_by_user.department_id = assigned_by_department.id
         ORDER BY 
             CASE 
                 WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
@@ -238,12 +240,14 @@ $taskQuery = $user_role === 'Admin'
         ? "
             SELECT tasks.*, 
                    assigned_to_user.username AS assigned_to, 
-                   assigned_to_department.name AS department, 
-                   assigned_by_user.username AS assigned_by 
+                   assigned_to_department.name AS assigned_to_department, 
+                   assigned_by_user.username AS assigned_by,
+                   assigned_by_department.name AS assigned_by_department 
             FROM tasks 
             JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
             JOIN departments AS assigned_to_department ON assigned_to_user.department_id = assigned_to_department.id
             JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+            JOIN departments AS assigned_by_department ON assigned_by_user.department_id = assigned_by_department.id
             WHERE assigned_to_department.id = (SELECT department_id FROM users WHERE id = ?) 
             ORDER BY 
                 CASE 
@@ -254,9 +258,11 @@ $taskQuery = $user_role === 'Admin'
         "
         : "
             SELECT tasks.*, 
-                   assigned_by_user.username AS assigned_by 
+                   assigned_by_user.username AS assigned_by,
+                   assigned_by_department.name AS assigned_by_department 
             FROM tasks 
             JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+            JOIN departments AS assigned_by_department ON assigned_by_user.department_id = assigned_by_department.id
             WHERE tasks.user_id = ? 
             ORDER BY 
                 CASE 
@@ -831,9 +837,12 @@ function getWeekdays($start, $end)
                                     </form>
                                 </td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
-                                <td><?= htmlspecialchars($row['assigned_by']) ?></td>
+                                <td><?= htmlspecialchars($row['assigned_by']) ?>
+                                    (<?= htmlspecialchars($row['assigned_by_department']) ?>)
+                                </td>
                                 <?php if ($user_role !== 'User'): ?>
-                                    <td><?= htmlspecialchars($row['assigned_to']) ?> (<?= htmlspecialchars($row ['department']) ?>)</td>
+                                    <td><?= htmlspecialchars($row['assigned_to']) ?> (<?= htmlspecialchars($row['department']) ?>)
+                                    </td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
                                 <?php if (($user_role !== 'User' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'Admin'): ?>
@@ -846,7 +855,7 @@ function getWeekdays($start, $end)
                                         </form>
                                     </td>
                                 <?php else: ?>
-                                    
+
                                 <?php endif; ?>
                             </tr>
                         <?php endif; ?>
@@ -957,9 +966,12 @@ function getWeekdays($start, $end)
                                     </form>
                                 </td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
-                                <td><?= htmlspecialchars($row['assigned_by']) ?></td>
+                                <td><?= htmlspecialchars($row['assigned_by']) ?>
+                                    (<?= htmlspecialchars($row['assigned_by_department']) ?>)
+                                </td>
                                 <?php if ($user_role !== 'User'): ?>
-                                    <td><?= htmlspecialchars($row['assigned_to']) ?> (<?= htmlspecialchars($row ['department']) ?>)</td>
+                                    <td><?= htmlspecialchars($row['assigned_to']) ?> (<?= htmlspecialchars($row['department']) ?>)
+                                    </td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
                             </tr>
