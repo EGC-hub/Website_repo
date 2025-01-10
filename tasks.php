@@ -1328,7 +1328,7 @@ function getWeekdays($start, $end)
                         const assignedToText = row.querySelector('td:nth-child(9)').textContent.trim(); // Assigned To column (9th column)
 
                         // Extract the department names from the "Assigned To" column
-                        const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Use `const` to avoid redeclaration
+                        const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Extract department(s) from parentheses
                         const departmentNames = departmentMatch ? departmentMatch[1].trim().split(', ') : [];
 
                         const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
@@ -1340,6 +1340,7 @@ function getWeekdays($start, $end)
                         // Check if the row matches the selected departments (only for admins/managers)
                         let isDepartmentMatch = true; // Default to true for regular users
                         if (userRole === 'Admin' || userRole === 'Manager') {
+                            // Only check the assigned to department
                             isDepartmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.some(department => departmentNames.includes(department));
                         }
 
@@ -1370,24 +1371,6 @@ function getWeekdays($start, $end)
                     }
                 });
             }
-
-            // Reset filters
-            function resetFilters() {
-                // Clear the selected values in the dropdowns
-                $('#project-filter').val(null).trigger('change');
-                $('#department-filter').val(null).trigger('change');
-
-                // Clear date inputs
-                document.getElementById('start-date').value = '';
-                document.getElementById('end-date').value = '';
-
-                // Reapply filters to show all tasks
-                applyAllFilters();
-            }
-
-            // Attach event listener for reset button
-            document.querySelector('.btn-primary[onclick="resetFilters()"]').onclick = resetFilters;
-        });
     </script>
 </body>
 
