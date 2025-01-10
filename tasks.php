@@ -987,12 +987,12 @@ function getWeekdays($start, $end)
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        </div>
-    </div>
 
-    <!-- Alert for Completed Tasks -->
-    <div id="no-data-alert-completed" class="alert alert-warning mt-3" style="display: none;">
-        No data found in Completed Tasks matching the selected filters.
+            <!-- Alert for Completed Tasks -->
+            <div id="no-data-alert-completed" class="alert alert-warning mt-3" style="display: none;">
+                No data found in Completed Tasks matching the selected filters.
+            </div>
+        </div>
     </div>
 
     <!-- Modal for Task Completion -->
@@ -1374,4 +1374,4 @@ function getWeekdays($start, $end)
 </body>
 
 </html>
-<?php $conn->close(); ?>c
+<?php $conn->close(); ?>
