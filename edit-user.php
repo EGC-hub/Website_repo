@@ -26,12 +26,11 @@ try {
 
     // Fetch user details with role and department names
     $stmt = $pdo->prepare("
-SELECT u.id, u.username, u.email, u.role_id, u.department_id, r.name AS role_name, d.name AS department_name 
-FROM users u
-LEFT JOIN roles r ON u.role_id = r.id
-LEFT JOIN departments d ON u.department_id = d.id
-WHERE u.id = :id
-");
+        SELECT u.id, u.username, u.email, u.role_id, r.name AS role_name 
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.id
+        WHERE u.id = :id
+    ");
     $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -61,35 +60,51 @@ WHERE u.id = :id
         }
     }
 
+    // Fetch the departments assigned to the user
+    $userDepartments = [];
+    $userDepartmentQuery = $pdo->prepare("SELECT department_id FROM user_departments WHERE user_id = :user_id");
+    $userDepartmentQuery->bindParam(':user_id', $userId, PDO::PARAM_INT);
+    $userDepartmentQuery->execute();
+    while ($row = $userDepartmentQuery->fetch(PDO::FETCH_ASSOC)) {
+        $userDepartments[] = $row['department_id'];
+    }
+
     // Handle form submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim($_POST['email']);
         $role_id = isset($_POST['role']) ? intval($_POST['role']) : null; // Ensure role_id is an integer
-        $department_id = isset($_POST['department']) ? intval($_POST['department']) : null; // Ensure department_id is an integer
+        $selectedDepartments = isset($_POST['departments']) ? $_POST['departments'] : []; // Selected departments
 
         if (empty($email)) {
             $error = "Email is required.";
         } elseif ($user_role === 'Admin') { // Admin can change all fields
-            // Validate role_id and department_id
+            // Validate role_id
             $validRoleIds = array_column($roles, 'id');
-            $validDepartmentIds = array_column($departments, 'id');
-
             if (!in_array($role_id, $validRoleIds)) {
                 $error = "Invalid role selected.";
-            } elseif (!in_array($department_id, $validDepartmentIds)) {
-                $error = "Invalid department selected.";
             } else {
-                $updateStmt = $pdo->prepare("UPDATE users SET email = :email, role_id = :role_id, department_id = :department_id WHERE id = :id");
+                // Update user email and role
+                $updateStmt = $pdo->prepare("UPDATE users SET email = :email, role_id = :role_id WHERE id = :id");
                 $updateStmt->bindParam(':email', $email);
                 $updateStmt->bindParam(':role_id', $role_id);
-                $updateStmt->bindParam(':department_id', $department_id);
                 $updateStmt->bindParam(':id', $userId);
 
                 if ($updateStmt->execute()) {
+                    // Update user departments
+                    // First, delete existing department assignments
+                    $deleteStmt = $pdo->prepare("DELETE FROM user_departments WHERE user_id = :user_id");
+                    $deleteStmt->bindParam(':user_id', $userId);
+                    $deleteStmt->execute();
+
+                    // Insert new department assignments
+                    foreach ($selectedDepartments as $department_id) {
+                        $insertStmt = $pdo->prepare("INSERT INTO user_departments (user_id, department_id) VALUES (:user_id, :department_id)");
+                        $insertStmt->bindParam(':user_id', $userId);
+                        $insertStmt->bindParam(':department_id', $department_id);
+                        $insertStmt->execute();
+                    }
+
                     $success = "User updated successfully.";
-                    $user['email'] = $email;
-                    $user['role_name'] = $roles[array_search($role_id, array_column($roles, 'id'))]['name'];
-                    $user['department_name'] = $departments[array_search($department_id, array_column($departments, 'id'))]['name'];
                 } else {
                     $error = "Failed to update user. Please try again.";
                 }
@@ -101,7 +116,6 @@ WHERE u.id = :id
 
             if ($updateStmt->execute()) {
                 $success = "Email updated successfully.";
-                $user['email'] = $email;
             } else {
                 $error = "Failed to update email. Please try again.";
             }
@@ -221,21 +235,21 @@ WHERE u.id = :id
             </div>
             <?php if ($user_role == 'Admin'): ?>
                 <div class="form-group">
-                    <label for="department">Department</label>
-                    <select id="department" name="department" required>
-                        <?php foreach ($departments as $department): ?>
-                            <option value="<?= $department['id'] ?>" <?= $department['id'] == $user['department_id'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($department['name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label for="role">Role</label>
                     <select id="role" name="role" required>
                         <?php foreach ($roles as $role): ?>
                             <option value="<?= $role['id'] ?>" <?= $role['id'] == $user['role_id'] ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($role['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="departments">Departments</label>
+                    <select id="departments" name="departments[]" multiple required>
+                        <?php foreach ($departments as $department): ?>
+                            <option value="<?= $department['id'] ?>" <?= in_array($department['id'], $userDepartments) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($department['name']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
