@@ -743,7 +743,7 @@ function getWeekdays($start, $end)
 
                     <!-- Multi-select dropdown for filtering by department -->
                     <div class="filter-dropdown">
-                        <label for="department-filter">Filter by Department:</label>
+                        <label for="department-filter">Filter by Department of Assigned User:</label>
                         <select id="department-filter" multiple="multiple">
                             <option value="All">All</option>
                             <?php foreach ($departments as $department): ?>
