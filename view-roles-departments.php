@@ -33,6 +33,72 @@ try {
     $pdo = new PDO($dsn, $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    // Initialize error and success messages
+    $errorMsg = "";
+    $successMsg = "";
+
+    // Handle form submission for creating a new role
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_role'])) {
+        $roleName = trim($_POST['role_name']);
+
+        if (empty($roleName)) {
+            $errorMsg = "Role name is required.";
+        } else {
+            // Check if the role already exists
+            $checkStmt = $pdo->prepare("SELECT id FROM roles WHERE name = :name");
+            $checkStmt->bindParam(':name', $roleName);
+            $checkStmt->execute();
+
+            if ($checkStmt->rowCount() > 0) {
+                $errorMsg = "Role already exists.";
+            } else {
+                // Insert the new role into the database
+                $insertStmt = $pdo->prepare("INSERT INTO roles (name) VALUES (:name)");
+                $insertStmt->bindParam(':name', $roleName);
+
+                if ($insertStmt->execute()) {
+                    $successMsg = "Role created successfully.";
+                    // Refresh the page to show the new role
+                    header("Location: view-roles-departments.php");
+                    exit;
+                } else {
+                    $errorMsg = "Failed to create role. Please try again.";
+                }
+            }
+        }
+    }
+
+    // Handle form submission for creating a new department
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_department'])) {
+        $departmentName = trim($_POST['department_name']);
+
+        if (empty($departmentName)) {
+            $errorMsg = "Department name is required.";
+        } else {
+            // Check if the department already exists
+            $checkStmt = $pdo->prepare("SELECT id FROM departments WHERE name = :name");
+            $checkStmt->bindParam(':name', $departmentName);
+            $checkStmt->execute();
+
+            if ($checkStmt->rowCount() > 0) {
+                $errorMsg = "Department already exists.";
+            } else {
+                // Insert the new department into the database
+                $insertStmt = $pdo->prepare("INSERT INTO departments (name) VALUES (:name)");
+                $insertStmt->bindParam(':name', $departmentName);
+
+                if ($insertStmt->execute()) {
+                    $successMsg = "Department created successfully.";
+                    // Refresh the page to show the new department
+                    header("Location: view-roles-departments.php");
+                    exit;
+                } else {
+                    $errorMsg = "Failed to create department. Please try again.";
+                }
+            }
+        }
+    }
+
     // Fetch the logged-in user's departments from the user_departments table
     $user_id = $_SESSION['user_id'];
     $stmt = $pdo->prepare("
@@ -225,6 +291,18 @@ try {
             margin-bottom: 20px;
         }
 
+        .error {
+            color: red;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            color: green;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.8rem;
@@ -255,13 +333,19 @@ try {
         <div class="container">
             <h1>Roles & Departments</h1>
 
+            <!-- Display error or success messages -->
+            <?php if (!empty($errorMsg)): ?>
+                <div class="error"><?= htmlspecialchars($errorMsg) ?></div>
+            <?php elseif (!empty($successMsg)): ?>
+                <div class="success"><?= htmlspecialchars($successMsg) ?></div>
+            <?php endif; ?>
+
             <!-- Centered modal buttons -->
             <div class="modal-buttons">
                 <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
                     Create New Role
                 </a>
-                <a type="button" class="back-button" data-bs-toggle="modal"
-                    data-bs-target="#createDepartmentModal">
+                <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createDepartmentModal">
                     Create New Department
                 </a>
             </div>
