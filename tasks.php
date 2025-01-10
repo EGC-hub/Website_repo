@@ -841,7 +841,8 @@ function getWeekdays($start, $end)
                                     (<?= htmlspecialchars($row['assigned_by_department']) ?>)
                                 </td>
                                 <?php if ($user_role !== 'User'): ?>
-                                    <td><?= htmlspecialchars($row['assigned_to']) ?> (<?= htmlspecialchars($row['assigned_to_department']) ?>)
+                                    <td><?= htmlspecialchars($row['assigned_to']) ?>
+                                        (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                     </td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
@@ -970,7 +971,8 @@ function getWeekdays($start, $end)
                                     (<?= htmlspecialchars($row['assigned_by_department']) ?>)
                                 </td>
                                 <?php if ($user_role !== 'User'): ?>
-                                    <td><?= htmlspecialchars($row['assigned_to']) ?> (<?= htmlspecialchars($row['assigned_to_department']) ?>)
+                                    <td><?= htmlspecialchars($row['assigned_to']) ?>
+                                        (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                     </td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
@@ -1270,15 +1272,20 @@ function getWeekdays($start, $end)
             function applyAllFilters() {
                 const selectedProjects = $('#project-filter').val();
                 const selectedDepartments = $('#department-filter').val();
-                const startDate = new Date(document.getElementById('start-date').value);
-                const endDate = new Date(document.getElementById('end-date').value);
+                const startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
+                const endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value) : null;
                 const tables = ['pending-tasks', 'remaining-tasks'];
 
                 tables.forEach(tableId => {
                     const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                     rows.forEach(row => {
                         const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
-                        const departmentName = row.querySelector('td:nth-child(11)').textContent.trim(); // Department column
+                        const assignedToText = row.querySelector('td:nth-child(9)').textContent.trim(); // Assigned To column (9th column)
+
+                        // Extract the department name from the "Assigned To" column
+                        const departmentMatch = assignedToText.match(/\(([^)]+)\)/);
+                        const departmentName = departmentMatch ? departmentMatch[1].trim() : '';
+
                         const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
                         const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
 
@@ -1297,9 +1304,9 @@ function getWeekdays($start, $end)
 
                         // Display the row only if it matches all filters
                         if (projectMatch && departmentMatch && dateMatch) {
-                            row.style.display = '';
+                            row.style.display = ''; // Show the row
                         } else {
-                            row.style.display = 'none';
+                            row.style.display = 'none'; // Hide the row
                         }
                     });
                 });
@@ -1326,4 +1333,4 @@ function getWeekdays($start, $end)
 </body>
 
 </html>
-<?php $conn->close(); ?>c
+<?php $conn->close(); ?>cc
