@@ -257,13 +257,13 @@ try {
 
             <!-- Centered modal buttons -->
             <div class="modal-buttons">
-                <button type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
+                <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
                     Create New Role
-                </button>
-                <button type="button" class="back-button" data-bs-toggle="modal"
+                </a>
+                <a type="button" class="back-button" data-bs-toggle="modal"
                     data-bs-target="#createDepartmentModal">
                     Create New Department
-                </button>
+                </a>
             </div>
 
             <!-- Roles Table -->
