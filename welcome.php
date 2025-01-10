@@ -14,23 +14,51 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-// Retrieve the username, role, and department from the session
-$username = $_SESSION['username'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
-$userRole = $_SESSION['role'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
-$department = $_SESSION['department'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
+// Database connection
+$config = include '../config.php';
+$dsn = "mysql:host=localhost;dbname=euro_login_system;charset=utf8mb4";
+$username = $config['dbUsername'];
+$password = $config['dbPassword'];
 
-// Optional: Session timeout settings
-$timeout_duration = 1200;
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
-    // If the session is expired, destroy it and redirect to login page
-    session_unset();
-    session_destroy();
-    header("Location: portal-login.html");
-    exit;
+try {
+    $pdo = new PDO($dsn, $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Retrieve the username, role, and user ID from the session
+    $username = $_SESSION['username'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
+    $userRole = $_SESSION['role'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
+    $userId = $_SESSION['user_id'] ?? null; // User ID from session
+
+    // Fetch all departments assigned to the user
+    $userDepartments = [];
+    if ($userId) {
+        $stmt = $pdo->prepare("
+            SELECT d.name 
+            FROM user_departments ud
+            JOIN departments d ON ud.department_id = d.id
+            WHERE ud.user_id = :user_id
+        ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $userDepartments = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    // Optional: Session timeout settings
+    $timeout_duration = 1200;
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
+        // If the session is expired, destroy it and redirect to login page
+        session_unset();
+        session_destroy();
+        header("Location: portal-login.html");
+        exit;
+    }
+
+    // Update last activity time
+    $_SESSION['last_activity'] = time();
+
+} catch (PDOException $e) {
+    die("Error: " . $e->getMessage());
 }
-
-// Update last activity time
-$_SESSION['last_activity'] = time();
 ?>
 
 <!DOCTYPE html>
@@ -159,8 +187,11 @@ $_SESSION['last_activity'] = time();
 <body>
     <div class="main-container">
         <div class="user-info">
-            <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong> | Department:
-                <strong><?= htmlspecialchars($department) ?></strong>
+            <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong></p>
+            <p>Departments: 
+                <strong>
+                    <?= !empty($userDepartments) ? htmlspecialchars(implode(', ', $userDepartments)) : 'None' ?>
+                </strong>
             </p>
             <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
         </div>
@@ -195,7 +226,6 @@ $_SESSION['last_activity'] = time();
             <a href="logout.php" class="logout-btn">Log Out</a>
         </div>
     </div>
-
 </body>
 
 </html>
