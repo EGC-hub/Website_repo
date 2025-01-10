@@ -1291,7 +1291,7 @@ function getWeekdays($start, $end)
 
                         // Check if the row matches the selected projects and departments
                         const projectMatch = selectedProjects === null || selectedProjects.length === 0 || selectedProjects.includes(projectName);
-                        const departmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.includes(departmentName);
+                        const isDepartmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.includes(departmentName);
 
                         // Check if the task falls within the selected date range
                         let dateMatch = true;
@@ -1303,7 +1303,7 @@ function getWeekdays($start, $end)
                         }
 
                         // Display the row only if it matches all filters
-                        if (projectMatch && departmentMatch && dateMatch) {
+                        if (projectMatch && isDepartmentMatch && dateMatch) {
                             row.style.display = ''; // Show the row
                         } else {
                             row.style.display = 'none'; // Hide the row
