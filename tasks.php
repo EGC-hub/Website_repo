@@ -65,11 +65,13 @@ $roles = $conn->query("SELECT id, name FROM roles")->fetch_all(MYSQLI_ASSOC);
 
 // Fetch logged-in user's details
 $userQuery = $conn->prepare("
-    SELECT u.username, d.name AS department, r.name AS role 
+    SELECT u.id, u.username, u.email, GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, r.name AS role 
     FROM users u
-    JOIN departments d ON u.department_id = d.id
+    JOIN user_departments ud ON u.id = ud.user_id
+    JOIN departments d ON ud.department_id = d.id
     JOIN roles r ON u.role_id = r.id
     WHERE u.id = ?
+    GROUP BY u.id
 ");
 $userQuery->bind_param("i", $user_id);
 $userQuery->execute();
@@ -92,26 +94,34 @@ if ($user_role === 'Admin' || $user_role === 'Manager') {
     if ($user_role === 'Admin') {
         // Admin can assign tasks to users and managers
         $userQuery = "
-            SELECT u.id, u.username, u.email, d.name AS department, r.name AS role 
+            SELECT u.id, u.username, u.email, GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, r.name AS role 
             FROM users u
-            JOIN departments d ON u.department_id = d.id
+            JOIN user_departments ud ON u.id = ud.user_id
+            JOIN departments d ON ud.department_id = d.id
             JOIN roles r ON u.role_id = r.id
             WHERE r.name IN ('User', 'Manager')
+            GROUP BY u.id
         ";
     } else {
         // Manager can only assign tasks to users in their department
         $userQuery = "
-            SELECT u.id, u.username, u.email, d.name AS department, r.name AS role 
+            SELECT u.id, u.username, u.email, GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, r.name AS role 
             FROM users u
-            JOIN departments d ON u.department_id = d.id
+            JOIN user_departments ud ON u.id = ud.user_id
+            JOIN departments d ON ud.department_id = d.id
             JOIN roles r ON u.role_id = r.id
-            WHERE d.id = (SELECT department_id FROM users WHERE id = $user_id) 
-              AND r.name = 'User' 
-              OR u.id = $user_id
+            WHERE ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
+              AND r.name = 'User'
+            GROUP BY u.id
         ";
     }
 
-    $userResult = $conn->query($userQuery);
+    $stmt = $conn->prepare($userQuery);
+    if ($user_role === 'Manager') {
+        $stmt->bind_param("i", $user_id);
+    }
+    $stmt->execute();
+    $userResult = $stmt->get_result();
     while ($row = $userResult->fetch_assoc()) {
         $users[] = $row;
     }
@@ -221,14 +231,17 @@ $taskQuery = $user_role === 'Admin'
     ? "
         SELECT tasks.*, 
                assigned_to_user.username AS assigned_to, 
-               assigned_to_department.name AS assigned_to_department, 
+               GROUP_CONCAT(assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
                assigned_by_user.username AS assigned_by,
-               assigned_by_department.name AS assigned_by_department 
+               GROUP_CONCAT(assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
         FROM tasks 
         JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
-        JOIN departments AS assigned_to_department ON assigned_to_user.department_id = assigned_to_department.id
+        JOIN user_departments AS assigned_to_ud ON assigned_to_user.id = assigned_to_ud.user_id
+        JOIN departments AS assigned_to_department ON assigned_to_ud.department_id = assigned_to_department.id
         JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-        JOIN departments AS assigned_by_department ON assigned_by_user.department_id = assigned_by_department.id
+        JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
+        JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
+        GROUP BY tasks.task_id
         ORDER BY 
             CASE 
                 WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
@@ -240,15 +253,18 @@ $taskQuery = $user_role === 'Admin'
         ? "
             SELECT tasks.*, 
                    assigned_to_user.username AS assigned_to, 
-                   assigned_to_department.name AS assigned_to_department, 
+                   GROUP_CONCAT(assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
                    assigned_by_user.username AS assigned_by,
-                   assigned_by_department.name AS assigned_by_department 
+                   GROUP_CONCAT(assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
             FROM tasks 
             JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
-            JOIN departments AS assigned_to_department ON assigned_to_user.department_id = assigned_to_department.id
+            JOIN user_departments AS assigned_to_ud ON assigned_to_user.id = assigned_to_ud.user_id
+            JOIN departments AS assigned_to_department ON assigned_to_ud.department_id = assigned_to_department.id
             JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-            JOIN departments AS assigned_by_department ON assigned_by_user.department_id = assigned_by_department.id
-            WHERE assigned_to_department.id = (SELECT department_id FROM users WHERE id = ?) 
+            JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
+            JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
+            WHERE assigned_to_ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
+            GROUP BY tasks.task_id
             ORDER BY 
                 CASE 
                     WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
@@ -259,11 +275,13 @@ $taskQuery = $user_role === 'Admin'
         : "
             SELECT tasks.*, 
                    assigned_by_user.username AS assigned_by,
-                   assigned_by_department.name AS assigned_by_department 
+                   GROUP_CONCAT(assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
             FROM tasks 
             JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-            JOIN departments AS assigned_by_department ON assigned_by_user.department_id = assigned_by_department.id
+            JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
+            JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
             WHERE tasks.user_id = ? 
+            GROUP BY tasks.task_id
             ORDER BY 
                 CASE 
                     WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
@@ -839,11 +857,11 @@ function getWeekdays($start, $end)
                                 </td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_by']) ?>
-                                    (<?= htmlspecialchars($row['assigned_by_department']) ?>)
+                                    (<?= htmlspecialchars($row['assigned_by_departments']) ?>)
                                 </td>
                                 <?php if ($user_role !== 'User'): ?>
                                     <td><?= htmlspecialchars($row['assigned_to']) ?>
-                                        (<?= htmlspecialchars($row['assigned_to_department']) ?>)
+                                        (<?= htmlspecialchars($row['assigned_to_departments']) ?>)
                                     </td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
@@ -974,11 +992,11 @@ function getWeekdays($start, $end)
                                 </td>
                                 <td><?= htmlspecialchars($row['project_type']) ?></td>
                                 <td><?= htmlspecialchars($row['assigned_by']) ?>
-                                    (<?= htmlspecialchars($row['assigned_by_department']) ?>)
+                                    (<?= htmlspecialchars($row['assigned_by_departments']) ?>)
                                 </td>
                                 <?php if ($user_role !== 'User'): ?>
                                     <td><?= htmlspecialchars($row['assigned_to']) ?>
-                                        (<?= htmlspecialchars($row['assigned_to_department']) ?>)
+                                        (<?= htmlspecialchars($row['assigned_to_departments']) ?>)
                                     </td>
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
@@ -1309,9 +1327,9 @@ function getWeekdays($start, $end)
                         const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
                         const assignedToText = row.querySelector('td:nth-child(9)').textContent.trim(); // Assigned To column (9th column)
 
-                        // Extract the department name from the "Assigned To" column
+                        // Extract the department names from the "Assigned To" column
                         const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Use `const` to avoid redeclaration
-                        const departmentName = departmentMatch ? departmentMatch[1].trim() : '';
+                        const departmentNames = departmentMatch ? departmentMatch[1].trim().split(', ') : [];
 
                         const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
                         const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
@@ -1322,7 +1340,7 @@ function getWeekdays($start, $end)
                         // Check if the row matches the selected departments (only for admins/managers)
                         let isDepartmentMatch = true; // Default to true for regular users
                         if (userRole === 'Admin' || userRole === 'Manager') {
-                            isDepartmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.includes(departmentName);
+                            isDepartmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.some(department => departmentNames.includes(department));
                         }
 
                         // Check if the task falls within the selected date range
