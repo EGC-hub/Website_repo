@@ -48,36 +48,29 @@ try {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Roles & Departments</title>
     <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
             padding: 20px;
         }
 
         .main-container {
             width: 90%;
             max-width: 1200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
+            margin: 0 auto;
         }
 
         .user-info {
             text-align: center;
-            width: 90%;
-            max-width: 1200px;
-            margin-top: 20px;
             margin-bottom: 20px;
             padding: 20px;
             background-color: #f8f9fa;
@@ -99,13 +92,10 @@ try {
         }
 
         .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
         }
 
         h1 {
@@ -213,6 +203,7 @@ try {
         }
     </style>
 </head>
+
 <body>
     <div class="main-container">
         <div class="user-info">
@@ -224,10 +215,15 @@ try {
         <div class="container">
             <h1>Roles & Departments</h1>
 
+            <!-- Button to trigger modal for creating new role or department -->
+            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModal">
+                Create New Role/Department
+            </button>
+
             <!-- Roles Table -->
             <h2>Roles</h2>
             <?php if (!empty($roles)): ?>
-                <table>
+                <table class="table table-bordered">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -241,10 +237,12 @@ try {
                                 <td><?= htmlspecialchars($role['id']) ?></td>
                                 <td><?= htmlspecialchars($role['name']) ?></td>
                                 <td>
-                                    <a href="edit-role.php?id=<?= urlencode($role['id']) ?>" class="edit-button">Edit</a>
+                                    <a href="edit-role.php?id=<?= urlencode($role['id']) ?>"
+                                        class="btn btn-sm btn-primary">Edit</a>
                                     <form action="delete-role.php" method="POST" style="display:inline;">
                                         <input type="hidden" name="role_id" value="<?= htmlspecialchars($role['id']) ?>">
-                                        <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this role?')">Delete</button>
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure you want to delete this role?')">Delete</button>
                                     </form>
                                 </td>
                             </tr>
@@ -258,7 +256,7 @@ try {
             <!-- Departments Table -->
             <h2>Departments</h2>
             <?php if (!empty($departments)): ?>
-                <table>
+                <table class="table table-bordered">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -272,10 +270,13 @@ try {
                                 <td><?= htmlspecialchars($department['id']) ?></td>
                                 <td><?= htmlspecialchars($department['name']) ?></td>
                                 <td>
-                                    <a href="edit-department.php?id=<?= urlencode($department['id']) ?>" class="edit-button">Edit</a>
+                                    <a href="edit-department.php?id=<?= urlencode($department['id']) ?>"
+                                        class="btn btn-sm btn-primary">Edit</a>
                                     <form action="delete-department.php" method="POST" style="display:inline;">
-                                        <input type="hidden" name="department_id" value="<?= htmlspecialchars($department['id']) ?>">
-                                        <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this department?')">Delete</button>
+                                        <input type="hidden" name="department_id"
+                                            value="<?= htmlspecialchars($department['id']) ?>">
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure you want to delete this department?')">Delete</button>
                                     </form>
                                 </td>
                             </tr>
@@ -287,8 +288,43 @@ try {
             <?php endif; ?>
 
             <!-- Back Button -->
-            <a href="welcome.php" class="back-button">Back to Dashboard</a>
+            <a href="welcome.php" class="btn btn-secondary">Back to Dashboard</a>
         </div>
     </div>
+
+    <!-- Modal for creating new role or department -->
+    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Create New Role/Department</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="create-roles-departments.php">
+                        <div class="mb-3">
+                            <label for="role_name" class="form-label">Role Name</label>
+                            <input type="text" class="form-control" id="role_name" name="role_name" required>
+                        </div>
+                        <button type="submit" name="create_role" class="btn btn-primary">Create Role</button>
+                    </form>
+
+                    <form method="POST" action="create-roles-departments.php" class="mt-3">
+                        <div class="mb-3">
+                            <label for="department_name" class="form-label">Department Name</label>
+                            <input type="text" class="form-control" id="department_name" name="department_name"
+                                required>
+                        </div>
+                        <button type="submit" name="create_department" class="btn btn-primary">Create
+                            Department</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
