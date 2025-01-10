@@ -1283,7 +1283,7 @@ function getWeekdays($start, $end)
                         const assignedToText = row.querySelector('td:nth-child(9)').textContent.trim(); // Assigned To column (9th column)
 
                         // Extract the department name from the "Assigned To" column
-                        const departmentMatch = assignedToText.match(/\(([^)]+)\)/);
+                        const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Use `const` to avoid redeclaration
                         const departmentName = departmentMatch ? departmentMatch[1].trim() : '';
 
                         const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
