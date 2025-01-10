@@ -34,15 +34,19 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Initialize error and success messages
-    $errorMsg = "";
-    $successMsg = "";
+    $errorMsg = $_SESSION['errorMsg'] ?? "";
+    $successMsg = $_SESSION['successMsg'] ?? "";
+
+    // Clear the messages from the session after displaying them
+    unset($_SESSION['errorMsg']);
+    unset($_SESSION['successMsg']);
 
     // Handle form submission for creating a new role
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_role'])) {
         $roleName = trim($_POST['role_name']);
 
         if (empty($roleName)) {
-            $errorMsg = "Role name is required.";
+            $_SESSION['errorMsg'] = "Role name is required.";
         } else {
             // Check if the role already exists
             $checkStmt = $pdo->prepare("SELECT id FROM roles WHERE name = :name");
@@ -50,22 +54,23 @@ try {
             $checkStmt->execute();
 
             if ($checkStmt->rowCount() > 0) {
-                $errorMsg = "Role already exists.";
+                $_SESSION['errorMsg'] = "Role already exists.";
             } else {
                 // Insert the new role into the database
                 $insertStmt = $pdo->prepare("INSERT INTO roles (name) VALUES (:name)");
                 $insertStmt->bindParam(':name', $roleName);
 
                 if ($insertStmt->execute()) {
-                    $successMsg = "Role created successfully.";
-                    // Refresh the page to show the new role
-                    header("Location: view-roles-departments.php");
-                    exit;
+                    $_SESSION['successMsg'] = "Role created successfully.";
                 } else {
-                    $errorMsg = "Failed to create role. Please try again.";
+                    $_SESSION['errorMsg'] = "Failed to create role. Please try again.";
                 }
             }
         }
+
+        // Redirect to the same page to avoid form resubmission
+        header("Location: view-roles-departments.php");
+        exit;
     }
 
     // Handle form submission for creating a new department
@@ -73,7 +78,7 @@ try {
         $departmentName = trim($_POST['department_name']);
 
         if (empty($departmentName)) {
-            $errorMsg = "Department name is required.";
+            $_SESSION['errorMsg'] = "Department name is required.";
         } else {
             // Check if the department already exists
             $checkStmt = $pdo->prepare("SELECT id FROM departments WHERE name = :name");
@@ -81,22 +86,23 @@ try {
             $checkStmt->execute();
 
             if ($checkStmt->rowCount() > 0) {
-                $errorMsg = "Department already exists.";
+                $_SESSION['errorMsg'] = "Department already exists.";
             } else {
                 // Insert the new department into the database
                 $insertStmt = $pdo->prepare("INSERT INTO departments (name) VALUES (:name)");
                 $insertStmt->bindParam(':name', $departmentName);
 
                 if ($insertStmt->execute()) {
-                    $successMsg = "Department created successfully.";
-                    // Refresh the page to show the new department
-                    header("Location: view-roles-departments.php");
-                    exit;
+                    $_SESSION['successMsg'] = "Department created successfully.";
                 } else {
-                    $errorMsg = "Failed to create department. Please try again.";
+                    $_SESSION['errorMsg'] = "Failed to create department. Please try again.";
                 }
             }
         }
+
+        // Redirect to the same page to avoid form resubmission
+        header("Location: view-roles-departments.php");
+        exit;
     }
 
     // Fetch the logged-in user's departments from the user_departments table
