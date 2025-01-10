@@ -635,6 +635,7 @@ function getWeekdays($start, $end)
                 </div>
                 <div class="modal-body">
                     <form method="post" action="">
+                        <input type="hidden" id="user-role" value="<?= htmlspecialchars($user_role) ?>">
                         <div class="form-group">
                             <label for="project_name">Project Name:</label>
                             <input type="text" id="project_name" name="project_name" required>
@@ -1246,18 +1247,27 @@ function getWeekdays($start, $end)
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function () {
-            // Initialize Select2 on the project and department filter dropdowns
+            // Get the user's role from the hidden input field
+            const userRole = document.getElementById('user-role').value;
+
+            // Initialize Select2 on the project filter dropdown
             $('#project-filter').select2({
                 placeholder: "Select projects to filter",
                 allowClear: true,
                 width: '300px'
             });
 
-            $('#department-filter').select2({
-                placeholder: "Select departments to filter",
-                allowClear: true,
-                width: '300px'
-            });
+            // Initialize Select2 on the department filter dropdown (only for admins/managers)
+            if (userRole === 'Admin' || userRole === 'Manager') {
+                $('#department-filter').select2({
+                    placeholder: "Select departments to filter",
+                    allowClear: true,
+                    width: '300px'
+                });
+            } else {
+                // Hide the department filter for regular users
+                $('#department-filter').closest('.filter-dropdown').hide();
+            }
 
             // Remove the "All" option initially
             $('#project-filter option[value="All"]').remove();
@@ -1280,7 +1290,7 @@ function getWeekdays($start, $end)
                     const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                     rows.forEach(row => {
                         const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
-                        const assignedToText = row.querySelector('td:nth-child(10)').textContent.trim(); // Assigned To column (9th column)
+                        const assignedToText = row.querySelector('td:nth-child(9)').textContent.trim(); // Assigned To column (9th column)
 
                         // Extract the department name from the "Assigned To" column
                         const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Use `const` to avoid redeclaration
@@ -1289,9 +1299,14 @@ function getWeekdays($start, $end)
                         const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
                         const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
 
-                        // Check if the row matches the selected projects and departments
+                        // Check if the row matches the selected projects
                         const projectMatch = selectedProjects === null || selectedProjects.length === 0 || selectedProjects.includes(projectName);
-                        const isDepartmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.includes(departmentName);
+
+                        // Check if the row matches the selected departments (only for admins/managers)
+                        let isDepartmentMatch = true; // Default to true for regular users
+                        if (userRole === 'Admin' || userRole === 'Manager') {
+                            isDepartmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.includes(departmentName);
+                        }
 
                         // Check if the task falls within the selected date range
                         let dateMatch = true;
@@ -1333,4 +1348,4 @@ function getWeekdays($start, $end)
 </body>
 
 </html>
-<?php $conn->close(); ?>
+<?php $conn->close(); ?>c
