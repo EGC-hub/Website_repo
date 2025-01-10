@@ -1280,7 +1280,7 @@ function getWeekdays($start, $end)
                     const rows = document.querySelectorAll(`#${tableId} tbody tr`);
                     rows.forEach(row => {
                         const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
-                        const assignedToText = row.querySelector('td:nth-child(9)').textContent.trim(); // Assigned To column (9th column)
+                        const assignedToText = row.querySelector('td:nth-child(10)').textContent.trim(); // Assigned To column (9th column)
 
                         // Extract the department name from the "Assigned To" column
                         const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Use `const` to avoid redeclaration
