@@ -30,7 +30,7 @@ $_SESSION['last_activity'] = time();
 
 $user_id = $_SESSION['user_id'];
 $user_role = $_SESSION['role'];
-$user_department = $_SESSION['department'];
+$user_departments = $_SESSION['departments'] ?? []; // Fetch departments from session
 $user_username = $_SESSION['username'];
 
 // Fetch users based on role
@@ -41,24 +41,29 @@ try {
     if ($user_role === 'Admin') {
         // Admin: View all users except Admins
         $stmt = $pdo->prepare("
-            SELECT u.id, u.username, u.email, r.name AS role_name, d.name AS department_name 
+            SELECT u.id, u.username, u.email, r.name AS role_name 
             FROM users u
             LEFT JOIN roles r ON u.role_id = r.id
-            LEFT JOIN departments d ON u.department_id = d.id
             WHERE r.name != 'Admin'
-            ORDER BY d.name, u.username
-        ");
-    } elseif ($user_role === 'Manager') {
-        // Manager: View only users in the same department, excluding Admins and their own account
-        $stmt = $pdo->prepare("
-            SELECT u.id, u.username, u.email, r.name AS role_name, d.name AS department_name 
-            FROM users u
-            LEFT JOIN roles r ON u.role_id = r.id
-            LEFT JOIN departments d ON u.department_id = d.id
-            WHERE d.name = :department AND r.name NOT IN ('Admin', 'Manager') AND u.id != :user_id
             ORDER BY u.username
         ");
-        $stmt->bindParam(':department', $user_department);
+    } elseif ($user_role === 'Manager') {
+        // Manager: View only users in the same department(s), excluding Admins and their own account
+        $stmt = $pdo->prepare("
+            SELECT u.id, u.username, u.email, r.name AS role_name 
+            FROM users u
+            LEFT JOIN roles r ON u.role_id = r.id
+            LEFT JOIN user_departments ud ON u.id = ud.user_id
+            LEFT JOIN departments d ON ud.department_id = d.id
+            WHERE d.name IN (" . implode(',', array_fill(0, count($user_departments), '?')) . ") 
+              AND r.name NOT IN ('Admin', 'Manager') 
+              AND u.id != :user_id
+            ORDER BY u.username
+        ");
+        // Bind department names to the query
+        foreach ($user_departments as $index => $department) {
+            $stmt->bindValue($index + 1, $department);
+        }
         $stmt->bindParam(':user_id', $user_id);
     } else {
         // Unauthorized access
@@ -68,6 +73,19 @@ try {
 
     $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fetch departments for each user
+    foreach ($users as &$user) {
+        $departmentStmt = $pdo->prepare("
+            SELECT d.name 
+            FROM user_departments ud
+            JOIN departments d ON ud.department_id = d.id
+            WHERE ud.user_id = :user_id
+        ");
+        $departmentStmt->bindParam(':user_id', $user['id']);
+        $departmentStmt->execute();
+        $user['departments'] = $departmentStmt->fetchAll(PDO::FETCH_COLUMN);
+    }
 
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
@@ -253,8 +271,11 @@ try {
 <body>
     <div class="main-container">
         <div class="user-info">
-            <p>Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong> | Department:
-                <strong><?= htmlspecialchars($user_department) ?></strong>
+            <p>Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong></p>
+            <p>Departments: 
+                <strong>
+                    <?= !empty($user_departments) ? htmlspecialchars(implode(', ', $user_departments)) : 'None' ?>
+                </strong>
             </p>
             <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
         </div>
@@ -262,46 +283,7 @@ try {
             <h1>Users</h1>
 
             <?php if ($user_role === 'Admin'): ?>
-                <p>Viewing all users grouped by department</p>
-                <?php
-                $current_department = '';
-                foreach ($users as $user):
-                    if ($current_department !== $user['department_name']) {
-                        if ($current_department !== '') {
-                            echo "</tbody></table>";
-                        }
-                        $current_department = $user['department_name'];
-                        echo "<h2>Department: " . htmlspecialchars($current_department) . "</h2>";
-                        echo "<table>
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>";
-                    }
-                    echo "<tr>
-                        <td>" . htmlspecialchars($user['username']) . "</td>
-                        <td>" . htmlspecialchars($user['email']) . "</td>
-                        <td>" . htmlspecialchars($user['role_name']) . "</td>
-                        <td>
-                        <a href='edit-user.php?id=" . urlencode($user['id']) . "' class='edit-button'>Edit</a>
-                        <form action='delete-user.php' method='POST' style='display:inline;'>
-                        <input type='hidden' name='user_id' value='" . htmlspecialchars($user['id']) . "'>
-                        <button type='submit' class='delete-button' onclick='return confirm(\"Are you sure you want to delete this user?\")'>Delete</button>
-                        </form>
-                        </td>
-                    </tr>";
-                endforeach;
-                if ($current_department !== '') {
-                    echo "</tbody></table>";
-                }
-                ?>
-            <?php elseif ($user_role === 'Manager'): ?>
-                <p>Viewing users in your department: <strong><?= htmlspecialchars($user_department) ?></strong></p>
+                <p>Viewing all users</p>
                 <?php if (!empty($users)): ?>
                     <table>
                         <thead>
@@ -309,6 +291,8 @@ try {
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th>
+                                <th>Departments</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -317,6 +301,40 @@ try {
                                     <td><?= htmlspecialchars($user['username']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
                                     <td><?= htmlspecialchars($user['role_name']) ?></td>
+                                    <td><?= !empty($user['departments']) ? htmlspecialchars(implode(', ', $user['departments'])) : 'None' ?></td>
+                                    <td>
+                                        <a href='edit-user.php?id=<?= urlencode($user['id']) ?>' class='edit-button'>Edit</a>
+                                        <form action='delete-user.php' method='POST' style='display:inline;'>
+                                            <input type='hidden' name='user_id' value='<?= htmlspecialchars($user['id']) ?>'>
+                                            <button type='submit' class='delete-button' onclick='return confirm("Are you sure you want to delete this user?")'>Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <p>No users found.</p>
+                <?php endif; ?>
+            <?php elseif ($user_role === 'Manager'): ?>
+                <p>Viewing users in your department(s): <strong><?= htmlspecialchars(implode(', ', $user_departments)) ?></strong></p>
+                <?php if (!empty($users)): ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Departments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($users as $user): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($user['username']) ?></td>
+                                    <td><?= htmlspecialchars($user['email']) ?></td>
+                                    <td><?= htmlspecialchars($user['role_name']) ?></td>
+                                    <td><?= !empty($user['departments']) ? htmlspecialchars(implode(', ', $user['departments'])) : 'None' ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

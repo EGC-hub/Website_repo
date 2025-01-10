@@ -80,11 +80,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "<script>alert('Username not found.'); window.location.href = 'portal-login.html';</script>";
     }
 
-    // Close the statements and connection
+    // Close the statements
     $stmt->close();
     $departmentStmt->close();
-    $conn->close();
 }
+
+// Close the connection
+$conn->close();
 
 // Display error if any
 if (isset($error)) {
