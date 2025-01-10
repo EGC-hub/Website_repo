@@ -70,6 +70,10 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             padding: 20px;
@@ -78,11 +82,17 @@ try {
         .main-container {
             width: 90%;
             max-width: 1200px;
-            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
 
         .user-info {
             text-align: center;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 20px;
             margin-bottom: 20px;
             padding: 20px;
             background-color: #f8f9fa;
@@ -104,10 +114,13 @@ try {
         }
 
         .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px;
         }
 
         h1 {
@@ -121,6 +134,13 @@ try {
             font-size: 1.5rem;
             color: #457b9d;
             margin-top: 30px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 1rem;
+            color: #457b9d;
+            margin-bottom: 30px;
         }
 
         table {
@@ -198,6 +218,13 @@ try {
             font-family: 'Poppins', sans-serif;
         }
 
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.8rem;
@@ -219,27 +246,30 @@ try {
 <body>
     <div class="main-container">
         <div class="user-info">
-            <p>Logged in as: <strong><?= htmlspecialchars($_SESSION['username']) ?></strong> | Department(s):
-                <strong><?= htmlspecialchars(implode(', ', $user_departments)) ?></strong>
+            <p>Logged in as: <strong><?= htmlspecialchars($_SESSION['username']) ?></strong></p>
+            <p>Department(s):
+                <strong><?= !empty($user_departments) ? htmlspecialchars(implode(', ', $user_departments)) : 'None' ?></strong>
             </p>
             <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
         </div>
         <div class="container">
             <h1>Roles & Departments</h1>
 
-            <!-- Buttons to trigger modals -->
-            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createRoleModal">
-                Create New Role
-            </button>
-            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal"
-                data-bs-target="#createDepartmentModal">
-                Create New Department
-            </button>
+            <!-- Centered modal buttons -->
+            <div class="modal-buttons">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createRoleModal">
+                    Create New Role
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#createDepartmentModal">
+                    Create New Department
+                </button>
+            </div>
 
             <!-- Roles Table -->
             <h2>Roles</h2>
             <?php if (!empty($roles)): ?>
-                <table class="table table-bordered">
+                <table>
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -253,11 +283,10 @@ try {
                                 <td><?= htmlspecialchars($role['id']) ?></td>
                                 <td><?= htmlspecialchars($role['name']) ?></td>
                                 <td>
-                                    <a href="edit-role.php?id=<?= urlencode($role['id']) ?>"
-                                        class="btn btn-sm btn-primary">Edit</a>
+                                    <a href="edit-role.php?id=<?= urlencode($role['id']) ?>" class="edit-button">Edit</a>
                                     <form action="delete-role.php" method="POST" style="display:inline;">
                                         <input type="hidden" name="role_id" value="<?= htmlspecialchars($role['id']) ?>">
-                                        <button type="submit" class="btn btn-sm btn-danger"
+                                        <button type="submit" class="delete-button"
                                             onclick="return confirm('Are you sure you want to delete this role?')">Delete</button>
                                     </form>
                                 </td>
@@ -272,7 +301,7 @@ try {
             <!-- Departments Table -->
             <h2>Departments</h2>
             <?php if (!empty($departments)): ?>
-                <table class="table table-bordered">
+                <table>
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -287,11 +316,11 @@ try {
                                 <td><?= htmlspecialchars($department['name']) ?></td>
                                 <td>
                                     <a href="edit-department.php?id=<?= urlencode($department['id']) ?>"
-                                        class="btn btn-sm btn-primary">Edit</a>
+                                        class="edit-button">Edit</a>
                                     <form action="delete-department.php" method="POST" style="display:inline;">
                                         <input type="hidden" name="department_id"
                                             value="<?= htmlspecialchars($department['id']) ?>">
-                                        <button type="submit" class="btn btn-sm btn-danger"
+                                        <button type="submit" class="delete-button"
                                             onclick="return confirm('Are you sure you want to delete this department?')">Delete</button>
                                     </form>
                                 </td>
@@ -304,7 +333,7 @@ try {
             <?php endif; ?>
 
             <!-- Back Button -->
-            <a href="welcome.php" class="btn btn-secondary">Back to Dashboard</a>
+            <a href="welcome.php" class="back-button">Back to Dashboard</a>
         </div>
     </div>
 
