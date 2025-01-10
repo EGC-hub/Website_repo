@@ -1325,7 +1325,7 @@ function getWeekdays($start, $end)
 
                     rows.forEach(row => {
                         const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
-                        const assignedToText = row.querySelector('td:nth-child(9)').textContent.trim(); // Assigned To column (9th column)
+                        const assignedToText = row.querySelector('td:nth-child(10)').textContent.trim(); // Assigned To column (9th column)
 
                         // Extract the department names from the "Assigned To" column
                         const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Extract department(s) from parentheses
