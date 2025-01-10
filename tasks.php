@@ -88,17 +88,6 @@ if ($userResult->num_rows > 0) {
     $loggedInRole = "Unknown";
 }
 
-if ($userResult->num_rows > 0) {
-    $userDetails = $userResult->fetch_assoc();
-    $loggedInUsername = $userDetails['username'];
-    $loggedInDepartment = $userDetails['department'];
-    $loggedInRole = $userDetails['role'];
-} else {
-    $loggedInUsername = "Unknown";
-    $loggedInDepartment = "Unknown";
-    $loggedInRole = "Unknown";
-}
-
 // Fetch users for task assignment (admin and manager roles)
 $users = [];
 if ($user_role === 'Admin' || $user_role === 'Manager') {
