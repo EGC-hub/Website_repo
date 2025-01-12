@@ -138,13 +138,6 @@ try {
             color: #333;
         }
 
-        .logo {
-            width: 40px;
-            /* Adjust the size of the logo */
-            height: 40px;
-            /* Adjust the size of the logo */
-        }
-
         .navbar {
             display: flex;
             align-items: center;
@@ -193,7 +186,7 @@ try {
             <div class="navbar">
                 <!-- Logo Container -->
                 <div class="d-flex align-items-center me-3">
-                    <img src="images/logo/logo.webp" alt="Logo" class="logo" style="width: auto; height: 40px;">
+                    <img src="images/logo/logo.webp" alt="Logo" class="logo" style="width: auto; height: 80px;">
                 </div>
 
                 <!-- User Info -->
