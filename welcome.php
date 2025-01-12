@@ -120,8 +120,29 @@ try {
         }
 
         .user-info {
+            display: flex;
+            align-items: center;
+            /* Vertically center the logo and text */
             margin-right: 20px;
             font-size: 14px;
+        }
+
+        .user-info .logo {
+            width: 40px;
+            /* Adjust the size of the logo */
+            height: 40px;
+            /* Adjust the size of the logo */
+            margin-right: 10px;
+            /* Add some spacing between the logo and text */
+            border-radius: 50%;
+            /* Optional: Make the logo circular */
+        }
+
+        .user-info p {
+            margin: 0;
+            /* Remove default margin for better alignment */
+            line-height: 1.4;
+            /* Adjust line height for better readability */
         }
 
         .logout-btn {
@@ -171,8 +192,13 @@ try {
             <!-- Navbar -->
             <div class="navbar">
                 <div class="user-info">
+                    <!-- Logo -->
+                    <img src="images/logo/logo.webp" alt="Logo" class="logo">
+                    <!-- User Info -->
                     <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong></p>
-                    <p>Departments: <strong><?= !empty($userDepartments) ? htmlspecialchars(implode(', ', $userDepartments)) : 'None' ?></strong></p>
+                    <p>Department(s):
+                        <strong><?= !empty($userDepartments) ? htmlspecialchars(implode(', ', $userDepartments)) : 'None' ?></strong>
+                    </p>
                 </div>
                 <button class="logout-btn" onclick="window.location.href='logout.php'">Log Out</button>
             </div>
