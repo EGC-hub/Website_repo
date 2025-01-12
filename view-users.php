@@ -120,34 +120,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($username) || empty($email) || empty($password) || empty($role_id) || empty($department_id)) {
         $errorMsg = "Please fill in all fields.";
     } else {
-        // Validate password complexity
-        if (!validatePassword($password)) {
-            $errorMsg = "Password must contain at least one uppercase letter, one number, one special character, and be at least 8 characters long.";
-        } else {
-            // Hash the password
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        // Hash the password
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-            try {
-                // Insert the user into the `users` table
-                $insertUserQuery = "INSERT INTO users (username, email, password, role_id) VALUES (?, ?, ?, ?)";
-                $stmt = $pdo->prepare($insertUserQuery);
-                $stmt->execute([$username, $email, $hashedPassword, $role_id]);
+        try {
+            // Insert the user into the `users` table
+            $insertUserQuery = "INSERT INTO users (username, email, password, role_id) VALUES (?, ?, ?, ?)";
+            $stmt = $pdo->prepare($insertUserQuery);
+            $stmt->execute([$username, $email, $hashedPassword, $role_id]);
 
-                // Get the last inserted user ID
-                $newUserId = $pdo->lastInsertId();
+            // Get the last inserted user ID
+            $newUserId = $pdo->lastInsertId();
 
-                // Insert the user-department relationship into the `user_departments` table
-                $insertUserDepartmentQuery = "INSERT INTO user_departments (user_id, department_id) VALUES (?, ?)";
-                $stmt = $pdo->prepare($insertUserDepartmentQuery);
-                $stmt->execute([$newUserId, $department_id]);
+            // Insert the user-department relationship into the `user_departments` table
+            $insertUserDepartmentQuery = "INSERT INTO user_departments (user_id, department_id) VALUES (?, ?)";
+            $stmt = $pdo->prepare($insertUserDepartmentQuery);
+            $stmt->execute([$newUserId, $department_id]);
 
-                // Set success message and refresh the page
-                $_SESSION['successMsg'] = "User created successfully.";
-                header("Location: view-users.php");
-                exit;
-            } catch (PDOException $e) {
-                $errorMsg = "Failed to create user: " . $e->getMessage();
-            }
+            // Set success message and refresh the page
+            $_SESSION['successMsg'] = "User created successfully.";
+            header("Location: view-users.php");
+            exit;
+        } catch (PDOException $e) {
+            $errorMsg = "Failed to create user: " . $e->getMessage();
         }
     }
 }
@@ -417,6 +412,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 20px;
             border-radius: 5px;
         }
+
+        #passwordError {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+            /* Hidden by default */
+        }
     </style>
 </head>
 
@@ -517,7 +520,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <!-- Modal for Create User -->
-    <div class="overlay" id="overlay"></div>
     <div class="modal" id="createUserModal">
         <h2>Create User</h2>
         <form id="createUserForm" method="POST" action="view-users.php">
@@ -528,6 +530,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
+                <!-- Error message for password validation -->
+                <div id="passwordError" style="color: red; display: none;">
+                    Password must contain at least one uppercase letter, one number, one special character, and be at
+                    least 8 characters long.
+                </div>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
@@ -564,6 +571,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById('createUserModal').style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
         }
+    </script>
+
+    <!-- Password verification -->
+    <script>
+        function validatePassword(password) {
+            // Password must contain at least one uppercase letter, one number, and one special character
+            const uppercase = /[A-Z]/.test(password);
+            const number = /\d/.test(password);
+            const specialChar = /[^\w]/.test(password); // Matches any non-word character
+
+            if (!uppercase || !number || !specialChar || password.length < 8) {
+                return false;
+            }
+            return true;
+        }
+
+        document.getElementById('createUserForm').addEventListener('submit', function (event) {
+            const password = document.getElementById('password').value;
+            const passwordError = document.getElementById('passwordError');
+
+            if (!validatePassword(password)) {
+                event.preventDefault(); // Prevent form submission
+                passwordError.style.display = 'block'; // Show the error message
+            } else {
+                passwordError.style.display = 'none'; // Hide the error message if valid
+            }
+        });
     </script>
 </body>
 
