@@ -158,9 +158,6 @@ try {
                 <a href="data-display.php">Data Display</a>
             <?php endif; ?>
             <a href="tasks.php">Tasks</a>
-            <?php if ($userRole === 'Admin'): ?>
-                <a href="create-user.php">Create User</a>
-            <?php endif; ?>
             <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
                 <a href="view-users.php">View Users</a>
             <?php endif; ?>
