@@ -155,6 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>View Users</title>
     <style>
         /* Your original styling */
@@ -328,82 +329,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        /* Modal Styling */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            width: 90%;
-            max-width: 500px;
-        }
-
-        .modal h2 {
-            margin-top: 0;
-        }
-
-        .modal .form-group {
-            margin-bottom: 15px;
-        }
-
-        .modal label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .modal input[type="text"],
-        .modal input[type="password"],
-        .modal input[type="email"],
-        .modal select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        .modal button {
-            width: 100%;
-            padding: 10px;
-            background-color: #002c5f;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .modal button:hover {
-            background-color: #004080;
-        }
-
-        .modal .cancel-btn {
-            background-color: #e63946;
-            margin-top: 10px;
-        }
-
-        .modal .cancel-btn:hover {
-            background-color: #d62828;
-        }
-
-        /* Overlay for Modal */
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-
         .success-message {
             text-align: center;
             background-color: #5cb85c;
@@ -420,6 +345,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: none;
             /* Hidden by default */
         }
+
+        /* .modal-header .modal-title {
+            width: 100%;
+            text-align: center;
+        } */
     </style>
 </head>
 
@@ -444,9 +374,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php unset($_SESSION['successMsg']); ?>
             <?php endif; ?>
 
-            <!-- Add a "Create User" button -->
-            <button onclick="openModal()"
-                style="margin-bottom: 20px; padding: 10px 20px; background-color: #002c5f; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal"
+                style="margin-bottom: 20px;">
                 Create User
             </button>
 
@@ -520,57 +449,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <!-- Modal for Create User -->
-    <div class="modal" id="createUserModal">
-        <h2>Create User</h2>
-        <form id="createUserForm" method="POST" action="view-users.php">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-                <!-- Error message for password validation -->
-                <div id="passwordError" style="color: red; display: none;">
-                    Password must contain at least one uppercase letter, one number, one special character, and be at
-                    least 8 characters long.
+    <!-- Bootstrap Modal -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-center w-100" id="createUserModalLabel">Create User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createUserForm" method="POST" action="view-users.php">
+                        <div class="form-group mb-3">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" class="form-control" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" class="form-control" required>
+                            <!-- Error message for password validation -->
+                            <div id="passwordError" class="text-danger" style="display: none;">
+                                Password must contain at least one uppercase letter, one number, one special character,
+                                and be at least 8 characters long.
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="role">Role</label>
+                            <select id="role" name="role" class="form-control" required>
+                                <?php foreach ($roles as $role): ?>
+                                    <option value="<?= $role['id'] ?>"><?= htmlspecialchars($role['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="department">Department</label>
+                            <select id="department" name="department" class="form-control" required>
+                                <?php foreach ($departments as $department): ?>
+                                    <option value="<?= $department['id'] ?>"><?= htmlspecialchars($department['name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Create User</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="role">Role</label>
-                <select id="role" name="role" required>
-                    <?php foreach ($roles as $role): ?>
-                        <option value="<?= $role['id'] ?>"><?= htmlspecialchars($role['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="department">Department</label>
-                <select id="department" name="department" required>
-                    <?php foreach ($departments as $department): ?>
-                        <option value="<?= $department['id'] ?>"><?= htmlspecialchars($department['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <button type="submit">Create User</button>
-            <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
-        </form>
+        </div>
     </div>
 
     <script>
+        // Open the modal using Bootstrap's modal method
         function openModal() {
-            document.getElementById('createUserModal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
+            const modal = new bootstrap.Modal(document.getElementById('createUserModal'));
+            modal.show();
         }
 
+        // Close the modal using Bootstrap's modal method
         function closeModal() {
-            document.getElementById('createUserModal').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createUserModal'));
+            modal.hide();
         }
+
+        // Password validation function
+        function validatePassword(password) {
+            const uppercase = /[A-Z]/.test(password);
+            const number = /\d/.test(password);
+            const specialChar = /[^\w]/.test(password);
+
+            if (!uppercase || !number || !specialChar || password.length < 8) {
+                return false;
+            }
+            return true;
+        }
+
+        // Add form submission validation
+        document.getElementById('createUserForm').addEventListener('submit', function (event) {
+            const password = document.getElementById('password').value;
+            const passwordError = document.getElementById('passwordError');
+
+            if (!validatePassword(password)) {
+                event.preventDefault(); // Prevent form submission
+                passwordError.style.display = 'block'; // Show the error message
+            } else {
+                passwordError.style.display = 'none'; // Hide the error message if valid
+            }
+        });
     </script>
 
     <!-- Password verification -->
@@ -599,6 +569,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
