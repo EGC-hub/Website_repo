@@ -67,164 +67,129 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome Page</title>
+    <title>Dashboard</title>
     <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            padding: 20px;
-            /* Add padding to the body */
         }
 
-        /* Apply box-sizing to all elements */
-        * {
-            box-sizing: border-box;
-        }
-
-        .main-container {
+        .dashboard-container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            width: 100%;
-            max-width: 1200px;
-            /* Match the width of the welcome-container */
+            min-height: 100vh;
         }
 
-        .user-info {
-            text-align: center;
-            width: 90%;
-            /* Match the width of the welcome-container */
-            max-width: 700px;
-            /* Match the width of the welcome-container */
-            margin-top: 20px;
-            margin-bottom: 20px;
-            padding: 20px;
-            /* Increase padding for better spacing */
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .user-info p {
-            margin: 5px 0;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .user-info .session-warning {
-            color: grey;
-            /* Red color for warning */
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .welcome-container {
-            text-align: center;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            /* Match the width of the user-info */
-            max-width: 700px;
-            /* Match the width of the user-info */
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .button-container {
-            margin-top: 20px;
-        }
-
-        .btn {
-            display: inline-block;
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            text-decoration: none;
-            color: white;
+        .sidebar {
+            width: 250px;
             background-color: #002c5f;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
+            color: white;
+            padding: 20px;
         }
 
-        .btn:hover {
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
             background-color: #004080;
         }
 
-        .logout-btn {
-            display: inline-block;
-            margin: 20px auto;
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
             padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            text-decoration: none;
-            color: white;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            margin-right: 20px;
+            font-size: 14px;
+        }
+
+        .logout-btn {
             background-color: #ff4d4d;
-            border-radius: 5px;
+            color: white;
             border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
         .logout-btn:hover {
             background-color: #ff1a1a;
         }
+
+        .dashboard-placeholder {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            color: #333;
+        }
     </style>
 </head>
 
 <body>
-    <div class="main-container">
-        <div class="user-info">
-            <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong></p>
-            <p>Departments: 
-                <strong>
-                    <?= !empty($userDepartments) ? htmlspecialchars(implode(', ', $userDepartments)) : 'None' ?>
-                </strong>
-            </p>
-            <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>Menu</h3>
+            <?php if ($userRole === 'Admin'): ?>
+                <a href="data-display.php">Data Display</a>
+            <?php endif; ?>
+            <a href="tasks.php">Tasks</a>
+            <?php if ($userRole === 'Admin'): ?>
+                <a href="create-user.php">Create User</a>
+            <?php endif; ?>
+            <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
+                <a href="view-users.php">View Users</a>
+            <?php endif; ?>
+            <?php if ($userRole === 'Admin'): ?>
+                <a href="view-roles-departments.php">View Role or Department</a>
+            <?php endif; ?>
         </div>
 
-        <div class="welcome-container">
-            <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
-            <div class="button-container">
-                <!-- Buttons for navigation -->
-                <?php if ($userRole === 'Admin'): ?>
-                    <a href="data-display.php" class="btn">Data Display</a>
-                <?php endif; ?>
-
-                <a href="tasks.php" class="btn">Tasks</a>
-
-                <!-- Display 'Create User' button only if user has 'admin' role -->
-                <?php if ($userRole === 'Admin'): ?>
-                    <a href="create-user.php" class="btn">Create User</a>
-                <?php endif; ?>
-
-                <!-- Display 'View Users' if user has 'admin' or 'manager' role -->
-                <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
-                    <a href="view-users.php" class="btn">View Users</a>
-                <?php endif; ?>
-
-                <!-- Display 'Create New Role or Department' button only if user has 'admin' role -->
-                <?php if ($userRole === 'Admin'): ?>
-                    <a href="view-roles-departments.php" class="btn">View Role or Department</a>
-                <?php endif; ?>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Navbar -->
+            <div class="navbar">
+                <div class="user-info">
+                    <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong></p>
+                    <p>Departments: <strong><?= !empty($userDepartments) ? htmlspecialchars(implode(', ', $userDepartments)) : 'None' ?></strong></p>
+                </div>
+                <button class="logout-btn" onclick="window.location.href='logout.php'">Log Out</button>
             </div>
-            <!-- Logout Button -->
-            <a href="logout.php" class="logout-btn">Log Out</a>
+
+            <!-- Dashboard Placeholder -->
+            <div class="dashboard-placeholder">
+                <h2>Welcome to the Dashboard</h2>
+                <p>This is a placeholder for your dashboard content.</p>
+            </div>
         </div>
     </div>
+
+    <!-- Bootstrap JS (with Popper.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
