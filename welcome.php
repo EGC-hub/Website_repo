@@ -1,66 +1,3 @@
-<?php
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Start session
-session_start();
-
-// Check if the user is logged in
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    // Redirect to login page if not logged in
-    header("Location: portal-login.html");
-    exit;
-}
-
-// Database connection
-$config = include '../config.php';
-$dsn = "mysql:host=localhost;dbname=euro_login_system;charset=utf8mb4";
-$username = $config['dbUsername'];
-$password = $config['dbPassword'];
-
-try {
-    $pdo = new PDO($dsn, $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // Retrieve the username, role, and user ID from the session
-    $username = $_SESSION['username'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
-    $userRole = $_SESSION['role'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
-    $userId = $_SESSION['user_id'] ?? null; // User ID from session
-
-    // Fetch all departments assigned to the user
-    $userDepartments = [];
-    if ($userId) {
-        $stmt = $pdo->prepare("
-            SELECT d.name 
-            FROM user_departments ud
-            JOIN departments d ON ud.department_id = d.id
-            WHERE ud.user_id = :user_id
-        ");
-        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-        $stmt->execute();
-        $userDepartments = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    }
-
-    // Optional: Session timeout settings
-    $timeout_duration = 1200;
-    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
-        // If the session is expired, destroy it and redirect to login page
-        session_unset();
-        session_destroy();
-        header("Location: portal-login.html");
-        exit;
-    }
-
-    // Update last activity time
-    $_SESSION['last_activity'] = time();
-
-} catch (PDOException $e) {
-    die("Error: " . $e->getMessage());
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -129,36 +66,37 @@ try {
             background-color: #ff1a1a;
         }
 
-        .dashboard-placeholder {
-            background-color: #f8f9fa;
+        .dashboard-content {
             padding: 20px;
+        }
+
+        .card {
+            border: none;
             border-radius: 10px;
-            margin-top: 20px;
-            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #002c5f;
+        }
+
+        .card-text {
+            font-size: 2.5rem;
+            font-weight: bold;
             color: #333;
         }
 
-        .navbar {
-            display: flex;
-            align-items: center;
-            /* Vertically center all items in the navbar */
-            padding: 10px 20px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .logout-btn {
-            background-color: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .logout-btn:hover {
-            background-color: #ff1a1a;
+        .text-muted {
+            font-size: 0.9rem;
+            color: #666;
         }
     </style>
 </head>
@@ -201,10 +139,127 @@ try {
                 <button class="logout-btn" onclick="window.location.href='logout.php'">Log Out</button>
             </div>
 
-            <!-- Dashboard Placeholder -->
-            <div class="dashboard-placeholder">
-                <h2>Welcome to the Dashboard</h2>
-                <p>This is a placeholder for your dashboard content.</p>
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Row 1: Key Metrics -->
+                <div class="row mb-4">
+                    <!-- Open Tickets -->
+                    <div class="col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Open Tickets</h5>
+                                <p class="card-text display-4">15</p>
+                                <p class="text-muted">Outstanding</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- New Joiner Setup -->
+                    <div class="col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">New Joiner Setup</h5>
+                                <p class="card-text display-4">7</p>
+                                <p class="text-muted">Tasks</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Projects -->
+                    <div class="col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Projects</h5>
+                                <p class="card-text display-4">27</p>
+                                <p class="text-muted">Up</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Uptime -->
+                    <div class="col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Uptime</h5>
+                                <p class="card-text display-4">99.9%</p>
+                                <p class="text-muted">Last downtime: 13h ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Tasks by Project -->
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Tasks by Project</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Cloud Upgrade</strong> - 13 tasks</p>
+                                        <p class="mb-1"><strong>Induction Materials</strong> - 7 tasks</p>
+                                        <p class="mb-1"><strong>CRM System</strong> - 24 tasks</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Sales</strong> - 1 task</p>
+                                        <p class="mb-1"><strong>Website</strong> - 6 tasks</p>
+                                        <p class="mb-1"><strong>BAU</strong> - 27 tasks</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pie Chart Placeholder -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Task Distribution</h5>
+                                <div class="text-center">
+                                    <img src="https://via.placeholder.com/150" alt="Pie Chart Placeholder" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Tickets and Budget -->
+                <div class="row mb-4">
+                    <!-- Tickets This Month -->
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Tickets This Month</h5>
+                                <p class="card-text display-4">148</p>
+                                <p class="text-muted">+78 from last month</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Budget Utilization -->
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Budget Utilization</h5>
+                                <p class="card-text display-4">$40K</p>
+                                <p class="text-muted">84% of budget used</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 4: IT Service NPS -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">IT Service NPS</h5>
+                                <p class="card-text display-4">296.9k</p>
+                                <p class="text-muted">Resolved within 4 hours</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
