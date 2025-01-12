@@ -193,7 +193,7 @@ try {
             <div class="navbar">
                 <!-- Logo Container -->
                 <div class="d-flex align-items-center me-3">
-                    <img src="images/logo/logo-2.1.ico" alt="Logo" class="logo" style="width: 40px; height: 40px;">
+                    <img src="images/logo/logo.webp" alt="Logo" class="logo" style="width: 40px; height: 40px;">
                 </div>
 
                 <!-- User Info -->
