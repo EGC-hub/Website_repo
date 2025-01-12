@@ -33,6 +33,20 @@ $user_role = $_SESSION['role'];
 $user_departments = $_SESSION['departments'] ?? []; // Fetch departments from session
 $user_username = $_SESSION['username'];
 
+// Function to validate password complexity
+function validatePassword($password)
+{
+    // Password must contain at least one uppercase letter, one number, and one special character
+    $uppercase = preg_match('@[A-Z]@', $password);
+    $number = preg_match('@\d@', $password);
+    $specialChar = preg_match('@[^\w]@', $password); // Matches any non-word character
+
+    if (!$uppercase || !$number || !$specialChar || strlen($password) < 8) {
+        return false;
+    }
+    return true;
+}
+
 // Fetch users based on role
 try {
     $pdo = new PDO($dsn, $username, $password);
@@ -106,26 +120,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($username) || empty($email) || empty($password) || empty($role_id) || empty($department_id)) {
         $errorMsg = "Please fill in all fields.";
     } else {
-        // Hash the password
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        // Validate password complexity
+        if (!validatePassword($password)) {
+            $errorMsg = "Password must contain at least one uppercase letter, one number, one special character, and be at least 8 characters long.";
+        } else {
+            // Hash the password
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-        try {
-            // Insert the user into the `users` table
-            $insertUserQuery = "INSERT INTO users (username, email, password, role_id) VALUES (?, ?, ?, ?)";
-            $stmt = $pdo->prepare($insertUserQuery);
-            $stmt->execute([$username, $email, $hashedPassword, $role_id]);
+            try {
+                // Insert the user into the `users` table
+                $insertUserQuery = "INSERT INTO users (username, email, password, role_id) VALUES (?, ?, ?, ?)";
+                $stmt = $pdo->prepare($insertUserQuery);
+                $stmt->execute([$username, $email, $hashedPassword, $role_id]);
 
-            // Get the last inserted user ID
-            $newUserId = $pdo->lastInsertId();
+                // Get the last inserted user ID
+                $newUserId = $pdo->lastInsertId();
 
-            // Insert the user-department relationship into the `user_departments` table
-            $insertUserDepartmentQuery = "INSERT INTO user_departments (user_id, department_id) VALUES (?, ?)";
-            $stmt = $pdo->prepare($insertUserDepartmentQuery);
-            $stmt->execute([$newUserId, $department_id]);
+                // Insert the user-department relationship into the `user_departments` table
+                $insertUserDepartmentQuery = "INSERT INTO user_departments (user_id, department_id) VALUES (?, ?)";
+                $stmt = $pdo->prepare($insertUserDepartmentQuery);
+                $stmt->execute([$newUserId, $department_id]);
 
-            $successMsg = "User created successfully.";
-        } catch (PDOException $e) {
-            $errorMsg = "Failed to create user: " . $e->getMessage();
+                // Set success message and refresh the page
+                $_SESSION['successMsg'] = "User created successfully.";
+                header("Location: view-users.php");
+                exit;
+            } catch (PDOException $e) {
+                $errorMsg = "Failed to create user: " . $e->getMessage();
+            }
         }
     }
 }
@@ -386,6 +408,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
+
+        .success-message {
+            text-align: center;
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 
@@ -403,8 +434,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="container">
             <h1>Users</h1>
 
+            <?php if (isset($_SESSION['successMsg'])): ?>
+                <div class="success-message">
+                    <?= htmlspecialchars($_SESSION['successMsg']) ?>
+                </div>
+                <?php unset($_SESSION['successMsg']); ?>
+            <?php endif; ?>
+
             <!-- Add a "Create User" button -->
-            <button onclick="openModal()" style="margin-bottom: 20px; padding: 10px 20px; background-color: #002c5f; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            <button onclick="openModal()"
+                style="margin-bottom: 20px; padding: 10px 20px; background-color: #002c5f; color: white; border: none; border-radius: 5px; cursor: pointer;">
                 Create User
             </button>
 
@@ -445,7 +484,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
             <?php elseif ($user_role === 'Manager'): ?>
                 <p>Viewing users in your department(s):
-                    <strong><?= htmlspecialchars(implode(', ', $user_departments)) ?></strong></p>
+                    <strong><?= htmlspecialchars(implode(', ', $user_departments)) ?></strong>
+                </p>
                 <?php if (!empty($users)): ?>
                     <table>
                         <thead>
