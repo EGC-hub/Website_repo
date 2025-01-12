@@ -110,39 +110,9 @@ try {
             background-color: #ffffff;
         }
 
-        .navbar {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
         .user-info {
-            display: flex;
-            align-items: center;
-            /* Vertically center the logo and text */
             margin-right: 20px;
             font-size: 14px;
-        }
-
-        .user-info .logo {
-            width: 40px;
-            /* Adjust the size of the logo */
-            height: 40px;
-            /* Adjust the size of the logo */
-            margin-right: 10px;
-            /* Add some spacing between the logo and text */
-            border-radius: 50%;
-            /* Optional: Make the logo circular */
-        }
-
-        .user-info p {
-            margin: 0;
-            /* Remove default margin for better alignment */
-            line-height: 1.4;
-            /* Adjust line height for better readability */
         }
 
         .logout-btn {
@@ -166,6 +136,36 @@ try {
             margin-top: 20px;
             text-align: center;
             color: #333;
+        }
+
+        .logo {
+            width: 40px;
+            /* Adjust the size of the logo */
+            height: 40px;
+            /* Adjust the size of the logo */
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            /* Vertically center all items in the navbar */
+            padding: 10px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logout-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #ff1a1a;
         }
     </style>
 </head>
@@ -191,15 +191,20 @@ try {
         <div class="main-content">
             <!-- Navbar -->
             <div class="navbar">
-                <div class="user-info">
-                    <!-- Logo -->
-                    <img src="images/logo/logo.webp" alt="Logo" class="logo">
-                    <!-- User Info -->
-                    <p>Logged in as: <strong><?= htmlspecialchars($username) ?></strong></p>
-                    <p>Department(s):
+                <!-- Logo Container -->
+                <div class="d-flex align-items-center me-3">
+                    <img src="images/logo/logo-2.1.ico" alt="Logo" class="logo" style="width: 40px; height: 40px;">
+                </div>
+
+                <!-- User Info -->
+                <div class="user-info me-3">
+                    <p class="mb-0">Logged in as: <strong><?= htmlspecialchars($username) ?></strong></p>
+                    <p class="mb-0">Departments:
                         <strong><?= !empty($userDepartments) ? htmlspecialchars(implode(', ', $userDepartments)) : 'None' ?></strong>
                     </p>
                 </div>
+
+                <!-- Logout Button -->
                 <button class="logout-btn" onclick="window.location.href='logout.php'">Log Out</button>
             </div>
 
