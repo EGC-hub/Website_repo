@@ -399,6 +399,11 @@ try {
             <?php $dcount = 1 ?>
             <?php if (!empty($departments)): ?>
                 <table>
+                    <colgroup>
+                        <col style="width: 10%">
+                        <col style="width: 60%">
+                        <col style="width: 30%">
+                    </colgroup>
                     <thead>
                         <tr>
                             <th>#</th>
