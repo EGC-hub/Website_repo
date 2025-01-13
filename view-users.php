@@ -351,7 +351,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         /* Style for Select2 dropdown */
-        .select2-container--default .select2-selection--multiple {
+        /* .select2-container--default .select2-selection--multiple {
             border: 1px solid #ced4da;
             border-radius: 4px;
             padding: 5px;
@@ -373,7 +373,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
             color: #e63946;
-        }
+        } */
     </style>
 </head>
 
