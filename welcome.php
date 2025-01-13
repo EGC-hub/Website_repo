@@ -178,6 +178,11 @@ try {
             background-color: #ffffff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
+        .chart-canvas {
+            width: 100% !important;
+            height: 300px !important;
+        }
     </style>
 </head>
 
@@ -276,7 +281,7 @@ try {
                             <div class="card-body">
                                 <h5 class="card-title">Task Distribution</h5>
                                 <div class="text-center">
-                                    <canvas id="taskDistributionChart"></canvas>
+                                    <canvas id="taskDistributionChart" class="chart-canvas"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -288,7 +293,7 @@ try {
                             <div class="card-body">
                                 <h5 class="card-title">Task Completion Over Time</h5>
                                 <div class="text-center">
-                                    <canvas id="taskCompletionChart"></canvas>
+                                    <canvas id="taskCompletionChart" class="chart-canvas"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -361,7 +366,8 @@ try {
                         }]
                     },
                     options: {
-                        responsive: true,
+                        responsive: true, // Make the chart responsive
+                        maintainAspectRatio: false, // Allow custom sizing
                         plugins: {
                             legend: {
                                 position: 'bottom',
@@ -388,7 +394,8 @@ try {
                         }]
                     },
                     options: {
-                        responsive: true,
+                        responsive: true, // Make the chart responsive
+                        maintainAspectRatio: false, // Allow custom sizing
                         plugins: {
                             legend: {
                                 position: 'bottom',
@@ -425,7 +432,8 @@ try {
                         }]
                     },
                     options: {
-                        responsive: true,
+                        responsive: true, // Make the chart responsive
+                        maintainAspectRatio: false, // Allow custom sizing
                         plugins: {
                             legend: {
                                 position: 'bottom',
