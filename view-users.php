@@ -439,7 +439,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
             <?php endif; ?>
 
-            <a href="welcome.php" class="back-button">Back</a>
+            <a href="welcome.php" class="back-button">Back to Dashboard</a>
         </div>
     </div>
 

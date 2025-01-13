@@ -728,7 +728,7 @@ function getWeekdays($start, $end)
 
     <div class="task-container">
         <div class="logout-button">
-            <a href="welcome.php">Back</a>
+            <a href="welcome.php">Back to Dashboard</a>
         </div>
         <h2>Tasks</h2>
 
