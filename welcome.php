@@ -1,3 +1,65 @@
+<?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Start session
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    // Redirect to login page if not logged in
+    header("Location: portal-login.html");
+    exit;
+}
+
+// Database connection
+$config = include '../config.php';
+$dsn = "mysql:host=localhost;dbname=euro_login_system;charset=utf8mb4";
+$username = $config['dbUsername'];
+$password = $config['dbPassword'];
+
+try {
+    $pdo = new PDO($dsn, $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Retrieve the username, role, and user ID from the session
+    $username = $_SESSION['username'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
+    $userRole = $_SESSION['role'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
+    $userId = $_SESSION['user_id'] ?? null; // User ID from session
+
+    // Fetch all departments assigned to the user
+    $userDepartments = [];
+    if ($userId) {
+        $stmt = $pdo->prepare("
+            SELECT d.name 
+            FROM user_departments ud
+            JOIN departments d ON ud.department_id = d.id
+            WHERE ud.user_id = :user_id
+        ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $userDepartments = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    // Optional: Session timeout settings
+    $timeout_duration = 1200;
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
+        // If the session is expired, destroy it and redirect to login page
+        session_unset();
+        session_destroy();
+        header("Location: portal-login.html");
+        exit;
+    }
+
+    // Update last activity time
+    $_SESSION['last_activity'] = time();
+
+} catch (PDOException $e) {
+    die("Error: " . $e->getMessage());
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
