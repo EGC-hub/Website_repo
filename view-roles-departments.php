@@ -362,15 +362,16 @@ try {
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>#</th>
                             <th>Role Name</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <?php $rcount = 1 ?>
                         <?php foreach ($roles as $role): ?>
                             <tr>
-                                <td><?= htmlspecialchars($role['id']) ?></td>
+                                <td><?= $rcount++ ?></td>
                                 <td><?= htmlspecialchars($role['name']) ?></td>
                                 <td>
                                     <a href="edit-role.php?id=<?= urlencode($role['id']) ?>" class="edit-button">Edit</a>
@@ -390,11 +391,12 @@ try {
 
             <!-- Departments Table -->
             <h2>Departments</h2>
+            <?php $dcount = 1 ?>
             <?php if (!empty($departments)): ?>
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>#</th>
                             <th>Department Name</th>
                             <th>Actions</th>
                         </tr>
@@ -402,7 +404,7 @@ try {
                     <tbody>
                         <?php foreach ($departments as $department): ?>
                             <tr>
-                                <td><?= htmlspecialchars($department['id']) ?></td>
+                                <td><?= $dcount++ ?></td>
                                 <td><?= htmlspecialchars($department['name']) ?></td>
                                 <td>
                                     <a href="edit-department.php?id=<?= urlencode($department['id']) ?>"
