@@ -201,6 +201,7 @@ try {
         <!-- Main Content -->
         <div class="main-content">
             <!-- Navbar -->
+            <!-- Navbar -->
             <div class="navbar">
                 <!-- Logo Container -->
                 <div class="d-flex align-items-center me-3">
@@ -208,7 +209,7 @@ try {
                 </div>
 
                 <!-- User Info -->
-                <div class="user-info me-3">
+                <div class="user-info me-3 ms-auto"> <!-- Added ms-auto here -->
                     <p class="mb-0">Logged in as: <strong><?= htmlspecialchars($username) ?></strong></p>
                     <p class="mb-0">Departments:
                         <strong><?= !empty($userDepartments) ? htmlspecialchars(implode(', ', $userDepartments)) : 'None' ?></strong>
