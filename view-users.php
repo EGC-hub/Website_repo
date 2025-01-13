@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
     $role_id = intval($_POST['role']);
-    $department_id = intval($_POST['department']);
+    $department_ids = $_POST['departments'];
 
     // Validate inputs
     if (empty($username) || empty($email) || empty($password) || empty($role_id) || empty($department_id)) {
@@ -132,10 +132,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Get the last inserted user ID
             $newUserId = $pdo->lastInsertId();
 
-            // Insert the user-department relationship into the `user_departments` table
+            // Insert the user-department relationships into the `user_departments` table
             $insertUserDepartmentQuery = "INSERT INTO user_departments (user_id, department_id) VALUES (?, ?)";
             $stmt = $pdo->prepare($insertUserDepartmentQuery);
-            $stmt->execute([$newUserId, $department_id]);
+
+            foreach ($department_ids as $department_id) {
+                $stmt->execute([$newUserId, intval($department_id)]);
+            }
 
             // Set success message and refresh the page
             $_SESSION['successMsg'] = "User created successfully.";
@@ -345,6 +348,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: none;
             /* Hidden by default */
         }
+
+        /* Style for multiselect dropdown */
+        select[multiple] {
+            height: auto;
+            min-height: 100px;
+            padding: 5px;
+        }
+
+        select[multiple] option {
+            padding: 5px;
+        }
     </style>
 </head>
 
@@ -484,8 +498,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </select>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="department">Department</label>
-                            <select id="department" name="department" class="form-control" required>
+                            <label for="departments">Departments</label>
+                            <select id="departments" name="departments[]" class="form-control" multiple required>
                                 <?php foreach ($departments as $department): ?>
                                     <option value="<?= $department['id'] ?>"><?= htmlspecialchars($department['name']) ?>
                                     </option>
@@ -537,32 +551,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 passwordError.style.display = 'none'; // Hide the error message if valid
             }
-        });
-    </script>
 
-    <!-- Password verification -->
-    <script>
-        function validatePassword(password) {
-            // Password must contain at least one uppercase letter, one number, and one special character
-            const uppercase = /[A-Z]/.test(password);
-            const number = /\d/.test(password);
-            const specialChar = /[^\w]/.test(password); // Matches any non-word character
-
-            if (!uppercase || !number || !specialChar || password.length < 8) {
-                return false;
-            }
-            return true;
-        }
-
-        document.getElementById('createUserForm').addEventListener('submit', function (event) {
-            const password = document.getElementById('password').value;
-            const passwordError = document.getElementById('passwordError');
-
-            if (!validatePassword(password)) {
+            // Validate departments
+            if (departments.selectedOptions.length === 0) {
                 event.preventDefault(); // Prevent form submission
-                passwordError.style.display = 'block'; // Show the error message
-            } else {
-                passwordError.style.display = 'none'; // Hide the error message if valid
+                alert('Please select at least one department.'); // Show an alert
             }
         });
     </script>
