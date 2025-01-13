@@ -191,9 +191,6 @@ try {
         <!-- Sidebar -->
         <div class="sidebar">
             <h3>Menu</h3>
-            <?php if ($userRole === 'Admin'): ?>
-                <a href="data-display.php">Data Display</a>
-            <?php endif; ?>
             <a href="tasks.php">Tasks</a>
             <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
                 <a href="view-users.php">View Users</a>

@@ -345,11 +345,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: none;
             /* Hidden by default */
         }
-
-        /* .modal-header .modal-title {
-            width: 100%;
-            text-align: center;
-        } */
     </style>
 </head>
 
