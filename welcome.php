@@ -98,6 +98,15 @@
             font-size: 0.9rem;
             color: #666;
         }
+
+        .list-group-item {
+            border: none;
+            padding: 10px 15px;
+        }
+
+        .list-group-item:hover {
+            background-color: #f8f9fa;
+        }
     </style>
 </head>
 
@@ -140,6 +149,7 @@
             </div>
 
             <!-- Dashboard Content -->
+            <!-- Dashboard Content -->
             <div class="dashboard-content">
                 <!-- Row 1: Key Metrics -->
                 <div class="row mb-4">
@@ -147,125 +157,123 @@
                     <div class="col-md-3">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">Open Tickets</h5>
+                                <h5 class="card-title">Total Tasks</h5>
                                 <p class="card-text display-4">15</p>
                                 <p class="text-muted">Outstanding</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- New Joiner Setup -->
+                    <!-- Tasks in Progress -->
                     <div class="col-md-3">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">New Joiner Setup</h5>
-                                <p class="card-text display-4">7</p>
-                                <p class="text-muted">Tasks</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Projects -->
-                    <div class="col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Projects</h5>
+                                <h5 class="card-title">Tasks in Progress</h5>
                                 <p class="card-text display-4">27</p>
-                                <p class="text-muted">Up</p>
+                                <p class="text-muted">Active</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Uptime -->
+                    <!-- Completed Tasks -->
                     <div class="col-md-3">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">Uptime</h5>
-                                <p class="card-text display-4">99.9%</p>
-                                <p class="text-muted">Last downtime: 13h ago</p>
+                                <h5 class="card-title">Completed Tasks</h5>
+                                <p class="card-text display-4">42</p>
+                                <p class="text-muted">This Month</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delayed Tasks -->
+                    <div class="col-md-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Delayed Tasks</h5>
+                                <p class="card-text display-4">8</p>
+                                <p class="text-muted">Overdue</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Row 2: Tasks by Project -->
+                <!-- Row 2: Charts and Graphs -->
                 <div class="row mb-4">
-                    <div class="col-md-8">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Tasks by Project</h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <p class="mb-1"><strong>Cloud Upgrade</strong> - 13 tasks</p>
-                                        <p class="mb-1"><strong>Induction Materials</strong> - 7 tasks</p>
-                                        <p class="mb-1"><strong>CRM System</strong> - 24 tasks</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p class="mb-1"><strong>Sales</strong> - 1 task</p>
-                                        <p class="mb-1"><strong>Website</strong> - 6 tasks</p>
-                                        <p class="mb-1"><strong>BAU</strong> - 27 tasks</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pie Chart Placeholder -->
-                    <div class="col-md-4">
+                    <!-- Task Distribution Chart -->
+                    <div class="col-md-6">
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Task Distribution</h5>
                                 <div class="text-center">
-                                    <img src="https://via.placeholder.com/150" alt="Pie Chart Placeholder" class="img-fluid">
+                                    <img src="https://via.placeholder.com/400x200" alt="Task Distribution Chart"
+                                        class="img-fluid">
+                                    <p class="text-muted mt-2">Pie chart showing task distribution by status.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task Completion Over Time -->
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Task Completion Over Time</h5>
+                                <div class="text-center">
+                                    <img src="https://via.placeholder.com/400x200" alt="Task Completion Chart"
+                                        class="img-fluid">
+                                    <p class="text-muted mt-2">Line chart showing task completion trends.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Row 3: Tickets and Budget -->
+                <!-- Row 3: Additional Metrics -->
                 <div class="row mb-4">
-                    <!-- Tickets This Month -->
-                    <div class="col-md-6">
+                    <!-- Average Task Duration -->
+                    <div class="col-md-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">Tickets This Month</h5>
-                                <p class="card-text display-4">148</p>
-                                <p class="text-muted">+78 from last month</p>
+                                <h5 class="card-title">Average Task Duration</h5>
+                                <p class="card-text display-4">5.2</p>
+                                <p class="text-muted">Days</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Budget Utilization -->
-                    <div class="col-md-6">
+                    <!-- Tasks by Department -->
+                    <div class="col-md-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">Budget Utilization</h5>
-                                <p class="card-text display-4">$40K</p>
-                                <p class="text-muted">84% of budget used</p>
+                                <h5 class="card-title">Tasks by Department</h5>
+                                <div class="text-center">
+                                    <img src="https://via.placeholder.com/400x200" alt="Tasks by Department Chart"
+                                        class="img-fluid">
+                                    <p class="text-muted mt-2">Bar chart showing tasks by department.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Row 4: IT Service NPS -->
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
+                    <!-- User Performance -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">IT Service NPS</h5>
-                                <p class="card-text display-4">296.9k</p>
-                                <p class="text-muted">Resolved within 4 hours</p>
+                                <h5 class="card-title">Top Performers</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">John Doe - 15 tasks completed</li>
+                                    <li class="list-group-item">Jane Smith - 12 tasks completed</li>
+                                    <li class="list-group-item">Alice Johnson - 10 tasks completed</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Bootstrap JS (with Popper.js) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <!-- Bootstrap JS (with Popper.js) -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
