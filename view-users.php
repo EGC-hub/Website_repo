@@ -159,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <title>View Users</title>
     <style>
         /* Your original styling */
@@ -349,15 +350,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             /* Hidden by default */
         }
 
-        /* Style for multiselect dropdown */
-        select[multiple] {
-            height: auto;
-            min-height: 100px;
+        /* Style for Select2 dropdown */
+        .select2-container--default .select2-selection--multiple {
+            border: 1px solid #ced4da;
+            border-radius: 4px;
             padding: 5px;
         }
 
-        select[multiple] option {
-            padding: 5px;
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #1d3557;
+            border: 1px solid #1d3557;
+            color: white;
+            padding: 2px 8px;
+            margin: 2px;
+            border-radius: 4px;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: white;
+            margin-right: 5px;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #e63946;
         }
     </style>
 </head>
@@ -514,6 +529,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        // Initialize Select2 for the departments dropdown
+        $(document).ready(function () {
+            $('#departments').select2({
+                placeholder: "Select departments", // Placeholder text
+                allowClear: true, // Allow clearing selections
+                closeOnSelect: false // Keep the dropdown open after selecting an item
+            });
+        });
+
+        // Password validation function
+        function validatePassword(password) {
+            const uppercase = /[A-Z]/.test(password);
+            const number = /\d/.test(password);
+            const specialChar = /[^\w]/.test(password);
+
+            if (!uppercase || !number || !specialChar || password.length < 8) {
+                return false;
+            }
+            return true;
+        }
+
+        // Add form submission validation
+        document.getElementById('createUserForm').addEventListener('submit', function (event) {
+            const password = document.getElementById('password').value;
+            const passwordError = document.getElementById('passwordError');
+            const departments = document.getElementById('departments');
+
+            // Validate password
+            if (!validatePassword(password)) {
+                event.preventDefault(); // Prevent form submission
+                passwordError.style.display = 'block'; // Show the error message
+            } else {
+                passwordError.style.display = 'none'; // Hide the error message if valid
+            }
+
+            // Validate departments
+            if (departments.selectedOptions.length === 0) {
+                event.preventDefault(); // Prevent form submission
+                alert('Please select at least one department.'); // Show an alert
+            }
+        });
+    </script>
 
     <script>
         // Open the modal using Bootstrap's modal method
