@@ -360,6 +360,11 @@ try {
             <h2>Roles</h2>
             <?php if (!empty($roles)): ?>
                 <table>
+                    <colgroup>
+                        <col style="width: 10%">
+                        <col style="width: 60%">
+                        <col style="width: 30%">
+                    </colgroup>
                     <thead>
                         <tr>
                             <th>#</th>
