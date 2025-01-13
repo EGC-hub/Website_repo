@@ -201,7 +201,6 @@ try {
         <!-- Main Content -->
         <div class="main-content">
             <!-- Navbar -->
-            <!-- Navbar -->
             <div class="navbar">
                 <!-- Logo Container -->
                 <div class="d-flex align-items-center me-3">
@@ -220,7 +219,6 @@ try {
                 <button class="logout-btn" onclick="window.location.href='logout.php'">Log Out</button>
             </div>
 
-            <!-- Dashboard Content -->
             <!-- Dashboard Content -->
             <div class="dashboard-content">
                 <!-- Row 1: Key Metrics -->
@@ -278,9 +276,7 @@ try {
                             <div class="card-body">
                                 <h5 class="card-title">Task Distribution</h5>
                                 <div class="text-center">
-                                    <img src="https://via.placeholder.com/400x200" alt="Task Distribution Chart"
-                                        class="img-fluid">
-                                    <p class="text-muted mt-2">Pie chart showing task distribution by status.</p>
+                                    <canvas id="taskDistributionChart"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -292,9 +288,7 @@ try {
                             <div class="card-body">
                                 <h5 class="card-title">Task Completion Over Time</h5>
                                 <div class="text-center">
-                                    <img src="https://via.placeholder.com/400x200" alt="Task Completion Chart"
-                                        class="img-fluid">
-                                    <p class="text-muted mt-2">Line chart showing task completion trends.</p>
+                                    <canvas id="taskCompletionChart"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -320,9 +314,7 @@ try {
                             <div class="card-body">
                                 <h5 class="card-title">Tasks by Department</h5>
                                 <div class="text-center">
-                                    <img src="https://via.placeholder.com/400x200" alt="Tasks by Department Chart"
-                                        class="img-fluid">
-                                    <p class="text-muted mt-2">Bar chart showing tasks by department.</p>
+                                    <canvas id="tasksByDepartmentChart"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -346,6 +338,111 @@ try {
 
             <!-- Bootstrap JS (with Popper.js) -->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+            <!-- Chart.js -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+            <script>
+                // Task Distribution Chart (Pie Chart)
+                const taskDistributionChart = new Chart(document.getElementById('taskDistributionChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: ['Pending', 'In Progress', 'Completed', 'Delayed'],
+                        datasets: [{
+                            label: 'Task Distribution',
+                            data: [15, 27, 42, 8],
+                            backgroundColor: [
+                                '#FF6384', // Red for Pending
+                                '#36A2EB', // Blue for In Progress
+                                '#4BC0C0', // Teal for Completed
+                                '#FFCE56'  // Yellow for Delayed
+                            ],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Task Distribution by Status'
+                            }
+                        }
+                    }
+                });
+
+                // Task Completion Over Time (Line Chart)
+                const taskCompletionChart = new Chart(document.getElementById('taskCompletionChart'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                        datasets: [{
+                            label: 'Tasks Completed',
+                            data: [10, 20, 30, 25, 40, 35, 50],
+                            fill: false,
+                            borderColor: '#36A2EB',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Task Completion Over Time'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                // Tasks by Department (Bar Chart)
+                const tasksByDepartmentChart = new Chart(document.getElementById('tasksByDepartmentChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['IT', 'HR', 'Finance', 'Sales', 'Operations'],
+                        datasets: [{
+                            label: 'Tasks by Department',
+                            data: [20, 15, 10, 25, 30],
+                            backgroundColor: [
+                                '#FF6384', // Red for IT
+                                '#36A2EB', // Blue for HR
+                                '#4BC0C0', // Teal for Finance
+                                '#FFCE56', // Yellow for Sales
+                                '#9966FF'  // Purple for Operations
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Tasks by Department'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            </script>
 </body>
 
 </html>
