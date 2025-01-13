@@ -349,12 +349,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: none;
             /* Hidden by default */
         }
+        .select2-container--default .select2-selection--multiple {
+            border: 1px solid #ced4da;            border-radius: 4px;            padding: 6px;            width: 100%;            min-height: 38px;        }
 
-        /* Style for Select2 dropdown */
-        /* .select2-container--default .select2-selection--multiple {
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            padding: 5px;
+        .select2-container--default .select2-results__option {
+            padding: 6px 12px;
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice {
@@ -373,7 +372,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
             color: #e63946;
-        } */
+        }
+
+        .select2-container--open {
+            z-index: 9999 !important;
+        }
     </style>
 </head>
 
