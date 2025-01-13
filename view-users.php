@@ -369,7 +369,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php unset($_SESSION['successMsg']); ?>
             <?php endif; ?>
 
-            <a type="button" class="btn back-button" data-bs-toggle="modal" data-bs-target="#createUserModal"
+            <a class="btn back-button" data-bs-toggle="modal" data-bs-target="#createUserModal"
                 style="margin-bottom: 20px;">
                 Create User
             </a>
