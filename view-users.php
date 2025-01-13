@@ -380,6 +380,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <table>
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th>
@@ -388,8 +389,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </tr>
                         </thead>
                         <tbody>
+                            <?php $count = 1 ?>
                             <?php foreach ($users as $user): ?>
                                 <tr>
+                                    <td><?= $count++ ?></td>
                                     <td><?= htmlspecialchars($user['username']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
                                     <td><?= htmlspecialchars($user['role_name']) ?></td>

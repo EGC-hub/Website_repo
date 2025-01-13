@@ -792,7 +792,7 @@ function getWeekdays($start, $end)
             <table class="table table-striped table-hover align-middle text-center" id="pending-tasks">
                 <thead>
                     <tr class="align-middle">
-                        <th>#</th> <!-- New column for task count -->
+                        <th>#</th>
                         <th>Project Name</th>
                         <th>Task Name</th>
                         <th>Task Description</th>
