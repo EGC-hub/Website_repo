@@ -694,7 +694,7 @@ function getWeekdays($start, $end)
                                 <?php foreach ($users as $user): ?>
                                     <option value="<?= $user['id'] ?>">
                                         <?= htmlspecialchars($user['username']) ?>
-                                        (<?= htmlspecialchars($user['department']) ?> -
+                                        (<?= htmlspecialchars($user['departments']) ?> -
                                         <?= htmlspecialchars($user['role']) ?>)
                                     </option>
                                 <?php endforeach; ?>
