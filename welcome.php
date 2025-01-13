@@ -169,6 +169,15 @@ try {
         .list-group-item:hover {
             background-color: #f8f9fa;
         }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            /* Vertically center all items in the navbar */
+            padding: 10px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 
