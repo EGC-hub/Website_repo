@@ -83,6 +83,11 @@ try {
         $stmt->execute();
         $tasksInProgress = $stmt->fetch(PDO::FETCH_ASSOC)['tasks_in_progress'];
 
+        // Fetch completed tasks
+        $stmt = $pdo->prepare("SELECT COUNT(*) as completed_tasks FROM tasks WHERE status = 'Completed on Time'");
+        $stmt->execute();
+        $completedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['completed_tasks'];
+
     } else {
         // Fetch total tasks for manager's departments
         $stmt = $pdo->prepare("
