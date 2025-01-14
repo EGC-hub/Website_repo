@@ -105,7 +105,7 @@ try {
         SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
         SUM(CASE WHEN status = 'Started' THEN 1 ELSE 0 END) as in_progress,
         SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
-        SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as delayed
+        SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as 'delayed'
     FROM tasks
     ");
     $stmt->execute();
