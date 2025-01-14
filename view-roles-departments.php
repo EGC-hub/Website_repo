@@ -63,7 +63,7 @@ try {
                 if ($insertStmt->execute()) {
                     $_SESSION['successMsg'] = "Role created successfully.";
                 } else {
-                    $_SESSION['errorMsg'] = "Failed to create role. Please try again.";
+                    $_SESSION['errorMsg'] = "Failed to add role. Please try again.";
                 }
             }
         }
@@ -95,7 +95,7 @@ try {
                 if ($insertStmt->execute()) {
                     $_SESSION['successMsg'] = "Department created successfully.";
                 } else {
-                    $_SESSION['errorMsg'] = "Failed to create department. Please try again.";
+                    $_SESSION['errorMsg'] = "Failed to add department. Please try again.";
                 }
             }
         }
@@ -454,7 +454,7 @@ try {
                             <label for="role_name" class="form-label">Role Name</label>
                             <input type="text" class="form-control" id="role_name" name="role_name" required>
                         </div>
-                        <button type="submit" name="create_role" class="btn btn-primary">Create Role</button>
+                        <button type="submit" name="create_role" class="btn btn-primary">Add Role</button>
                     </form>
                 </div>
             </div>
