@@ -114,12 +114,12 @@ try {
     // Fetch task completion over time (grouped by month)
     $stmt = $pdo->prepare("
     SELECT 
-        DATE_FORMAT(actual_completion_date, '%b') as month,
-        COUNT(*) as tasks_completed
+    DATE_FORMAT(expected_finish_date, '%b') as month,
+    COUNT(*) as tasks_completed
     FROM tasks
     WHERE status = 'Completed on Time'
-    GROUP BY DATE_FORMAT(actual_completion_date, '%Y-%m')
-    ORDER BY actual_completion_date
+    GROUP BY DATE_FORMAT(expected_finish_date, '%Y-%m')
+    ORDER BY expected_finish_date;
     ");
     $stmt->execute();
     $taskCompletionOverTime = $stmt->fetchAll(PDO::FETCH_ASSOC);
