@@ -253,6 +253,9 @@ try {
         $stmt->execute();
         $tasksByDepartment = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Generate colors dynamically based on the number of departments
+        $departmentColors = generateColors(count($tasksByDepartment));
+
         // Fetch top performers for manager's departments
         $stmt = $pdo->prepare("
         SELECT 
