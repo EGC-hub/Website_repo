@@ -42,6 +42,7 @@ try {
     $userRole = $_SESSION['role'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
     $userId = $_SESSION['user_id'] ?? null; // User ID from session
 
+    // For admin
     // Fetch all departments assigned to the user
     $userDepartments = [];
     if ($userId) {
@@ -139,6 +140,123 @@ try {
     ORDER BY tasks_completed DESC
     LIMIT 3;
     ");
+    $stmt->execute();
+    $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+    // For manager
+    // Fetch all departments assigned to the manager
+    $managerDepartments = [];
+    if ($userId && $userRole === 'Manager') {
+        $stmt = $pdo->prepare("
+        SELECT d.name 
+        FROM user_departments ud
+        JOIN departments d ON ud.department_id = d.id
+        WHERE ud.user_id = :user_id
+    ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $managerDepartments = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    // Fetch total tasks for manager's departments
+    $stmt = $pdo->prepare("
+    SELECT COUNT(*) as total_tasks 
+    FROM tasks t
+    JOIN user_departments ud ON t.user_id = ud.user_id
+    WHERE ud.department_id IN (
+        SELECT department_id 
+        FROM user_departments 
+        WHERE user_id = :user_id
+    )
+    ");
+    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+    $stmt->execute();
+    $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
+
+    // Fetch tasks in progress for manager's departments
+    $stmt = $pdo->prepare("
+    SELECT COUNT(*) as tasks_in_progress 
+    FROM tasks t
+    JOIN user_departments ud ON t.user_id = ud.user_id
+    WHERE t.status = 'Started' AND ud.department_id IN (
+        SELECT department_id 
+        FROM user_departments 
+        WHERE user_id = :user_id
+    )
+");
+    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+    $stmt->execute();
+    $tasksInProgress = $stmt->fetch(PDO::FETCH_ASSOC)['tasks_in_progress'];
+
+    // Fetch completed tasks for manager's departments
+    $stmt = $pdo->prepare("
+    SELECT COUNT(*) as completed_tasks 
+    FROM tasks t
+    JOIN user_departments ud ON t.user_id = ud.user_id
+    WHERE t.status = 'Completed on Time' AND ud.department_id IN (
+        SELECT department_id 
+        FROM user_departments 
+        WHERE user_id = :user_id
+    )
+    ");
+    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+    $stmt->execute();
+    $completedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['completed_tasks'];
+
+    // Fetch delayed tasks for manager's departments
+    $stmt = $pdo->prepare("
+    SELECT COUNT(*) as delayed_tasks 
+    FROM tasks t
+    JOIN user_departments ud ON t.user_id = ud.user_id
+    WHERE t.status = 'Delayed Completion' AND ud.department_id IN (
+        SELECT department_id 
+        FROM user_departments 
+        WHERE user_id = :user_id
+    )
+    ");
+    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+    $stmt->execute();
+    $delayedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['delayed_tasks'];
+
+    // Fetch tasks by department for manager's departments
+    $stmt = $pdo->prepare("
+    SELECT d.name, COUNT(t.task_id) as task_count 
+    FROM tasks t
+    JOIN users u ON t.user_id = u.id
+    JOIN user_departments ud ON u.id = ud.user_id
+    JOIN departments d ON ud.department_id = d.id
+    WHERE ud.department_id IN (
+        SELECT department_id 
+        FROM user_departments 
+        WHERE user_id = :user_id
+    )
+    GROUP BY d.name
+    ");
+    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+    $stmt->execute();
+    $tasksByDepartment = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fetch top performers for manager's departments
+    $stmt = $pdo->prepare("
+    SELECT 
+        u.username, 
+        d.name as department, 
+        COUNT(t.task_id) as tasks_completed 
+    FROM tasks t
+    JOIN users u ON t.user_id = u.id
+    JOIN user_departments ud ON u.id = ud.user_id
+    JOIN departments d ON ud.department_id = d.id
+    WHERE t.status = 'Completed on Time' AND ud.department_id IN (
+        SELECT department_id 
+        FROM user_departments 
+        WHERE user_id = :user_id
+    )
+    GROUP BY u.username, d.name
+    ORDER BY tasks_completed DESC
+    LIMIT 3
+    ");
+    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
     $stmt->execute();
     $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -415,7 +533,7 @@ try {
                     <div class="col-md-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">Tasks by Department</h5>
+                                <h5 class="card-title"> <?= ($userRole === 'Manager') ? 'Tasks in My Departments' : 'Tasks by Department' ?></h5>
                                 <div class="text-center">
                                     <canvas id="tasksByDepartmentChart"></canvas>
                                 </div>
@@ -427,10 +545,11 @@ try {
                     <div class="col-md-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">Top Performers</h5>
+                                <h5 class="card-title"><?= ($userRole === 'Manager') ? 'Top Performers in My Departments' : 'Top Performers' ?></h5>
                                 <ul class="list-group list-group-flush">
                                     <?php foreach ($topPerformers as $performer): ?>
-                                        <li class="list-group-item"><?= htmlspecialchars($performer['username']) ?> (<?= htmlspecialchars($performer['department']) ?>) -
+                                        <li class="list-group-item"><?= htmlspecialchars($performer['username']) ?>
+                                            (<?= htmlspecialchars($performer['department']) ?>) -
                                             <?= $performer['tasks_completed'] ?> tasks completed
                                         </li>
                                     <?php endforeach; ?>
