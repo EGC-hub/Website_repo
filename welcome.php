@@ -126,13 +126,18 @@ try {
 
     // Fetch top performers
     $stmt = $pdo->prepare("
-    SELECT u.username, COUNT(t.task_id) as tasks_completed 
+    SELECT 
+    u.username, 
+    d.name as department, 
+    COUNT(t.task_id) as tasks_completed 
     FROM tasks t
     JOIN users u ON t.user_id = u.id
+    JOIN user_departments ud ON u.id = ud.user_id
+    JOIN departments d ON ud.department_id = d.id
     WHERE t.status = 'Completed on Time'
-    GROUP BY u.username
+    GROUP BY u.username, d.name
     ORDER BY tasks_completed DESC
-    LIMIT 3
+    LIMIT 3;
     ");
     $stmt->execute();
     $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -327,7 +332,7 @@ try {
                             <div class="card-body">
                                 <h5 class="card-title">Tasks</h5>
                                 <p class="card-text display-4"><?= $totalTasks ?></p>
-                                <p class="text-muted">Outstanding</p>
+                                <p class="text-muted">Total Tasks</p>
                             </div>
                         </div>
                     </div>
@@ -349,7 +354,7 @@ try {
                             <div class="card-body">
                                 <h5 class="card-title">Completed Tasks</h5>
                                 <p class="card-text display-4"><?= $completedTasks ?></p>
-                                <p class="text-muted">This Month</p>
+                                <p class="text-muted">In Total</p>
                             </div>
                         </div>
                     </div>
@@ -360,7 +365,7 @@ try {
                             <div class="card-body">
                                 <h5 class="card-title">Delayed Tasks</h5>
                                 <p class="card-text display-4"><?= $delayedTasks ?></p>
-                                <p class="text-muted">Overdue</p>
+                                <p class="text-muted">Passed Due Date</p>
                             </div>
                         </div>
                     </div>
@@ -425,7 +430,7 @@ try {
                                 <h5 class="card-title">Top Performers</h5>
                                 <ul class="list-group list-group-flush">
                                     <?php foreach ($topPerformers as $performer): ?>
-                                        <li class="list-group-item"><?= htmlspecialchars($performer['username']) ?> -
+                                        <li class="list-group-item"><?= htmlspecialchars($performer['username']) ?> <?= htmlspecialchars($performer['department']) ?> -
                                             <?= $performer['tasks_completed'] ?> tasks completed
                                         </li>
                                     <?php endforeach; ?>
