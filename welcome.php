@@ -160,6 +160,7 @@ try {
         $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     } else {
+        // For manager
         // Fetch total tasks for manager's departments
         $stmt = $pdo->prepare("
         SELECT COUNT(*) as total_tasks 
@@ -439,6 +440,7 @@ try {
 </head>
 
 <body>
+    <?= $userId ?>
     <div class="dashboard-container">
         <!-- Sidebar -->
         <div class="sidebar">
