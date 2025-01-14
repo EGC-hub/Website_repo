@@ -20,6 +20,19 @@ $dsn = "mysql:host=localhost;dbname=euro_login_system;charset=utf8mb4";
 $username = $config['dbUsername'];
 $password = $config['dbPassword'];
 
+// Function to generate colors
+function generateColors($count)
+{
+    $colors = ['#FF6384', '#36A2EB', '#4BC0C0', '#FFCE56', '#9966FF', '#FF8A80', '#7CB342', '#FFD54F', '#64B5F6', '#BA68C8'];
+    // If there are more departments than predefined colors, generate random colors
+    if ($count > count($colors)) {
+        for ($i = count($colors); $i < $count; $i++) {
+            $colors[] = '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+        }
+    }
+    return array_slice($colors, 0, $count); // Return only the required number of colors
+}
+
 try {
     $pdo = new PDO($dsn, $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -43,6 +56,72 @@ try {
         $userDepartments = $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
+    // Fetch total tasks
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total_tasks FROM tasks");
+    $stmt->execute();
+    $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
+
+    // Fetch tasks in progress
+    $stmt = $pdo->prepare("SELECT COUNT(*) as tasks_in_progress FROM tasks WHERE status = 'Started'");
+    $stmt->execute();
+    $tasksInProgress = $stmt->fetch(PDO::FETCH_ASSOC)['tasks_in_progress'];
+
+    // Fetch completed tasks
+    $stmt = $pdo->prepare("SELECT COUNT(*) as completed_tasks FROM tasks WHERE status = 'Completed on Time'");
+    $stmt->execute();
+    $completedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['completed_tasks'];
+
+    // Fetch delayed tasks
+    $stmt = $pdo->prepare("SELECT COUNT(*) as delayed_tasks FROM tasks WHERE status = 'Delayed Completion'");
+    $stmt->execute();
+    $delayedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['delayed_tasks'];
+
+    // Fetch average task duration
+    $stmt = $pdo->prepare("SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, actual_completion_date)) as avg_duration FROM tasks WHERE status = 'Completed on Time'");
+    $stmt->execute();
+    $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
+    $avgDuration = round($avgDuration, 1); // Round to one decimal place
+
+    // Fetch tasks by department
+    $stmt = $pdo->prepare("
+    SELECT d.name, COUNT(t.task_id) as task_count 
+    FROM tasks t
+    JOIN users u ON t.user_id = u.id
+    JOIN user_departments ud ON u.id = ud.user_id
+    JOIN departments d ON ud.department_id = d.id
+    GROUP BY d.name
+    ");
+    $stmt->execute();
+    $tasksByDepartment = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Generate colors dynamically based on the number of departments
+    $departmentColors = generateColors(count($tasksByDepartment));
+
+    // Fetch task distribution by status
+    $stmt = $pdo->prepare("
+    SELECT 
+        SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
+        SUM(CASE WHEN status = 'Started' THEN 1 ELSE 0 END) as in_progress,
+        SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
+        SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as delayed
+    FROM tasks
+    ");
+    $stmt->execute();
+    $taskDistribution = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Fetch task completion over time (grouped by month)
+    $stmt = $pdo->prepare("
+    SELECT 
+        DATE_FORMAT(actual_completion_date, '%b') as month,
+        COUNT(*) as tasks_completed
+    FROM tasks
+    WHERE status = 'Completed on Time'
+    GROUP BY DATE_FORMAT(actual_completion_date, '%Y-%m')
+    ORDER BY actual_completion_date
+    ");
+    $stmt->execute();
+    $taskCompletionOverTime = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     // Optional: Session timeout settings
     $timeout_duration = 1200;
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
@@ -59,6 +138,8 @@ try {
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
 }
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -229,8 +310,8 @@ try {
                     <div class="col-md-3">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">Total Tasks</h5>
-                                <p class="card-text display-4">15</p>
+                                <h5 class="card-title">Tasks</h5>
+                                <p class="card-text display-4"><?= $totalTasks ?></p>
                                 <p class="text-muted">Outstanding</p>
                             </div>
                         </div>
@@ -241,7 +322,7 @@ try {
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Tasks in Progress</h5>
-                                <p class="card-text display-4">27</p>
+                                <p class="card-text display-4"><?= $tasksInProgress ?></p>
                                 <p class="text-muted">Active</p>
                             </div>
                         </div>
@@ -252,7 +333,7 @@ try {
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Completed Tasks</h5>
-                                <p class="card-text display-4">42</p>
+                                <p class="card-text display-4"><?= $completedTasks ?></p>
                                 <p class="text-muted">This Month</p>
                             </div>
                         </div>
@@ -263,7 +344,7 @@ try {
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Delayed Tasks</h5>
-                                <p class="card-text display-4">8</p>
+                                <p class="card-text display-4"><?= $delayedTasks ?></p>
                                 <p class="text-muted">Overdue</p>
                             </div>
                         </div>
@@ -304,7 +385,7 @@ try {
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Average Task Duration</h5>
-                                <p class="card-text display-4">5.2</p>
+                                <p class="card-text display-4"><?= $avgDuration ?></p>
                                 <p class="text-muted">Days</p>
                             </div>
                         </div>
@@ -328,9 +409,11 @@ try {
                             <div class="card-body">
                                 <h5 class="card-title">Top Performers</h5>
                                 <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">John Doe - 15 tasks completed</li>
-                                    <li class="list-group-item">Jane Smith - 12 tasks completed</li>
-                                    <li class="list-group-item">Alice Johnson - 10 tasks completed</li>
+                                    <?php foreach ($topPerformers as $performer): ?>
+                                        <li class="list-group-item"><?= htmlspecialchars($performer['username']) ?> -
+                                            <?= $performer['tasks_completed'] ?> tasks completed
+                                        </li>
+                                    <?php endforeach; ?>
                                 </ul>
                             </div>
                         </div>
@@ -352,7 +435,12 @@ try {
                         labels: ['Pending', 'In Progress', 'Completed', 'Delayed'],
                         datasets: [{
                             label: 'Task Distribution',
-                            data: [15, 27, 42, 8],
+                            data: [
+                                <?= $taskDistribution['pending'] ?>,
+                                <?= $taskDistribution['in_progress'] ?>,
+                                <?= $taskDistribution['completed'] ?>,
+                                <?= $taskDistribution['delayed'] ?>
+                            ],
                             backgroundColor: [
                                 '#FF6384', // Red for Pending
                                 '#36A2EB', // Blue for In Progress
@@ -381,10 +469,10 @@ try {
                 const taskCompletionChart = new Chart(document.getElementById('taskCompletionChart'), {
                     type: 'line',
                     data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                        labels: <?= json_encode(array_column($taskCompletionOverTime, 'month')) ?>,
                         datasets: [{
                             label: 'Tasks Completed',
-                            data: [10, 20, 30, 25, 40, 35, 50],
+                            data: <?= json_encode(array_column($taskCompletionOverTime, 'tasks_completed')) ?>,
                             fill: false,
                             borderColor: '#36A2EB',
                             tension: 0.1
@@ -414,17 +502,11 @@ try {
                 const tasksByDepartmentChart = new Chart(document.getElementById('tasksByDepartmentChart'), {
                     type: 'bar',
                     data: {
-                        labels: ['IT', 'HR', 'Finance', 'Sales', 'Operations'],
+                        labels: <?= json_encode(array_column($tasksByDepartment, 'name')) ?>,
                         datasets: [{
                             label: 'Tasks by Department',
-                            data: [20, 15, 10, 25, 30],
-                            backgroundColor: [
-                                '#FF6384', // Red for IT
-                                '#36A2EB', // Blue for HR
-                                '#4BC0C0', // Teal for Finance
-                                '#FFCE56', // Yellow for Sales
-                                '#9966FF'  // Purple for Operations
-                            ],
+                            data: <?= json_encode(array_column($tasksByDepartment, 'task_count')) ?>,
+                            backgroundColor: <?= json_encode($departmentColors) ?>,
                             borderWidth: 1
                         }]
                     },
