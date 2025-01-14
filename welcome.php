@@ -189,6 +189,7 @@ try {
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
         $tasksInProgress = $stmt->fetch(PDO::FETCH_ASSOC)['tasks_in_progress'];
+
         // Fetch tasks in progress for manager's departments
         $stmt = $pdo->prepare("
         SELECT COUNT(*) as tasks_in_progress 
@@ -274,6 +275,22 @@ try {
         $stmt->execute();
         $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Fetch average task duration
+        $stmt = $pdo->prepare("
+            SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, expected_finish_date)) as avg_duration 
+            FROM tasks t
+            JOIN user_departments ud ON t.user_id = ud.user_id
+            WHERE t.status = 'Completed on Time' 
+            AND ud.department_id IN (
+                SELECT department_id 
+                FROM user_departments 
+                WHERE user_id = :user_id
+            )
+        ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
+        $avgDuration = round($avgDuration, 1); // Round to one decimal place
     }
 
     // Optional: Session timeout settings
