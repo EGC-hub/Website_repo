@@ -58,9 +58,27 @@ try {
     }
 
     // Fetch total tasks
-    $stmt = $pdo->prepare("SELECT COUNT(*) as total_tasks FROM tasks");
-    $stmt->execute();
-    $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
+    if ($userRole === 'Admin') {
+        $stmt = $pdo->prepare("SELECT COUNT(*) as total_tasks FROM tasks");
+        $stmt->execute();
+        $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
+    }  else {
+        // Fetch total tasks for manager's departments
+        $stmt = $pdo->prepare("
+        SELECT COUNT(*) as total_tasks 
+        FROM tasks t
+        JOIN user_departments ud ON t.user_id = ud.user_id
+        WHERE ud.department_id IN (
+            SELECT department_id 
+            FROM user_departments 
+            WHERE user_id = :user_id
+        )
+        ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
+    }
+
 
     // Fetch tasks in progress
     $stmt = $pdo->prepare("SELECT COUNT(*) as tasks_in_progress FROM tasks WHERE status = 'Started'");
@@ -159,20 +177,6 @@ try {
         $managerDepartments = $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
-    // Fetch total tasks for manager's departments
-    $stmt = $pdo->prepare("
-    SELECT COUNT(*) as total_tasks 
-    FROM tasks t
-    JOIN user_departments ud ON t.user_id = ud.user_id
-    WHERE ud.department_id IN (
-        SELECT department_id 
-        FROM user_departments 
-        WHERE user_id = :user_id
-    )
-    ");
-    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-    $stmt->execute();
-    $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
 
     // Fetch tasks in progress for manager's departments
     $stmt = $pdo->prepare("
@@ -533,7 +537,9 @@ try {
                     <div class="col-md-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title"> <?= ($userRole === 'Manager') ? 'Tasks in My Departments' : 'Tasks by Department' ?></h5>
+                                <h5 class="card-title">
+                                    <?= ($userRole === 'Manager') ? 'Tasks in My Departments' : 'Tasks by Department' ?>
+                                </h5>
                                 <div class="text-center">
                                     <canvas id="tasksByDepartmentChart"></canvas>
                                 </div>
@@ -545,7 +551,9 @@ try {
                     <div class="col-md-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title"><?= ($userRole === 'Manager') ? 'Top Performers in My Departments' : 'Top Performers' ?></h5>
+                                <h5 class="card-title">
+                                    <?= ($userRole === 'Manager') ? 'Top Performers in My Departments' : 'Top Performers' ?>
+                                </h5>
                                 <ul class="list-group list-group-flush">
                                     <?php foreach ($topPerformers as $performer): ?>
                                         <li class="list-group-item"><?= htmlspecialchars($performer['username']) ?>
