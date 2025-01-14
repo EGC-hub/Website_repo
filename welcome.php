@@ -57,6 +57,21 @@ try {
         $userDepartments = $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
+    // For manager
+    // Fetch all departments assigned to the manager
+    $managerDepartments = [];
+    if ($userId && $userRole === 'Manager') {
+        $stmt = $pdo->prepare("
+        SELECT d.name 
+        FROM user_departments ud
+        JOIN departments d ON ud.department_id = d.id
+        WHERE ud.user_id = :user_id
+    ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $managerDepartments = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
     // Fetch total tasks
     if ($userRole === 'Admin') {
         $stmt = $pdo->prepare("SELECT COUNT(*) as total_tasks FROM tasks");
@@ -163,19 +178,6 @@ try {
 
 
     // For manager
-    // Fetch all departments assigned to the manager
-    $managerDepartments = [];
-    if ($userId && $userRole === 'Manager') {
-        $stmt = $pdo->prepare("
-        SELECT d.name 
-        FROM user_departments ud
-        JOIN departments d ON ud.department_id = d.id
-        WHERE ud.user_id = :user_id
-    ");
-        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-        $stmt->execute();
-        $managerDepartments = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    }
 
 
     // Fetch tasks in progress for manager's departments
