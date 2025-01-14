@@ -349,10 +349,10 @@ try {
             <!-- Centered modal buttons -->
             <div class="modal-buttons">
                 <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
-                    Create New Role
+                    Add Role
                 </a>
                 <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createDepartmentModal">
-                    Create New Department
+                    Add Department
                 </a>
             </div>
 
@@ -445,7 +445,7 @@ try {
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createRoleModalLabel">Create New Role</h5>
+                    <h5 class="modal-title" id="createRoleModalLabel">Add Role</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -467,7 +467,7 @@ try {
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createDepartmentModalLabel">Create New Department</h5>
+                    <h5 class="modal-title" id="createDepartmentModalLabel">Add Department</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
