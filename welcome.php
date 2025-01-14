@@ -709,6 +709,10 @@ try {
                         }
                     }
                 });
+
+                console.log("Tasks by Department Labels:", <?= json_encode(array_column($tasksByDepartment, 'name')) ?>);
+                console.log("Tasks by Department Data:", <?= json_encode(array_column($tasksByDepartment, 'task_count')) ?>);
+                console.log("Department Colors:", <?= json_encode($departmentColors) ?>);
             </script>
 </body>
 
