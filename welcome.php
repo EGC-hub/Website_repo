@@ -574,7 +574,15 @@ try {
                                     <?= ($userRole === 'Manager') ? 'Tasks in My Departments' : 'Tasks by Department' ?>
                                 </h5>
                                 <div class="text-center">
-                                    <canvas id="tasksByDepartmentChart"></canvas>
+                                    <!-- Chart for Admin -->
+                                    <?php if ($userRole === 'Admin'): ?>
+                                        <canvas id="tasksByDepartmentChartAdmin"></canvas>
+                                    <?php endif; ?>
+
+                                    <!-- Chart for Manager -->
+                                    <?php if ($userRole === 'Manager'): ?>
+                                        <canvas id="tasksByDepartmentChartManager"></canvas>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -678,9 +686,9 @@ try {
                     }
                 });
 
-                <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
-                    // Tasks by Department (Bar Chart)
-                    const tasksByDepartmentChart = new Chart(document.getElementById('tasksByDepartmentChart'), {
+                <?php if ($userRole === 'Admin'): ?>
+                    // Tasks by Department Chart for Admin (Bar Chart)
+                    const tasksByDepartmentChartAdmin = new Chart(document.getElementById('tasksByDepartmentChartAdmin'), {
                         type: 'bar',
                         data: {
                             labels: <?= json_encode(array_column($tasksByDepartment, 'name')) ?>,
@@ -701,6 +709,40 @@ try {
                                 title: {
                                     display: true,
                                     text: 'Tasks by Department'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                <?php endif; ?>
+
+                <?php if ($userRole === 'Manager'): ?>
+                    // Tasks by Department Chart for Manager (Bar Chart)
+                    const tasksByDepartmentChartManager = new Chart(document.getElementById('tasksByDepartmentChartManager'), {
+                        type: 'bar',
+                        data: {
+                            labels: <?= json_encode(array_column($tasksByDepartment, 'name')) ?>,
+                            datasets: [{
+                                label: 'Tasks in My Departments',
+                                data: <?= json_encode(array_column($tasksByDepartment, 'task_count')) ?>,
+                                backgroundColor: <?= json_encode($departmentColors) ?>,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Tasks in My Departments'
                                 }
                             },
                             scales: {
