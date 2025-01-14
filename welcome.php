@@ -684,40 +684,42 @@ try {
                     }
                 });
 
-                // Tasks by Department (Bar Chart)
-                console.log("Initializing chart for role: <?= $userRole ?>");
-                const tasksByDepartmentChart = new Chart(document.getElementById('tasksByDepartmentChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: <?= json_encode(array_column($tasksByDepartment, 'name')) ?>,
-                        datasets: [{
-                            label: 'Tasks by Department',
-                            data: <?= json_encode(array_column($tasksByDepartment, 'task_count')) ?>,
-                            backgroundColor: <?= json_encode($departmentColors) ?>,
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                            },
-                            title: {
-                                display: true,
-                                text: 'Tasks by Department'
-                            }
+                <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
+                            <script>
+                                console.log("Initializing chart for role: <?= $userRole ?>");
+                                const tasksByDepartmentChart = new Chart(document.getElementById('tasksByDepartmentChart'), {
+                                    type: 'bar',
+                                data: {
+                                    labels: <?= json_encode(array_column($tasksByDepartment, 'name')) ?>,
+                                datasets: [{
+                                    label: 'Tasks by Department',
+                                data: <?= json_encode(array_column($tasksByDepartment, 'task_count')) ?>,
+                                backgroundColor: <?= json_encode($departmentColors) ?>,
+                                borderWidth: 1
+                    }]
+                },
+                                options: {
+                                    responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                    position: 'bottom',
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
+                                title: {
+                                    display: true,
+                                text: 'Tasks by Department'
+                        }
+                    },
+                                scales: {
+                                    y: {
+                                    beginAtZero: true
                         }
                     }
-                });
-                console.log("Chart initialized:", tasksByDepartmentChart);
-            </script>
+                }
+            });
+                                console.log("Chart initialized:", tasksByDepartmentChart);
+                </script>
+            <?php endif; ?>
 </body>
 
 </html>
