@@ -430,7 +430,7 @@ try {
                                 <h5 class="card-title">Top Performers</h5>
                                 <ul class="list-group list-group-flush">
                                     <?php foreach ($topPerformers as $performer): ?>
-                                        <li class="list-group-item"><?= htmlspecialchars($performer['username']) ?> <?= htmlspecialchars($performer['department']) ?> -
+                                        <li class="list-group-item"><?= htmlspecialchars($performer['username']) ?> (<?= htmlspecialchars($performer['department']) ?>) -
                                             <?= $performer['tasks_completed'] ?> tasks completed
                                         </li>
                                     <?php endforeach; ?>
