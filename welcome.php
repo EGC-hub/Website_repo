@@ -678,37 +678,39 @@ try {
                     }
                 });
 
-                // Tasks by Department (Bar Chart)
-                const tasksByDepartmentChart = new Chart(document.getElementById('tasksByDepartmentChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: <?= json_encode(array_column($tasksByDepartment, 'name')) ?>,
-                        datasets: [{
-                            label: 'Tasks by Department',
-                            data: <?= json_encode(array_column($tasksByDepartment, 'task_count')) ?>,
-                            backgroundColor: <?= json_encode($departmentColors) ?>,
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                            },
-                            title: {
-                                display: true,
-                                text: 'Tasks by Department'
-                            }
+                <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
+                    // Tasks by Department (Bar Chart)
+                    const tasksByDepartmentChart = new Chart(document.getElementById('tasksByDepartmentChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: <?= json_encode(array_column($tasksByDepartment, 'name')) ?>,
+                            datasets: [{
+                                label: 'Tasks by Department',
+                                data: <?= json_encode(array_column($tasksByDepartment, 'task_count')) ?>,
+                                backgroundColor: <?= json_encode($departmentColors) ?>,
+                                borderWidth: 1
+                            }]
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Tasks by Department'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                <?php endif; ?>
             </script>
 </body>
 
