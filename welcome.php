@@ -440,10 +440,6 @@ try {
 </head>
 
 <body>
-    <?php
-    print_r($managerDepartments);
-    print_r($tasksByDepartment);
-        ?>
     <div class="dashboard-container">
         <!-- Sidebar -->
         <div class="sidebar">
