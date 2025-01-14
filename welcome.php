@@ -608,6 +608,12 @@ try {
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
             <script>
+                console.log("Tasks by Department Labels:", <?= json_encode(array_column($tasksByDepartment, 'name')) ?>);
+                console.log("Tasks by Department Data:", <?= json_encode(array_column($tasksByDepartment, 'task_count')) ?>);
+                console.log("Department Colors:", <?= json_encode($departmentColors) ?>);
+            </script>
+
+            <script>
                 // Task Distribution Chart (Pie Chart)
                 const taskDistributionChart = new Chart(document.getElementById('taskDistributionChart'), {
                     type: 'pie',
@@ -709,10 +715,6 @@ try {
                         }
                     }
                 });
-
-                console.log("Tasks by Department Labels:", <?= json_encode(array_column($tasksByDepartment, 'name')) ?>);
-                console.log("Tasks by Department Data:", <?= json_encode(array_column($tasksByDepartment, 'task_count')) ?>);
-                console.log("Department Colors:", <?= json_encode($departmentColors) ?>);
             </script>
 </body>
 
