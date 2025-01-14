@@ -685,6 +685,7 @@ try {
                 });
 
                 // Tasks by Department (Bar Chart)
+                console.log("Initializing chart for role: <?= $userRole ?>");
                 const tasksByDepartmentChart = new Chart(document.getElementById('tasksByDepartmentChart'), {
                     type: 'bar',
                     data: {
@@ -697,8 +698,8 @@ try {
                         }]
                     },
                     options: {
-                        responsive: true, // Make the chart responsive
-                        maintainAspectRatio: false, // Allow custom sizing
+                        responsive: true,
+                        maintainAspectRatio: false,
                         plugins: {
                             legend: {
                                 position: 'bottom',
@@ -715,6 +716,7 @@ try {
                         }
                     }
                 });
+                console.log("Chart initialized:", tasksByDepartmentChart);
             </script>
 </body>
 
