@@ -88,6 +88,77 @@ try {
         $stmt->execute();
         $completedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['completed_tasks'];
 
+        // Fetch delayed tasks
+        $stmt = $pdo->prepare("SELECT COUNT(*) as delayed_tasks FROM tasks WHERE status = 'Delayed Completion'");
+        $stmt->execute();
+        $delayedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['delayed_tasks'];
+
+        // Fetch average task duration
+        $stmt = $pdo->prepare(
+            "SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, expected_finish_date)) as avg_duration FROM tasks WHERE status = 'Completed on Time'"
+        );
+        $stmt->execute();
+        $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
+        $avgDuration = round($avgDuration, 1); // Round to one decimal place
+
+        // Fetch tasks by department
+        $stmt = $pdo->prepare("
+        SELECT d.name, COUNT(t.task_id) as task_count 
+        FROM tasks t
+        JOIN users u ON t.user_id = u.id
+        JOIN user_departments ud ON u.id = ud.user_id
+        JOIN departments d ON ud.department_id = d.id
+        GROUP BY d.name
+        ");
+        $stmt->execute();
+        $tasksByDepartment = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Generate colors dynamically based on the number of departments
+        $departmentColors = generateColors(count($tasksByDepartment));
+
+        // Fetch task distribution by status
+        $stmt = $pdo->prepare("
+        SELECT 
+            SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
+            SUM(CASE WHEN status = 'Started' THEN 1 ELSE 0 END) as in_progress,
+            SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
+            SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as 'delayed'
+        FROM tasks
+        ");
+        $stmt->execute();
+        $taskDistribution = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Fetch task completion over time (grouped by month)
+        $stmt = $pdo->prepare("
+        SELECT 
+        DATE_FORMAT(expected_finish_date, '%b') as month,
+        COUNT(*) as tasks_completed
+        FROM tasks
+        WHERE status = 'Completed on Time'
+        GROUP BY DATE_FORMAT(expected_finish_date, '%Y-%m')
+        ORDER BY expected_finish_date;
+        ");
+        $stmt->execute();
+        $taskCompletionOverTime = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fetch top performers
+        $stmt = $pdo->prepare("
+        SELECT 
+        u.username, 
+        d.name as department, 
+        COUNT(t.task_id) as tasks_completed 
+        FROM tasks t
+        JOIN users u ON t.user_id = u.id
+        JOIN user_departments ud ON u.id = ud.user_id
+        JOIN departments d ON ud.department_id = d.id
+        WHERE t.status = 'Completed on Time'
+        GROUP BY u.username, d.name
+        ORDER BY tasks_completed DESC
+        LIMIT 3;
+        ");
+        $stmt->execute();
+        $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     } else {
         // Fetch total tasks for manager's departments
         $stmt = $pdo->prepare("
@@ -146,137 +217,64 @@ try {
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
         $completedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['completed_tasks'];
+
+        // Fetch delayed tasks for manager's departments
+        $stmt = $pdo->prepare("
+        SELECT COUNT(*) as delayed_tasks 
+        FROM tasks t
+        JOIN user_departments ud ON t.user_id = ud.user_id
+        WHERE t.status = 'Delayed Completion' AND ud.department_id IN (
+            SELECT department_id 
+            FROM user_departments 
+            WHERE user_id = :user_id
+        )
+        ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $delayedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['delayed_tasks'];
+
+        // Fetch tasks by department for manager's departments
+        $stmt = $pdo->prepare("
+        SELECT d.name, COUNT(t.task_id) as task_count 
+        FROM tasks t
+        JOIN users u ON t.user_id = u.id
+        JOIN user_departments ud ON u.id = ud.user_id
+        JOIN departments d ON ud.department_id = d.id
+        WHERE ud.department_id IN (
+            SELECT department_id 
+            FROM user_departments 
+            WHERE user_id = :user_id
+        )
+        GROUP BY d.name
+        ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $tasksByDepartment = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fetch top performers for manager's departments
+        $stmt = $pdo->prepare("
+        SELECT 
+            u.username, 
+            d.name as department, 
+            COUNT(t.task_id) as tasks_completed 
+        FROM tasks t
+        JOIN users u ON t.user_id = u.id
+        JOIN user_departments ud ON u.id = ud.user_id
+        JOIN departments d ON ud.department_id = d.id
+        WHERE t.status = 'Completed on Time' AND ud.department_id IN (
+            SELECT department_id 
+            FROM user_departments 
+            WHERE user_id = :user_id
+        )
+        GROUP BY u.username, d.name
+        ORDER BY tasks_completed DESC
+        LIMIT 3
+        ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     }
-
-    // Fetch delayed tasks
-    $stmt = $pdo->prepare("SELECT COUNT(*) as delayed_tasks FROM tasks WHERE status = 'Delayed Completion'");
-    $stmt->execute();
-    $delayedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['delayed_tasks'];
-
-    // Fetch average task duration
-    $stmt = $pdo->prepare(
-        "SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, expected_finish_date)) as avg_duration FROM tasks WHERE status = 'Completed on Time'"
-    );
-    $stmt->execute();
-    $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
-    $avgDuration = round($avgDuration, 1); // Round to one decimal place
-
-    // Fetch tasks by department
-    $stmt = $pdo->prepare("
-    SELECT d.name, COUNT(t.task_id) as task_count 
-    FROM tasks t
-    JOIN users u ON t.user_id = u.id
-    JOIN user_departments ud ON u.id = ud.user_id
-    JOIN departments d ON ud.department_id = d.id
-    GROUP BY d.name
-    ");
-    $stmt->execute();
-    $tasksByDepartment = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Generate colors dynamically based on the number of departments
-    $departmentColors = generateColors(count($tasksByDepartment));
-
-    // Fetch task distribution by status
-    $stmt = $pdo->prepare("
-    SELECT 
-        SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
-        SUM(CASE WHEN status = 'Started' THEN 1 ELSE 0 END) as in_progress,
-        SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
-        SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as 'delayed'
-    FROM tasks
-    ");
-    $stmt->execute();
-    $taskDistribution = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Fetch task completion over time (grouped by month)
-    $stmt = $pdo->prepare("
-    SELECT 
-    DATE_FORMAT(expected_finish_date, '%b') as month,
-    COUNT(*) as tasks_completed
-    FROM tasks
-    WHERE status = 'Completed on Time'
-    GROUP BY DATE_FORMAT(expected_finish_date, '%Y-%m')
-    ORDER BY expected_finish_date;
-    ");
-    $stmt->execute();
-    $taskCompletionOverTime = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Fetch top performers
-    $stmt = $pdo->prepare("
-    SELECT 
-    u.username, 
-    d.name as department, 
-    COUNT(t.task_id) as tasks_completed 
-    FROM tasks t
-    JOIN users u ON t.user_id = u.id
-    JOIN user_departments ud ON u.id = ud.user_id
-    JOIN departments d ON ud.department_id = d.id
-    WHERE t.status = 'Completed on Time'
-    GROUP BY u.username, d.name
-    ORDER BY tasks_completed DESC
-    LIMIT 3;
-    ");
-    $stmt->execute();
-    $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-    // For manager
-
-    // Fetch delayed tasks for manager's departments
-    $stmt = $pdo->prepare("
-    SELECT COUNT(*) as delayed_tasks 
-    FROM tasks t
-    JOIN user_departments ud ON t.user_id = ud.user_id
-    WHERE t.status = 'Delayed Completion' AND ud.department_id IN (
-        SELECT department_id 
-        FROM user_departments 
-        WHERE user_id = :user_id
-    )
-    ");
-    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-    $stmt->execute();
-    $delayedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['delayed_tasks'];
-
-    // Fetch tasks by department for manager's departments
-    $stmt = $pdo->prepare("
-    SELECT d.name, COUNT(t.task_id) as task_count 
-    FROM tasks t
-    JOIN users u ON t.user_id = u.id
-    JOIN user_departments ud ON u.id = ud.user_id
-    JOIN departments d ON ud.department_id = d.id
-    WHERE ud.department_id IN (
-        SELECT department_id 
-        FROM user_departments 
-        WHERE user_id = :user_id
-    )
-    GROUP BY d.name
-    ");
-    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-    $stmt->execute();
-    $tasksByDepartment = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Fetch top performers for manager's departments
-    $stmt = $pdo->prepare("
-    SELECT 
-        u.username, 
-        d.name as department, 
-        COUNT(t.task_id) as tasks_completed 
-    FROM tasks t
-    JOIN users u ON t.user_id = u.id
-    JOIN user_departments ud ON u.id = ud.user_id
-    JOIN departments d ON ud.department_id = d.id
-    WHERE t.status = 'Completed on Time' AND ud.department_id IN (
-        SELECT department_id 
-        FROM user_departments 
-        WHERE user_id = :user_id
-    )
-    GROUP BY u.username, d.name
-    ORDER BY tasks_completed DESC
-    LIMIT 3
-    ");
-    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-    $stmt->execute();
-    $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Optional: Session timeout settings
     $timeout_duration = 1200;
