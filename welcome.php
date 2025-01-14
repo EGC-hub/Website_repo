@@ -1,5 +1,4 @@
 <?php
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -101,21 +100,6 @@ try {
         $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
         $avgDuration = round($avgDuration, 1); // Round to one decimal place
 
-        // Fetch tasks by department
-        $stmt = $pdo->prepare("
-        SELECT d.name, COUNT(t.task_id) as task_count 
-        FROM tasks t
-        JOIN users u ON t.user_id = u.id
-        JOIN user_departments ud ON u.id = ud.user_id
-        JOIN departments d ON ud.department_id = d.id
-        GROUP BY d.name
-        ");
-        $stmt->execute();
-        $tasksByDepartment = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Generate colors dynamically based on the number of departments
-        $departmentColors = generateColors(count($tasksByDepartment));
-
         // Fetch task distribution by status
         $stmt = $pdo->prepare("
         SELECT 
@@ -191,21 +175,6 @@ try {
         $stmt->execute();
         $tasksInProgress = $stmt->fetch(PDO::FETCH_ASSOC)['tasks_in_progress'];
 
-        // Fetch tasks in progress for manager's departments
-        $stmt = $pdo->prepare("
-        SELECT COUNT(*) as tasks_in_progress 
-        FROM tasks t
-        JOIN user_departments ud ON t.user_id = ud.user_id
-        WHERE t.status = 'Started' AND ud.department_id IN (
-            SELECT department_id 
-            FROM user_departments 
-            WHERE user_id = :user_id
-        )
-        ");
-        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-        $stmt->execute();
-        $tasksInProgress = $stmt->fetch(PDO::FETCH_ASSOC)['tasks_in_progress'];
-
         // Fetch completed tasks for manager's departments
         $stmt = $pdo->prepare("
             SELECT COUNT(*) as completed_tasks 
@@ -235,50 +204,6 @@ try {
         $stmt->execute();
         $delayedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['delayed_tasks'];
 
-        // Fetch tasks by department for manager's departments
-        $stmt = $pdo->prepare("
-        SELECT d.name, COUNT(t.task_id) as task_count 
-        FROM tasks t
-        JOIN users u ON t.user_id = u.id
-        JOIN user_departments ud ON u.id = ud.user_id
-        JOIN departments d ON ud.department_id = d.id
-        WHERE ud.department_id IN (
-            SELECT department_id 
-            FROM user_departments 
-            WHERE user_id = :user_id
-        )
-        GROUP BY d.name
-        ");
-        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-        $stmt->execute();
-        $tasksByDepartment = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Generate colors dynamically based on the number of departments
-        $departmentColors = generateColors(count($tasksByDepartment));
-
-        // Fetch top performers for manager's departments
-        $stmt = $pdo->prepare("
-        SELECT 
-            u.username, 
-            d.name as department, 
-            COUNT(t.task_id) as tasks_completed 
-        FROM tasks t
-        JOIN users u ON t.user_id = u.id
-        JOIN user_departments ud ON u.id = ud.user_id
-        JOIN departments d ON ud.department_id = d.id
-        WHERE t.status = 'Completed on Time' AND ud.department_id IN (
-            SELECT department_id 
-            FROM user_departments 
-            WHERE user_id = :user_id
-        )
-        GROUP BY u.username, d.name
-        ORDER BY tasks_completed DESC
-        LIMIT 3
-        ");
-        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-        $stmt->execute();
-        $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         // Fetch average task duration
         $stmt = $pdo->prepare("
             SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, expected_finish_date)) as avg_duration 
@@ -297,6 +222,44 @@ try {
         $avgDuration = round($avgDuration, 1); // Round to one decimal place
     }
 
+    // Fetch tasks by department for both admin and manager
+    if ($userRole === 'Admin' || $userRole === 'Manager') {
+        if ($userRole === 'Admin') {
+            // Fetch tasks by department for admin
+            $stmt = $pdo->prepare("
+                SELECT d.name, COUNT(t.task_id) as task_count 
+                FROM tasks t
+                JOIN users u ON t.user_id = u.id
+                JOIN user_departments ud ON u.id = ud.user_id
+                JOIN departments d ON ud.department_id = d.id
+                GROUP BY d.name
+            ");
+            $stmt->execute();
+            $tasksByDepartment = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            // Fetch tasks by department for manager
+            $stmt = $pdo->prepare("
+                SELECT d.name, COUNT(t.task_id) as task_count 
+                FROM tasks t
+                JOIN users u ON t.user_id = u.id
+                JOIN user_departments ud ON u.id = ud.user_id
+                JOIN departments d ON ud.department_id = d.id
+                WHERE ud.department_id IN (
+                    SELECT department_id 
+                    FROM user_departments 
+                    WHERE user_id = :user_id
+                )
+                GROUP BY d.name
+            ");
+            $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            $tasksByDepartment = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        // Generate colors dynamically based on the number of departments
+        $departmentColors = generateColors(count($tasksByDepartment));
+    }
+
     // Optional: Session timeout settings
     $timeout_duration = 1200;
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
@@ -313,8 +276,6 @@ try {
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
 }
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
