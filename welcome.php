@@ -77,7 +77,9 @@ try {
     $delayedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['delayed_tasks'];
 
     // Fetch average task duration
-    $stmt = $pdo->prepare("SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, actual_completion_date)) as avg_duration FROM tasks WHERE status = 'Completed on Time'");
+    $stmt = $pdo->prepare(
+        "SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, expected_finish_date)) as avg_duration FROM tasks WHERE status = 'Completed on Time'"
+    );
     $stmt->execute();
     $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
     $avgDuration = round($avgDuration, 1); // Round to one decimal place
