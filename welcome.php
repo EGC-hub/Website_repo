@@ -20,6 +20,19 @@ $dsn = "mysql:host=localhost;dbname=euro_login_system;charset=utf8mb4";
 $username = $config['dbUsername'];
 $password = $config['dbPassword'];
 
+// Function to generate colors
+function generateColors($count)
+{
+    $colors = ['#FF6384', '#36A2EB', '#4BC0C0', '#FFCE56', '#9966FF', '#FF8A80', '#7CB342', '#FFD54F', '#64B5F6', '#BA68C8'];
+    // If there are more departments than predefined colors, generate random colors
+    if ($count > count($colors)) {
+        for ($i = count($colors); $i < $count; $i++) {
+            $colors[] = '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+        }
+    }
+    return array_slice($colors, 0, $count); // Return only the required number of colors
+}
+
 try {
     $pdo = new PDO($dsn, $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -63,68 +76,50 @@ try {
     $stmt->execute();
     $delayedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['delayed_tasks'];
 
-    // Fetch average task duration for completed tasks (using expected dates)
-    $stmt = $pdo->prepare("
-        SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, expected_finish_date)) as avg_duration 
-        FROM tasks 
-        WHERE status = 'Completed on Time'
-    ");
+    // Fetch average task duration
+    $stmt = $pdo->prepare(
+        "SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, expected_finish_date)) as avg_duration FROM tasks WHERE status = 'Completed on Time'"
+    );
     $stmt->execute();
     $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
-
-    // Check if $avgDuration is not null before rounding
-    if ($avgDuration !== null) {
-        $avgDuration = round($avgDuration, 1); // Round to one decimal place
-    } else {
-        $avgDuration = 0; // Default value if no completed tasks are found
-    }
+    $avgDuration = round($avgDuration, 1); // Round to one decimal place
 
     // Fetch tasks by department
     $stmt = $pdo->prepare("
-        SELECT d.name, COUNT(t.task_id) as task_count 
-        FROM tasks t
-        JOIN users u ON t.user_id = u.id
-        JOIN user_departments ud ON u.id = ud.user_id
-        JOIN departments d ON ud.department_id = d.id
-        GROUP BY d.name
+    SELECT d.name, COUNT(t.task_id) as task_count 
+    FROM tasks t
+    JOIN users u ON t.user_id = u.id
+    JOIN user_departments ud ON u.id = ud.user_id
+    JOIN departments d ON ud.department_id = d.id
+    GROUP BY d.name
     ");
     $stmt->execute();
     $tasksByDepartment = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Fetch top performers
-    $stmt = $pdo->prepare("
-        SELECT u.username, COUNT(t.task_id) as tasks_completed 
-        FROM tasks t
-        JOIN users u ON t.user_id = u.id
-        WHERE t.status = 'Completed on Time'
-        GROUP BY u.username
-        ORDER BY tasks_completed DESC
-        LIMIT 3
-    ");
-    $stmt->execute();
-    $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Generate colors dynamically based on the number of departments
+    $departmentColors = generateColors(count($tasksByDepartment));
 
     // Fetch task distribution by status
     $stmt = $pdo->prepare("
-        SELECT 
-            SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
-            SUM(CASE WHEN status = 'Started' THEN 1 ELSE 0 END) as in_progress,
-            SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
-            SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as delayed
-        FROM tasks
+    SELECT 
+        SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
+        SUM(CASE WHEN status = 'Started' THEN 1 ELSE 0 END) as in_progress,
+        SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
+        SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as delayed
+    FROM tasks
     ");
     $stmt->execute();
     $taskDistribution = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Fetch task completion over time (grouped by month)
     $stmt = $pdo->prepare("
-        SELECT 
-            DATE_FORMAT(actual_completion_date, '%b') as month,
-            COUNT(*) as tasks_completed
-        FROM tasks
-        WHERE status = 'Completed on Time'
-        GROUP BY DATE_FORMAT(actual_completion_date, '%Y-%m')
-        ORDER BY actual_completion_date
+    SELECT 
+        DATE_FORMAT(actual_completion_date, '%b') as month,
+        COUNT(*) as tasks_completed
+    FROM tasks
+    WHERE status = 'Completed on Time'
+    GROUP BY DATE_FORMAT(actual_completion_date, '%Y-%m')
+    ORDER BY actual_completion_date
     ");
     $stmt->execute();
     $taskCompletionOverTime = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -145,6 +140,8 @@ try {
 } catch (PDOException $e) {
     die("Error: " . $e->getMessage());
 }
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
