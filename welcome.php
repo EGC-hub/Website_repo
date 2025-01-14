@@ -77,6 +77,12 @@ try {
         $stmt = $pdo->prepare("SELECT COUNT(*) as total_tasks FROM tasks");
         $stmt->execute();
         $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
+
+        // Fetch tasks in progress
+        $stmt = $pdo->prepare("SELECT COUNT(*) as tasks_in_progress FROM tasks WHERE status = 'Started'");
+        $stmt->execute();
+        $tasksInProgress = $stmt->fetch(PDO::FETCH_ASSOC)['tasks_in_progress'];
+
     } else {
         // Fetch total tasks for manager's departments
         $stmt = $pdo->prepare("
@@ -92,25 +98,18 @@ try {
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
         $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
-    }
 
-    if ($userRole === 'Admin') {
-        // Fetch tasks in progress
-        $stmt = $pdo->prepare("SELECT COUNT(*) as tasks_in_progress FROM tasks WHERE status = 'Started'");
-        $stmt->execute();
-        $tasksInProgress = $stmt->fetch(PDO::FETCH_ASSOC)['tasks_in_progress'];
-    } else {
         // Fetch tasks in progress for manager's departments
         $stmt = $pdo->prepare("
-    SELECT COUNT(*) as tasks_in_progress 
-    FROM tasks t
-    JOIN user_departments ud ON t.user_id = ud.user_id
-    WHERE t.status = 'Started' AND ud.department_id IN (
-        SELECT department_id 
-        FROM user_departments 
-        WHERE user_id = :user_id
-    )
-    ");
+        SELECT COUNT(*) as tasks_in_progress 
+        FROM tasks t
+        JOIN user_departments ud ON t.user_id = ud.user_id
+        WHERE t.status = 'Started' AND ud.department_id IN (
+            SELECT department_id 
+            FROM user_departments 
+            WHERE user_id = :user_id
+        )
+        ");
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
         $tasksInProgress = $stmt->fetch(PDO::FETCH_ASSOC)['tasks_in_progress'];
