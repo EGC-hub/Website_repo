@@ -124,6 +124,19 @@ try {
     $stmt->execute();
     $taskCompletionOverTime = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Fetch top performers
+    $stmt = $pdo->prepare("
+    SELECT u.username, COUNT(t.task_id) as tasks_completed 
+    FROM tasks t
+    JOIN users u ON t.user_id = u.id
+    WHERE t.status = 'Completed on Time'
+    GROUP BY u.username
+    ORDER BY tasks_completed DESC
+    LIMIT 3
+    ");
+    $stmt->execute();
+    $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     // Optional: Session timeout settings
     $timeout_duration = 1200;
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
