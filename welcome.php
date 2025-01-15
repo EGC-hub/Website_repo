@@ -99,7 +99,8 @@ try {
         );
         $stmt->execute();
         $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
-        $avgDuration = round($avgDuration, 1); // Round to one decimal place
+        $avgDuration = $avgDurationResult['avg_duration'] ?? 0; // Default to 0 if null
+        $avgDuration = round($avgDuration, 1); // Now safe to round
 
         // Fetch tasks by department
         $stmt = $pdo->prepare("
@@ -317,7 +318,8 @@ try {
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
         $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
-        $avgDuration = round($avgDuration, 1); // Round to one decimal place
+        $avgDuration = $avgDurationResult['avg_duration'] ?? 0; // Default to 0 if null
+        $avgDuration = round($avgDuration, 1); // Now safe to round
     }
 
     // For User
@@ -383,7 +385,8 @@ try {
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
         $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
-        $avgDuration = round($avgDuration, 1); // Round to one decimal place
+        $avgDuration = $avgDurationResult['avg_duration'] ?? 0; // Default to 0 if null
+        $avgDuration = round($avgDuration, 1); // Now safe to round
     }
 
     // Optional: Session timeout settings
