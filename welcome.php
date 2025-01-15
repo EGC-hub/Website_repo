@@ -528,6 +528,21 @@ try {
 </head>
 
 <body>
+    <?php
+    if ($userRole === 'Manager') {
+        echo "<pre>";
+        print_r($tasksByDepartment);
+        print_r($taskDistribution);
+        print_r($taskCompletionOverTime);
+        echo "</pre>";
+    } elseif ($userRole === 'User') {
+        echo "<pre>";
+        print_r($tasksByDepartment);
+        print_r($taskDistribution);
+        print_r($taskCompletionOverTime);
+        echo "</pre>";
+    }
+    ?>
     <div class="dashboard-container">
         <!-- Sidebar -->
         <div class="sidebar">
