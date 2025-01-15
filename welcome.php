@@ -164,8 +164,7 @@ try {
     if ($userRole === 'Manager') {
         // For manager
         // Fetch total tasks for manager's departments
-        $stmt = $pdo->prepare("
-        SELECT COUNT(*) as total_tasks 
+        $stmt = $pdo->prepare("SELECT COUNT(*) as total_tasks 
         FROM tasks t
         JOIN user_departments ud ON t.user_id = ud.user_id
         WHERE ud.department_id IN (
@@ -179,8 +178,7 @@ try {
         $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
 
         // Fetch tasks in progress for manager's departments
-        $stmt = $pdo->prepare("
-        SELECT COUNT(*) as tasks_in_progress 
+        $stmt = $pdo->prepare("SELECT COUNT(*) as tasks_in_progress 
         FROM tasks t
         JOIN user_departments ud ON t.user_id = ud.user_id
         WHERE t.status = 'Started' AND ud.department_id IN (
