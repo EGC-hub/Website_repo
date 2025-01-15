@@ -295,6 +295,25 @@ try {
         $stmt->execute();
         $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
         $avgDuration = round($avgDuration, 1); // Round to one decimal place
+
+        // Fetch task distribution by status
+        $stmt = $pdo->prepare("
+            SELECT 
+                SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
+                SUM(CASE WHEN status = 'Started' THEN 1 ELSE 0 END) as in_progress,
+                SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
+                SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as 'delayed'
+            FROM tasks t
+            JOIN user_departments ud ON t.user_id = ud.user_id
+            WHERE ud.department_id IN (
+                SELECT department_id 
+                FROM user_departments 
+                WHERE user_id = :user_id
+            )
+        ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $taskDistribution = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     // Optional: Session timeout settings
