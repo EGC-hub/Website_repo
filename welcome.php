@@ -316,6 +316,72 @@ try {
         $taskDistribution = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // For User
+    if ($userRole === 'User') {
+        // Fetch total tasks for the user
+        $stmt = $pdo->prepare("SELECT COUNT(*) as total_tasks FROM tasks WHERE user_id = :user_id");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
+
+        // Fetch tasks in progress for the user
+        $stmt = $pdo->prepare("SELECT COUNT(*) as tasks_in_progress FROM tasks WHERE user_id = :user_id AND status = 'Started'");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $tasksInProgress = $stmt->fetch(PDO::FETCH_ASSOC)['tasks_in_progress'];
+
+        // Fetch completed tasks for the user
+        $stmt = $pdo->prepare("SELECT COUNT(*) as completed_tasks FROM tasks WHERE user_id = :user_id AND status = 'Completed on Time'");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $completedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['completed_tasks'];
+
+        // Fetch delayed tasks for the user
+        $stmt = $pdo->prepare("SELECT COUNT(*) as delayed_tasks FROM tasks WHERE user_id = :user_id AND status = 'Delayed Completion'");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $delayedTasks = $stmt->fetch(PDO::FETCH_ASSOC)['delayed_tasks'];
+
+        // Fetch task distribution by status for the user
+        $stmt = $pdo->prepare("
+        SELECT 
+            SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
+            SUM(CASE WHEN status = 'Started' THEN 1 ELSE 0 END) as in_progress,
+            SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
+            SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as 'delayed'
+        FROM tasks
+        WHERE user_id = :user_id
+    ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $taskDistribution = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Fetch task completion over time for the user
+        $stmt = $pdo->prepare("
+        SELECT 
+            DATE_FORMAT(expected_finish_date, '%b') as month,
+            COUNT(*) as tasks_completed
+        FROM tasks
+        WHERE status = 'Completed on Time' AND user_id = :user_id
+        GROUP BY DATE_FORMAT(expected_finish_date, '%Y-%m')
+        ORDER BY expected_finish_date;
+    ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $taskCompletionOverTime = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fetch average task duration for the user
+        $stmt = $pdo->prepare("
+        SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, expected_finish_date)) as avg_duration 
+        FROM tasks 
+        WHERE status = 'Completed on Time' AND user_id = :user_id
+    ");
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
+        $avgDuration = round($avgDuration, 1); // Round to one decimal place
+    }
+
     // Optional: Session timeout settings
     $timeout_duration = 1200;
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
@@ -585,108 +651,146 @@ try {
                         </div>
                     </div>
 
-                    <!-- Tasks by Department -->
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    <?= ($userRole === 'Manager') ? 'Tasks in My Departments' : 'Tasks by Department' ?>
-                                </h5>
-                                <div class="text-center">
-                                    <canvas id="tasksByDepartmentChart"></canvas>
+                    <!-- Tasks by Department (Only for Admin and Manager) -->
+                    <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <?= ($userRole === 'Manager') ? 'Tasks in My Departments' : 'Tasks by Department' ?>
+                                    </h5>
+                                    <div class="text-center">
+                                        <canvas id="tasksByDepartmentChart"></canvas>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    <?php endif; ?>
 
-                    <!-- User Performance -->
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    <?= ($userRole === 'Manager') ? 'Top Performers in My Departments' : 'Top Performers' ?>
-                                </h5>
-                                <ul class="list-group list-group-flush">
-                                    <?php foreach ($topPerformers as $performer): ?>
-                                        <li class="list-group-item"><?= htmlspecialchars($performer['username']) ?>
-                                            (<?= htmlspecialchars($performer['department']) ?>) -
-                                            <?= $performer['tasks_completed'] ?> tasks completed
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
+                    <!-- User Performance (Only for Admin and Manager) -->
+                    <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <?= ($userRole === 'Manager') ? 'Top Performers in My Departments' : 'Top Performers' ?>
+                                    </h5>
+                                    <ul class="list-group list-group-flush">
+                                        <?php foreach ($topPerformers as $performer): ?>
+                                            <li class="list-group-item"><?= htmlspecialchars($performer['username']) ?>
+                                                (<?= htmlspecialchars($performer['department']) ?>) -
+                                                <?= $performer['tasks_completed'] ?> tasks completed
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
+        </div>
 
-            <!-- Bootstrap JS (with Popper.js) -->
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Bootstrap JS (with Popper.js) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-            <!-- Chart.js -->
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-            <script>
-                // Task Distribution Chart (Pie Chart)
-                const taskDistributionChart = new Chart(document.getElementById('taskDistributionChart'), {
-                    type: 'pie',
-                    data: {
-                        labels: ['Pending', 'In Progress', 'Completed', 'Delayed'],
-                        datasets: [{
-                            label: 'Task Distribution',
-                            data: [
-                                <?= $taskDistribution['pending'] ?>,
-                                <?= $taskDistribution['in_progress'] ?>,
-                                <?= $taskDistribution['completed'] ?>,
-                                <?= $taskDistribution['delayed'] ?>
-                            ],
-                            backgroundColor: [
-                                '#FF6384', // Red for Pending
-                                '#36A2EB', // Blue for In Progress
-                                '#4BC0C0', // Teal for Completed
-                                '#FFCE56'  // Yellow for Delayed
-                            ],
-                            hoverOffset: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true, // Make the chart responsive
-                        maintainAspectRatio: false, // Allow custom sizing
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                            },
-                            title: {
-                                display: true,
-                                text: 'Task Distribution by Status'
-                            }
+        <script>
+            // Task Distribution Chart (Pie Chart)
+            const taskDistributionChart = new Chart(document.getElementById('taskDistributionChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Pending', 'In Progress', 'Completed', 'Delayed'],
+                    datasets: [{
+                        label: 'Task Distribution',
+                        data: [
+                            <?= $taskDistribution['pending'] ?>,
+                            <?= $taskDistribution['in_progress'] ?>,
+                            <?= $taskDistribution['completed'] ?>,
+                            <?= $taskDistribution['delayed'] ?>
+                        ],
+                        backgroundColor: [
+                            '#FF6384', // Red for Pending
+                            '#36A2EB', // Blue for In Progress
+                            '#4BC0C0', // Teal for Completed
+                            '#FFCE56'  // Yellow for Delayed
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true, // Make the chart responsive
+                    maintainAspectRatio: false, // Allow custom sizing
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Task Distribution by Status'
                         }
                     }
-                });
+                }
+            });
 
-                // Task Completion Over Time (Line Chart)
-                const taskCompletionChart = new Chart(document.getElementById('taskCompletionChart'), {
-                    type: 'line',
+            // Task Completion Over Time (Line Chart)
+            const taskCompletionChart = new Chart(document.getElementById('taskCompletionChart'), {
+                type: 'line',
+                data: {
+                    labels: <?= json_encode(array_column($taskCompletionOverTime, 'month')) ?>,
+                    datasets: [{
+                        label: 'Tasks Completed',
+                        data: <?= json_encode(array_column($taskCompletionOverTime, 'tasks_completed')) ?>,
+                        fill: false,
+                        borderColor: '#36A2EB',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true, // Make the chart responsive
+                    maintainAspectRatio: false, // Allow custom sizing
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Task Completion Over Time'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
+                // Tasks by Department (Bar Chart)
+                const tasksByDepartmentChart = new Chart(document.getElementById('tasksByDepartmentChart'), {
+                    type: 'bar',
                     data: {
-                        labels: <?= json_encode(array_column($taskCompletionOverTime, 'month')) ?>,
+                        labels: <?= json_encode(array_column($tasksByDepartment, 'name')) ?>,
                         datasets: [{
-                            label: 'Tasks Completed',
-                            data: <?= json_encode(array_column($taskCompletionOverTime, 'tasks_completed')) ?>,
-                            fill: false,
-                            borderColor: '#36A2EB',
-                            tension: 0.1
+                            label: 'Tasks by Department',
+                            data: <?= json_encode(array_column($tasksByDepartment, 'task_count')) ?>,
+                            backgroundColor: <?= json_encode($departmentColors) ?>,
+                            borderWidth: 1
                         }]
                     },
                     options: {
-                        responsive: true, // Make the chart responsive
-                        maintainAspectRatio: false, // Allow custom sizing
+                        responsive: true,
+                        maintainAspectRatio: false,
                         plugins: {
                             legend: {
                                 position: 'bottom',
                             },
                             title: {
                                 display: true,
-                                text: 'Task Completion Over Time'
+                                text: 'Tasks by Department'
                             }
                         },
                         scales: {
@@ -696,41 +800,8 @@ try {
                         }
                     }
                 });
-
-                <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
-                    // Tasks by Department (Bar Chart)
-                    const tasksByDepartmentChart = new Chart(document.getElementById('tasksByDepartmentChart'), {
-                        type: 'bar',
-                        data: {
-                            labels: <?= json_encode(array_column($tasksByDepartment, 'name')) ?>,
-                            datasets: [{
-                                label: 'Tasks by Department',
-                                data: <?= json_encode(array_column($tasksByDepartment, 'task_count')) ?>,
-                                backgroundColor: <?= json_encode($departmentColors) ?>,
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'bottom',
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Tasks by Department'
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true
-                                }
-                            }
-                        }
-                    });
-                <?php endif; ?>
-            </script>
+            <?php endif; ?>
+        </script>
 </body>
 
 </html>
