@@ -462,7 +462,6 @@ try {
 </head>
 
 <body>
-    <?php error_log(print_r($tasksByDepartment, true)); ?>
     <div class="dashboard-container">
         <!-- Sidebar -->
         <div class="sidebar">
