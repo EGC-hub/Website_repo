@@ -339,7 +339,6 @@ try {
 <html lang="en">
 
 <head>
-    <?php print_r($taskDistribution) ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
@@ -463,6 +462,7 @@ try {
 </head>
 
 <body>
+    <?php error_log(print_r($tasksByDepartment, true)); ?>
     <div class="dashboard-container">
         <!-- Sidebar -->
         <div class="sidebar">
