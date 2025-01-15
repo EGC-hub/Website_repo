@@ -159,7 +159,9 @@ try {
         $stmt->execute();
         $topPerformers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    } else {
+    }
+
+    if ($userRole === 'Manager') {
         // For manager
         // Fetch total tasks for manager's departments
         $stmt = $pdo->prepare("
