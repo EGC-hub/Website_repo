@@ -538,7 +538,7 @@ try {
         echo "</pre>";
     } elseif ($userRole === 'User') {
         echo "<pre>";
-        $userId;
+        print($userId);
         print_r($tasksByDepartment);
         print_r($taskDistribution);
         print_r($taskCompletionOverTime);
