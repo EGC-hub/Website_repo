@@ -246,8 +246,11 @@ try {
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            position: relative !important;
+            left: auto !important;
+            top: auto !important;
+            margin-right: 5px !important;
             color: white !important;
-            margin-left: 5px !important;
             border: none !important;
             background-color: transparent !important;
             font-size: 1em !important;
