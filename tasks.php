@@ -687,6 +687,31 @@ $completedTasksPage = array_slice($completedTasks, ($currentPageCompleted - 1) *
         .see-more-link:hover {
             color: #004080;
         }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            margin: 0 5px;
+            padding: 5px 10px;
+            text-decoration: none;
+            color: #002c5f;
+            border: 1px solid #002c5f;
+            border-radius: 5px;
+        }
+
+        .pagination a.active {
+            background-color: #002c5f;
+            color: white;
+        }
+
+        .pagination a:hover {
+            background-color: #004080;
+            color: white;
+        }
     </style>
 </head>
 
