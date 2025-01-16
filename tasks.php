@@ -299,7 +299,7 @@ $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 // Calculate offset for the query
 $offset = ($currentPage - 1) * $tasksPerPage;
 
-// Fetch all tasks based on user role
+// Fetch all tasks based on user role and filters
 $stmt = $conn->prepare($taskQuery);
 if ($user_role === 'Manager' || $user_role === 'User') {
     $stmt->bind_param("i", $user_id);
@@ -324,6 +324,38 @@ $totalPages = ceil($totalTasks / $tasksPerPage);
 // Slice the arrays to get tasks for the current page
 $pendingStartedTasksPage = array_slice($pendingStartedTasks, $offset, $tasksPerPage);
 $completedTasksPage = array_slice($completedTasks, $offset, $tasksPerPage);
+
+// Add filter conditions to the query
+$filterConditions = [];
+
+if (isset($_GET['project']) && !empty($_GET['project'])) {
+    $projects = explode(',', $_GET['project']);
+    $projectConditions = array_map(function ($project) use ($conn) {
+        return "tasks.project_name = '" . $conn->real_escape_string($project) . "'";
+    }, $projects);
+    $filterConditions[] = "(" . implode(' OR ', $projectConditions) . ")";
+}
+
+if (isset($_GET['department']) && !empty($_GET['department'])) {
+    $departments = explode(',', $_GET['department']);
+    $departmentConditions = array_map(function ($department) use ($conn) {
+        return "assigned_to_department.name = '" . $conn->real_escape_string($department) . "'";
+    }, $departments);
+    $filterConditions[] = "(" . implode(' OR ', $departmentConditions) . ")";
+}
+
+if (isset($_GET['start_date']) && !empty($_GET['start_date'])) {
+    $filterConditions[] = "tasks.expected_start_date >= '" . $conn->real_escape_string($_GET['start_date']) . "'";
+}
+
+if (isset($_GET['end_date']) && !empty($_GET['end_date'])) {
+    $filterConditions[] = "tasks.expected_finish_date <= '" . $conn->real_escape_string($_GET['end_date']) . "'";
+}
+
+// Add filter conditions to the query
+if (!empty($filterConditions)) {
+    $taskQuery .= " WHERE " . implode(' AND ', $filterConditions);
+}
 ?>
 
 <!-- Delay logic -->
@@ -1438,127 +1470,48 @@ function getWeekdays($start, $end)
                 $('#project-filter option[value="All"]').remove();
                 $('#department-filter option[value="All"]').remove();
 
-                // Trigger combined filtering when any filter changes
+                // Trigger filtering when any filter changes
                 $('#project-filter, #department-filter, #start-date, #end-date').on('change', function () {
-                    applyAllFilters();
-                });
-
-                // Function to apply all filters (project, department, and date)
-                function applyAllFilters() {
                     const selectedProjects = $('#project-filter').val();
                     const selectedDepartments = $('#department-filter').val();
-                    const startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
-                    const endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value) : null;
+                    const startDate = document.getElementById('start-date').value;
+                    const endDate = document.getElementById('end-date').value;
 
-                    // Define tables and their corresponding alerts
-                    const tables = [
-                        { id: 'pending-tasks', alertId: 'no-data-alert-pending' },
-                        { id: 'remaining-tasks', alertId: 'no-data-alert-completed' }
-                    ];
+                    // Redirect to the first page with filters
+                    const queryParams = new URLSearchParams();
 
-                    // Flag to track if any rows are visible across all tables
-                    let anyRowsVisible = false;
-
-                    tables.forEach(table => {
-                        const rows = document.querySelectorAll(`#${table.id} tbody tr`);
-                        let hasVisibleRows = false; // Flag to track if any rows are visible in this table
-
-                        rows.forEach(row => {
-                            const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
-                            const assignedToText = row.querySelector('td:nth-child(10)').textContent.trim(); // Assigned To column (9th column)
-
-                            // Extract the department names from the "Assigned To" column
-                            const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Extract department(s) from parentheses
-                            const departmentNames = departmentMatch ? departmentMatch[1].trim().split(', ') : [];
-
-                            const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
-                            const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
-
-                            // Check if the row matches the selected projects
-                            const projectMatch = selectedProjects === null || selectedProjects.length === 0 || selectedProjects.includes(projectName);
-
-                            // Check if the row matches the selected departments (only for admins/managers)
-                            let isDepartmentMatch = true; // Default to true for regular users
-                            if (userRole === 'Admin' || userRole === 'Manager') {
-                                // Only check the assigned to department
-                                isDepartmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.some(department => departmentNames.includes(department));
-                            }
-
-                            // Check if the task falls within the selected date range
-                            let dateMatch = true;
-                            if (startDate && taskStartDate < startDate) {
-                                dateMatch = false;
-                            }
-                            if (endDate && taskEndDate > endDate) {
-                                dateMatch = false;
-                            }
-
-                            // Display the row only if it matches all filters
-                            if (projectMatch && isDepartmentMatch && dateMatch) {
-                                row.style.display = ''; // Show the row
-                                hasVisibleRows = true; // At least one row is visible in this table
-                                anyRowsVisible = true; // At least one row is visible across all tables
-                            } else {
-                                row.style.display = 'none'; // Hide the row
-                            }
-                        });
-
-                        // Show/hide the "No data found" alert for this table
-                        const noDataAlert = document.getElementById(table.alertId);
-                        if (hasVisibleRows) {
-                            noDataAlert.style.display = 'none'; // Hide the alert if rows are visible
-                        } else {
-                            noDataAlert.style.display = 'block'; // Show the alert if no rows are visible
-                        }
-                    });
-
-                    // Redirect to the first page of both tables if no rows are visible after filtering
-                    if (!anyRowsVisible) {
-                        const queryParams = new URLSearchParams();
-
-                        // Add filter parameters to the URL
-                        if (selectedProjects && selectedProjects.length > 0) {
-                            queryParams.set('project', selectedProjects.join(','));
-                        }
-                        if (selectedDepartments && selectedDepartments.length > 0) {
-                            queryParams.set('department', selectedDepartments.join(','));
-                        }
-                        if (document.getElementById('start-date').value) {
-                            queryParams.set('start_date', document.getElementById('start-date').value);
-                        }
-                        if (document.getElementById('end-date').value) {
-                            queryParams.set('end_date', document.getElementById('end-date').value);
-                        }
-
-                        // Reset pagination to the first page for both tables
-                        queryParams.set('page_pending', 1);
-                        queryParams.set('page_completed', 1);
-
-                        // Redirect to the new URL with filters and pagination
-                        window.location.href = `?${queryParams.toString()}`;
+                    // Add filter parameters to the URL
+                    if (selectedProjects && selectedProjects.length > 0) {
+                        queryParams.set('project', selectedProjects.join(','));
                     }
-                }
+                    if (selectedDepartments && selectedDepartments.length > 0) {
+                        queryParams.set('department', selectedDepartments.join(','));
+                    }
+                    if (startDate) {
+                        queryParams.set('start_date', startDate);
+                    }
+                    if (endDate) {
+                        queryParams.set('end_date', endDate);
+                    }
+
+                    // Reset pagination to the first page
+                    queryParams.set('page', 1);
+
+                    // Redirect to the new URL with filters and pagination
+                    window.location.href = `?${queryParams.toString()}`;
+                });
+
                 // Reset filters
                 function resetFilters() {
-                    // Clear the selected values in the dropdowns
-                    $('#project-filter').val(null).trigger('change');
-                    $('#department-filter').val(null).trigger('change');
-
-                    // Clear date inputs
-                    document.getElementById('start-date').value = '';
-                    document.getElementById('end-date').value = '';
-
-                    // Reapply filters to show all tasks
-                    applyAllFilters();
+                    // Redirect to the first page without filters
+                    window.location.href = "?page=1";
                 }
 
                 // Attach event listener for reset button
                 document.querySelector('.btn-primary[onclick="resetFilters()"]').onclick = resetFilters;
             });
-        </script>
 
-        <!-- JS for task description modal -->
-        <script>
+            // Task Description Modal
             document.addEventListener('DOMContentLoaded', function () {
                 const taskDescriptionModal = document.getElementById('taskDescriptionModal');
                 taskDescriptionModal.addEventListener('show.bs.modal', function (event) {
@@ -1568,10 +1521,8 @@ function getWeekdays($start, $end)
                     modalBody.textContent = description; // Set the modal content
                 });
             });
-        </script>
 
-        <!-- To check if task desc is more than 2 lines -->
-        <script>
+            // Task Description Height Check
             document.addEventListener('DOMContentLoaded', function () {
                 // Function to check if the description exceeds 2 lines
                 function checkDescriptionHeight() {
