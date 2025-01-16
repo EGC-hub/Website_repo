@@ -378,38 +378,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid #ccc;
         }
 
-        .select2-container--default .select2-selection--multiple {
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            padding: 6px;
-            width: 100%;
-            min-height: 38px;
+        /* Ensure the select2 dropdown matches the width of other inputs */
+        .select2-container {
+            width: 100% !important;
+            /* Force the width to be 100% */
         }
 
-        .select2-container--default .select2-results__option {
-            padding: 6px 12px;
+        /* Adjust the dropdown menu width */
+        .select2-dropdown {
+            width: 100% !important;
+            /* Ensure the dropdown matches the input width */
         }
 
-        .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            background-color: #1d3557;
-            border: 1px solid #1d3557;
-            color: white;
-            padding: 2px 8px;
-            margin: 2px;
-            border-radius: 4px;
+        /* Ensure the selected items in the dropdown match the input width */
+        .select2-selection--multiple {
+            width: 100% !important;
+            /* Force the width to be 100% */
+            border: 1px solid #ced4da !important;
+            /* Ensure consistent border styling */
+            border-radius: 4px !important;
+            /* Ensure consistent border radius */
+            padding: 6px !important;
+            /* Ensure consistent padding */
+            min-height: 38px !important;
+            /* Ensure consistent height */
         }
 
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-            color: white;
-            margin-right: 5px;
+        /* Fix the position of the "x" (clear button) in the selection */
+        .select2-selection--multiple .select2-selection__choice {
+            background-color: #1d3557 !important;
+            /* Background color for selected items */
+            border: 1px solid #1d3557 !important;
+            /* Border color for selected items */
+            color: white !important;
+            /* Text color for selected items */
+            padding: 2px 8px !important;
+            /* Padding for selected items */
+            margin: 2px !important;
+            /* Margin for selected items */
+            border-radius: 4px !important;
+            /* Border radius for selected items */
         }
 
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
-            color: #e63946;
+        /* Fix the position of the "x" (remove button) in the selected items */
+        .select2-selection--multiple .select2-selection__choice__remove {
+            color: white !important;
+            /* Color of the "x" (remove button) */
+            margin-right: 5px !important;
+            /* Move the "x" to the right */
         }
 
+        /* Hover effect for the "x" (remove button) */
+        .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #e63946 !important;
+            /* Change color on hover */
+        }
+
+        /* Ensure the dropdown is above other elements */
         .select2-container--open {
             z-index: 9999 !important;
+            /* Ensure the dropdown is on top */
         }
     </style>
 </head>
