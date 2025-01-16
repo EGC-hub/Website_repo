@@ -25,8 +25,8 @@ try {
     $stmt = $pdo->prepare($deleteUserQuery);
     $stmt->execute([$user_id]);
 
-    // Set success message
-    $_SESSION['successMsg'] = "User deleted successfully.";
+    // Set deletion message
+    $_SESSION['deletionMsg'] = "User deleted successfully.";
 
     // Redirect back to the view-users page
     header("Location: view-users.php");

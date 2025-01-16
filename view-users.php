@@ -342,6 +342,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 5px;
         }
 
+        .deletion-message {
+            text-align: center;
+            background-color: #e63946;
+            color: white;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
         #passwordError {
             color: red;
             font-size: 14px;
@@ -405,6 +414,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?= htmlspecialchars($_SESSION['successMsg']) ?>
                 </div>
                 <?php unset($_SESSION['successMsg']); ?>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['deletionMsg'])): ?>
+                <div class="deletion-message">
+                    <?= htmlspecialchars($_SESSION['deletionMsg']) ?>
+                </div>
+                <?php unset($_SESSION['deletionMsg']); ?>
             <?php endif; ?>
 
             <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createUserModal"
