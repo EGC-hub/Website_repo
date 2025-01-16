@@ -183,6 +183,7 @@ try {
             padding: 10px;
             border-radius: 5px;
             border: 1px solid #ccc;
+            box-sizing: border-box;
         }
 
         button {
@@ -222,34 +223,37 @@ try {
         }
 
         /* Select2 Styling */
-        .select2-container--default .select2-selection--multiple {
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            padding: 6px;
-            width: 100%;
-            min-height: 38px;
-        }
-
-        .select2-container--default .select2-results__option {
-            padding: 6px 12px;
-        }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            background-color: #1d3557;
-            border: 1px solid #1d3557;
-            color: white;
-            padding: 2px 8px;
-            margin: 2px;
-            border-radius: 4px;
-        }
-
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-            color: white;
-            margin-right: 5px;
+            position: relative !important;
+            left: auto !important;
+            top: auto !important;
+            margin-right: 5px !important;
+            color: white !important;
+            border: none !important;
+            background-color: transparent !important;
+            font-size: 1em !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
-            color: #e63946;
+            color: #e63946 !important;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .select2-dropdown {
+            width: 100% !important;
+        }
+
+        .select2-selection--multiple {
+            width: 100% !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 4px !important;
+            padding: 6px !important;
+            min-height: 38px !important;
         }
 
         .select2-container--open {
