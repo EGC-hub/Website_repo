@@ -223,6 +223,16 @@ try {
         }
 
         /* Select2 Styling */
+        input[type="text"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
             position: relative !important;
             left: auto !important;
@@ -254,6 +264,15 @@ try {
             border-radius: 4px !important;
             padding: 6px !important;
             min-height: 38px !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #1d3557 !important;
+            border: 1px solid #1d3557 !important;
+            color: white !important;
+            padding: 2px 8px !important;
+            margin: 2px !important;
+            border-radius: 4px !important;
         }
 
         .select2-container--open {
