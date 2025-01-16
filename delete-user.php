@@ -1,39 +1,39 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+session_start();
 
+// Check if the user is logged in and has the necessary permissions
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
+    header("Location: login.php");
+    exit;
+}
+
+// Include the database connection
 $config = include '../config.php';
-
-// Database connection
 $dsn = "mysql:host=localhost;dbname=euro_login_system;charset=utf8mb4";
 $username = $config['dbUsername'];
 $password = $config['dbPassword'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = $_POST['user_id'] ?? null;
+try {
+    $pdo = new PDO($dsn, $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    if (!$user_id) {
-        die("User ID is required.");
-    }
+    // Get the user ID from the POST request
+    $user_id = $_POST['user_id'];
 
-    try {
-        $pdo = new PDO($dsn, $username, $password);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Delete the user from the `users` table
+    $deleteUserQuery = "DELETE FROM users WHERE id = ?";
+    $stmt = $pdo->prepare($deleteUserQuery);
+    $stmt->execute([$user_id]);
 
-        // Delete user query
-        $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
-        $stmt->execute([$user_id]);
+    // Set success message
+    $_SESSION['successMsg'] = "User deleted successfully.";
 
-        if ($stmt->rowCount() > 0) {
-            echo '<script>alert("User deleted successfully."); window.location.href = "view-users.php";</script>';
-        } else {
-            echo '<script>alert("User not found or deletion failed."); window.location.href = "view-users.php";</script>';
-        }
-    } catch (PDOException $e) {
-        die("Database error: " . $e->getMessage());
-    }
-} else {
-    echo "Invalid request method.";
+    // Redirect back to the view-users page
+    header("Location: view-users.php");
+    exit;
+
+} catch (PDOException $e) {
+    // Handle any errors
+    die("Error: " . $e->getMessage());
 }
 ?>
