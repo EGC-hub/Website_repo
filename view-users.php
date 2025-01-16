@@ -378,82 +378,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid #ccc;
         }
 
-        /* Ensure the select2 dropdown matches the width of other inputs */
         .select2-container {
             width: 100% !important;
-            /* Force the width to be 100% */
         }
 
-        /* Adjust the dropdown menu width */
         .select2-dropdown {
             width: 100% !important;
-            /* Ensure the dropdown matches the input width */
         }
 
-        /* Ensure the selected items in the dropdown match the input width */
         .select2-selection--multiple {
             width: 100% !important;
-            /* Force the width to be 100% */
             border: 1px solid #ced4da !important;
-            /* Ensure consistent border styling */
             border-radius: 4px !important;
-            /* Ensure consistent border radius */
             padding: 6px !important;
-            /* Ensure consistent padding */
             min-height: 38px !important;
-            /* Ensure consistent height */
         }
 
-        /* Fix the position of the "x" (clear button) in the selection */
         .select2-selection--multiple .select2-selection__choice {
             background-color: #1d3557 !important;
-            /* Background color for selected items */
             border: 1px solid #1d3557 !important;
-            /* Border color for selected items */
             color: white !important;
-            /* Text color for selected items */
             padding: 2px 8px !important;
-            /* Padding for selected items */
             margin: 2px !important;
-            /* Margin for selected items */
             border-radius: 4px !important;
-            /* Border radius for selected items */
         }
-
-        /* Fix the position of the "x" (remove button) in the selected items */
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
             position: relative !important;
-            /* Change from absolute to relative */
             left: auto !important;
-            /* Reset the left position */
             top: auto !important;
-            /* Reset the top position */
             margin-right: 5px !important;
-            /* Add margin to the right */
             color: white !important;
-            /* Ensure the "x" is visible */
             border: none !important;
-            /* Remove any borders */
             background-color: transparent !important;
-            /* Ensure the background is transparent */
             font-size: 1em !important;
-            /* Ensure consistent font size */
             font-weight: bold !important;
-            /* Ensure consistent font weight */
             cursor: pointer !important;
-            /* Ensure the cursor is a pointer */
         }
 
-        /* Hover effect for the "x" (remove button) */
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
             color: #e63946 !important;
-            /* Change color on hover */
         }
 
-        /* Ensure the dropdown is above other elements */
         .select2-container--open {
             z-index: 9999 !important;
-            /* Ensure the dropdown is on top */
         }
     </style>
 </head>
