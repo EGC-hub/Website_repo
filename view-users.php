@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $department_ids = $_POST['departments'];
 
     // Validate inputs
-    if (empty($username) || empty($email) || empty($password) || empty($role_id) || empty($department_id)) {
+    if (empty($username) || empty($email) || empty($password) || empty($role_id) || empty($department_ids)) {
         $errorMsg = "Please fill in all fields.";
     } else {
         // Hash the password
@@ -349,8 +349,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: none;
             /* Hidden by default */
         }
+
         .select2-container--default .select2-selection--multiple {
-            border: 1px solid #ced4da;            border-radius: 4px;            padding: 6px;            width: 100%;            min-height: 38px;        }
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 6px;
+            width: 100%;
+            min-height: 38px;
+        }
 
         .select2-container--default .select2-results__option {
             padding: 6px 12px;
