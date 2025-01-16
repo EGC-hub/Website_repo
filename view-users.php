@@ -359,6 +359,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             /* Hidden by default */
         }
 
+        /* Add this CSS to your existing styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        /* Select2 Styling for the departments dropdown */
         .select2-container--default .select2-selection--multiple {
             border: 1px solid #ced4da;
             border-radius: 4px;
@@ -501,7 +523,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <!-- Modal for Create User -->
-    <!-- Bootstrap Modal -->
     <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
