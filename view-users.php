@@ -356,7 +356,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 14px;
             margin-top: 5px;
             display: none;
-            /* Hidden by default */
         }
 
         .form-group {
@@ -379,7 +378,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid #ccc;
         }
 
-        /* .select2-container--default .select2-selection--multiple {
+        .select2-container--default .select2-selection--multiple {
             border: 1px solid #ced4da;
             border-radius: 4px;
             padding: 6px;
@@ -407,7 +406,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
             color: #e63946;
-        } */
+        }
 
         .select2-container--open {
             z-index: 9999 !important;
