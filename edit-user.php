@@ -253,7 +253,6 @@ try {
             font-size: 1em !important;
             font-weight: bold !important;
             cursor: pointer !important;
-            order: 2;
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
