@@ -240,20 +240,20 @@ try {
             padding: 2px 8px !important;
             margin: 2px !important;
             border-radius: 4px !important;
-            display: flex !important;
+            display: inline-flex !important;
             align-items: center !important;
+            white-space: nowrap !important;
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
             color: white !important;
-            margin-right: 5px !important;
-            order: 2;
-            /* Move the "x" to the right */
+            margin-left: 5px !important;
             border: none !important;
             background-color: transparent !important;
             font-size: 1em !important;
             font-weight: bold !important;
             cursor: pointer !important;
+            order: 2;
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
@@ -274,6 +274,9 @@ try {
             border-radius: 4px !important;
             padding: 6px !important;
             min-height: 38px !important;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 4px !important;
         }
 
         .select2-container--open {
