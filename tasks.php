@@ -297,6 +297,7 @@ if ($user_role === 'Manager' || $user_role === 'User') {
 
 $stmt->execute();
 $result = $stmt->get_result();
+$allTasks = $result->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <!-- Delay logic -->
@@ -316,6 +317,34 @@ function getWeekdays($start, $end)
     return $weekdays;
 }
 ?>
+
+<!-- Logic for pagination -->
+<?php
+// Split tasks into Pending/Started and Completed
+$pendingStartedTasks = array_filter($allTasks, function ($task) {
+    return in_array($task['status'], ['Pending', 'Started']);
+});
+
+$completedTasks = array_filter($allTasks, function ($task) {
+    return !in_array($task['status'], ['Pending', 'Started']);
+});
+
+// Number of tasks per page
+$tasksPerPage = 10;
+
+// Get current page from query string, default to 1
+$currentPagePending = isset($_GET['page_pending']) ? (int) $_GET['page_pending'] : 1;
+$currentPageCompleted = isset($_GET['page_completed']) ? (int) $_GET['page_completed'] : 1;
+
+// Calculate total pages for each table
+$totalPagesPending = ceil(count($pendingStartedTasks) / $tasksPerPage);
+$totalPagesCompleted = ceil(count($completedTasks) / $tasksPerPage);
+
+// Slice the arrays to get tasks for the current page
+$pendingStartedTasksPage = array_slice($pendingStartedTasks, ($currentPagePending - 1) * $tasksPerPage, $tasksPerPage);
+$completedTasksPage = array_slice($completedTasks, ($currentPageCompleted - 1) * $tasksPerPage, $tasksPerPage);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -840,7 +869,7 @@ function getWeekdays($start, $end)
                 <tbody>
                     <?php
                     $taskCount = 1; // Initialize task count
-                    foreach ($rows as $row): ?>
+                    foreach ($pendingStartedTasksPage as $row): ?>
                         <?php if ($row['status'] === 'Pending' || $row['status'] === 'Started'): ?>
                             <tr class="align-middle">
                                 <td><?= $taskCount++ ?></td> <!-- Display task count and increment -->
@@ -927,6 +956,22 @@ function getWeekdays($start, $end)
                 No data found in Pending & Started Tasks matching the selected filters.
             </div>
 
+            <div class="pagination">
+                <?php if ($currentPagePending > 1): ?>
+                    <a
+                        href="?page_pending=<?= $currentPagePending - 1 ?>&page_completed=<?= $currentPageCompleted ?>">Previous</a>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $totalPagesPending; $i++): ?>
+                    <a href="?page_pending=<?= $i ?>&page_completed=<?= $currentPageCompleted ?>" <?= $i == $currentPagePending ? 'class="active"' : '' ?>><?= $i ?></a>
+                <?php endfor; ?>
+
+                <?php if ($currentPagePending < $totalPagesPending): ?>
+                    <a
+                        href="?page_pending=<?= $currentPagePending + 1 ?>&page_completed=<?= $currentPageCompleted ?>">Next</a>
+                <?php endif; ?>
+            </div>
+
             <!-- Completed Tasks Table -->
             <h3>Completed Tasks</h3>
             <table class="table table-striped table-hover align-middle text-center custom-table" id="remaining-tasks">
@@ -950,7 +995,7 @@ function getWeekdays($start, $end)
                 <tbody>
                     <?php
                     $taskCount = 1; // Initialize task count
-                    foreach ($rows as $row): ?>
+                    foreach ($completedTasksPage as $row): ?>
                         <?php if ($row['status'] !== 'Pending' && $row['status'] !== 'Started'): ?>
                             <?php
                             $delayInfo = '';
@@ -1061,196 +1106,264 @@ function getWeekdays($start, $end)
             <div id="no-data-alert-completed" class="alert alert-warning mt-3" style="display: none;">
                 No data found in Completed Tasks matching the selected filters.
             </div>
-        </div>
-    </div>
 
-    <!-- Modal for Task Completion -->
-    <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="completionForm" method="POST" onsubmit="handleCompletionForm(event)">
+            <div class="pagination">
+                <?php if ($currentPageCompleted > 1): ?>
+                    <a
+                        href="?page_pending=<?= $currentPagePending ?>&page_completed=<?= $currentPageCompleted - 1 ?>">Previous</a>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $totalPagesCompleted; $i++): ?>
+                    <a href="?page_pending=<?= $currentPagePending ?>&page_completed=<?= $i ?>" <?= $i == $currentPageCompleted ? 'class="active"' : '' ?>><?= $i ?></a>
+                <?php endfor; ?>
+
+                <?php if ($currentPageCompleted < $totalPagesCompleted): ?>
+                    <a
+                        href="?page_pending=<?= $currentPagePending ?>&page_completed=<?= $currentPageCompleted + 1 ?>">Next</a>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Modal for Task Completion -->
+        <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="completionForm" method="POST" onsubmit="handleCompletionForm(event)">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="completionModalLabel">Task Completion</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Hidden input for Task ID -->
+                            <input type="hidden" id="task-id" name="task_id">
+                            <!-- Hidden input for Status -->
+                            <input type="hidden" id="modal-status" name="status">
+
+                            <!-- Completion Description -->
+                            <div class="mb-3">
+                                <label for="completion-description" class="form-label">What was completed?</label>
+                                <textarea class="form-control" id="completion-description" name="completion_description"
+                                    rows="3" required></textarea>
+                            </div>
+
+                            <!-- Delayed Reason (Shown only for Delayed Completion) -->
+                            <div class="mb-3" id="delayed-reason-container" style="display: none;">
+                                <label for="delayed-reason" class="form-label">Why was it completed late?</label>
+                                <textarea class="form-control" id="delayed-reason" name="delayed_reason"
+                                    rows="3"></textarea>
+                            </div>
+
+                            <!-- Actual Completion Date -->
+                            <div class="mb-3" id="completion-date-container" style="display: none;">
+                                <label for="actual-completion-date" class="form-label">Actual Completion Date</label>
+                                <input type="datetime-local" class="form-control" id="actual-completion-date"
+                                    name="actual_completion_date">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Viewing Completion Description -->
+        <div class="modal fade" id="viewDescriptionModal" tabindex="-1" aria-labelledby="viewDescriptionModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="completionModalLabel">Task Completion</h5>
+                        <h5 class="modal-title" id="viewDescriptionModalLabel">Task Completion Description</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <!-- Hidden input for Task ID -->
-                        <input type="hidden" id="task-id" name="task_id">
-                        <!-- Hidden input for Status -->
-                        <input type="hidden" id="modal-status" name="status">
-
-                        <!-- Completion Description -->
-                        <div class="mb-3">
-                            <label for="completion-description" class="form-label">What was completed?</label>
-                            <textarea class="form-control" id="completion-description" name="completion_description"
-                                rows="3" required></textarea>
-                        </div>
-
-                        <!-- Delayed Reason (Shown only for Delayed Completion) -->
-                        <div class="mb-3" id="delayed-reason-container" style="display: none;">
-                            <label for="delayed-reason" class="form-label">Why was it completed late?</label>
-                            <textarea class="form-control" id="delayed-reason" name="delayed_reason"
-                                rows="3"></textarea>
-                        </div>
-
-                        <!-- Actual Completion Date -->
-                        <div class="mb-3" id="completion-date-container" style="display: none;">
-                            <label for="actual-completion-date" class="form-label">Actual Completion Date</label>
-                            <input type="datetime-local" class="form-control" id="actual-completion-date"
-                                name="actual_completion_date">
-                        </div>
+                        <p id="completion-description-text">No description provided.</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal for Viewing Completion Description -->
-    <div class="modal fade" id="viewDescriptionModal" tabindex="-1" aria-labelledby="viewDescriptionModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="viewDescriptionModalLabel">Task Completion Description</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="completion-description-text">No description provided.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="modal fade" id="delayedCompletionModal" tabindex="-1" aria-labelledby="delayedCompletionModalLabel"
-        aria-hidden="true">
-        <!-- Modal for delayed completion details viewing -->
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="delayedCompletionModalLabel">Delayed Completion Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Task Name:</strong> <span id="delayed-task-name"></span></p>
-                    <p><strong>Completed On:</strong> <span id="delayed-completion-date"></span></p>
-                    <p><strong>Reason for Delay:</strong></p>
-                    <p id="delay-reason"></p>
-                    <p><strong>Completion Description:</strong></p>
-                    <p id="completion-description-delayed"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success modal for task updation -->
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="successModalLabel">Status Updated</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Task Name:</strong> <span id="success-task-name"></span></p>
-                    <p><strong>Message:</strong> <span id="success-message"></span></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <div class="modal fade" id="delayedCompletionModal" tabindex="-1" aria-labelledby="delayedCompletionModalLabel"
+            aria-hidden="true">
+            <!-- Modal for delayed completion details viewing -->
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="delayedCompletionModalLabel">Delayed Completion Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Task Name:</strong> <span id="delayed-task-name"></span></p>
+                        <p><strong>Completed On:</strong> <span id="delayed-completion-date"></span></p>
+                        <p><strong>Reason for Delay:</strong></p>
+                        <p id="delay-reason"></p>
+                        <p><strong>Completion Description:</strong></p>
+                        <p id="completion-description-delayed"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal for task description -->
-    <div class="modal fade" id="taskDescriptionModal" tabindex="-1" aria-labelledby="taskDescriptionModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="taskDescriptionModalLabel">Task Description</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="full-task-description"></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <!-- Success modal for task updation -->
+        <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="successModalLabel">Status Updated</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Task Name:</strong> <span id="success-task-name"></span></p>
+                        <p><strong>Message:</strong> <span id="success-message"></span></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Jquery -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+        <!-- Modal for task description -->
+        <div class="modal fade" id="taskDescriptionModal" tabindex="-1" aria-labelledby="taskDescriptionModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="taskDescriptionModalLabel">Task Description</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="full-task-description"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <!-- Script for opening the modal to view details of completion -->
-    <script>
-        // Attach event listener for task name links
-        const viewDescriptionModal = document.getElementById('viewDescriptionModal');
-        viewDescriptionModal.addEventListener('show.bs.modal', function (event) {
-            // Button/link that triggered the modal
-            const button = event.relatedTarget;
+        <!-- Jquery -->
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 
-            // Extract completion description from data attribute
-            const description = button.getAttribute('data-description');
+        <!-- Script for opening the modal to view details of completion -->
+        <script>
+            // Attach event listener for task name links
+            const viewDescriptionModal = document.getElementById('viewDescriptionModal');
+            viewDescriptionModal.addEventListener('show.bs.modal', function (event) {
+                // Button/link that triggered the modal
+                const button = event.relatedTarget;
 
-            // Update the modal content
-            const descriptionText = document.getElementById('completion-description-text');
-            descriptionText.textContent = description || "No description provided.";
-        });
-    </script>
+                // Extract completion description from data attribute
+                const description = button.getAttribute('data-description');
 
-    <script>
-        const viewDescriptionModal = document.getElementById('viewDescriptionModal');
-        viewDescriptionModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const description = button.getAttribute('data-description');
-            const descriptionText = document.getElementById('completion-description-text');
-            descriptionText.textContent = description || "No description provided.";
-        });
-    </script>
+                // Update the modal content
+                const descriptionText = document.getElementById('completion-description-text');
+                descriptionText.textContent = description || "No description provided.";
+            });
+        </script>
 
-    <!-- JS for the dropdown handling -->
-    <script>
-        function handleStatusChange(event, taskId) {
-            event.preventDefault();
+        <script>
+            const viewDescriptionModal = document.getElementById('viewDescriptionModal');
+            viewDescriptionModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const description = button.getAttribute('data-description');
+                const descriptionText = document.getElementById('completion-description-text');
+                descriptionText.textContent = description || "No description provided.";
+            });
+        </script>
 
-            const status = event.target.value;
-            const form = event.target.form;
+        <!-- JS for the dropdown handling -->
+        <script>
+            function handleStatusChange(event, taskId) {
+                event.preventDefault();
 
-            // If the status is 'Delayed Completion' or 'Completed on Time', show the modal
-            if (status === 'Delayed Completion' || status === 'Completed on Time') {
-                document.getElementById('task-id').value = taskId;
-                document.getElementById('modal-status').value = status;
+                const status = event.target.value;
+                const form = event.target.form;
 
-                const delayedReasonContainer = document.getElementById('delayed-reason-container');
-                const completionDateContainer = document.getElementById('completion-date-container');
+                // If the status is 'Delayed Completion' or 'Completed on Time', show the modal
+                if (status === 'Delayed Completion' || status === 'Completed on Time') {
+                    document.getElementById('task-id').value = taskId;
+                    document.getElementById('modal-status').value = status;
 
-                if (status === 'Delayed Completion') {
-                    delayedReasonContainer.style.display = 'block';
-                    completionDateContainer.style.display = 'block';
+                    const delayedReasonContainer = document.getElementById('delayed-reason-container');
+                    const completionDateContainer = document.getElementById('completion-date-container');
+
+                    if (status === 'Delayed Completion') {
+                        delayedReasonContainer.style.display = 'block';
+                        completionDateContainer.style.display = 'block';
+                    } else {
+                        delayedReasonContainer.style.display = 'none';
+                        completionDateContainer.style.display = 'none';
+                    }
+
+                    const modal = new bootstrap.Modal(document.getElementById('completionModal'));
+                    modal.show();
                 } else {
-                    delayedReasonContainer.style.display = 'none';
-                    completionDateContainer.style.display = 'none';
-                }
+                    // For other statuses, submit the form directly
+                    fetch('update-status.php', {
+                        method: 'POST',
+                        body: new FormData(form)
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json(); // Parse the response as JSON
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // Update the modal content with the task name and message
+                                document.getElementById('success-task-name').innerText = data.task_name;
+                                document.getElementById('success-message').innerText = data.message;
 
-                const modal = new bootstrap.Modal(document.getElementById('completionModal'));
-                modal.show();
-            } else {
-                // For other statuses, submit the form directly
+                                // Show the success modal
+                                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                                successModal.show();
+                            } else {
+                                // If the update was not successful, show an alert with the error message
+                                alert(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while updating the status.');
+                        });
+                }
+            }
+        </script>
+
+        <!-- Script for viewing the delayed completion details -->
+        <script>
+            function showDelayedDetails(taskName, completionDate, delayReason, completionDescription) {
+                // Set the modal elements with the provided values
+                document.getElementById('delayed-task-name').innerText = taskName || "N/A";
+                document.getElementById('delayed-completion-date').innerText = completionDate || "N/A";
+                document.getElementById('delay-reason').innerText = delayReason || "N/A";
+
+                // Correctly set the completion description
+                const completionDescriptionElement = document.getElementById('completion-description-delayed');
+                completionDescriptionElement.innerText = completionDescription && completionDescription.trim() ? completionDescription : "No description provided.";
+            }
+        </script>
+        <!-- Script for handling completion form -->
+        <script>
+            function handleCompletionForm(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                const form = event.target;
+                const formData = new FormData(form);
+
                 fetch('update-status.php', {
                     method: 'POST',
-                    body: new FormData(form)
+                    body: formData
                 })
                     .then(response => {
                         if (!response.ok) {
@@ -1260,16 +1373,22 @@ function getWeekdays($start, $end)
                     })
                     .then(data => {
                         if (data.success) {
-                            // Update the modal content with the task name and message
-                            document.getElementById('success-task-name').innerText = data.task_name;
-                            document.getElementById('success-message').innerText = data.message;
+                            // Close the completion modal
+                            const completionModal = bootstrap.Modal.getInstance(document.getElementById('completionModal'));
+                            completionModal.hide();
 
                             // Show the success modal
+                            document.getElementById('success-task-name').innerText = data.task_name;
+                            document.getElementById('success-message').innerText = data.message;
                             const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                             successModal.show();
+
+                            // Optionally, refresh the task list or update the UI
+                            setTimeout(() => {
+                                window.location.reload(); // Reload the page to reflect the updated status
+                            }, 2000); // Reload after 2 seconds
                         } else {
-                            // If the update was not successful, show an alert with the error message
-                            alert(data.message);
+                            alert(data.message); // Show an error message if the update failed
                         }
                     })
                     .catch(error => {
@@ -1277,232 +1396,202 @@ function getWeekdays($start, $end)
                         alert('An error occurred while updating the status.');
                     });
             }
-        }
-    </script>
-
-    <!-- Script for viewing the delayed completion details -->
-    <script>
-        function showDelayedDetails(taskName, completionDate, delayReason, completionDescription) {
-            // Set the modal elements with the provided values
-            document.getElementById('delayed-task-name').innerText = taskName || "N/A";
-            document.getElementById('delayed-completion-date').innerText = completionDate || "N/A";
-            document.getElementById('delay-reason').innerText = delayReason || "N/A";
-
-            // Correctly set the completion description
-            const completionDescriptionElement = document.getElementById('completion-description-delayed');
-            completionDescriptionElement.innerText = completionDescription && completionDescription.trim() ? completionDescription : "No description provided.";
-        }
-    </script>
-    <!-- Script for handling completion form -->
-    <script>
-        function handleCompletionForm(event) {
-            event.preventDefault(); // Prevent the default form submission
-
-            const form = event.target;
-            const formData = new FormData(form);
-
-            fetch('update-status.php', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json(); // Parse the response as JSON
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Close the completion modal
-                        const completionModal = bootstrap.Modal.getInstance(document.getElementById('completionModal'));
-                        completionModal.hide();
-
-                        // Show the success modal
-                        document.getElementById('success-task-name').innerText = data.task_name;
-                        document.getElementById('success-message').innerText = data.message;
-                        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                        successModal.show();
-
-                        // Optionally, refresh the task list or update the UI
-                        setTimeout(() => {
-                            window.location.reload(); // Reload the page to reflect the updated status
-                        }, 2000); // Reload after 2 seconds
-                    } else {
-                        alert(data.message); // Show an error message if the update failed
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while updating the status.');
-                });
-        }
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
         </script>
-    <!-- Fix for Select2 and Filtering -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Get the user's role from the hidden input field
-            const userRole = document.getElementById('user-role').value;
 
-            // Initialize Select2 on the project filter dropdown
-            $('#project-filter').select2({
-                placeholder: "Select projects to filter",
-                allowClear: true,
-                width: '300px'
-            });
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+            </script>
+        <!-- Fix for Select2 and Filtering -->
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                // Get the user's role from the hidden input field
+                const userRole = document.getElementById('user-role').value;
 
-            // Initialize Select2 on the department filter dropdown (only for admins/managers)
-            if (userRole === 'Admin' || userRole === 'Manager') {
-                $('#department-filter').select2({
-                    placeholder: "Select departments to filter",
+                // Initialize Select2 on the project filter dropdown
+                $('#project-filter').select2({
+                    placeholder: "Select projects to filter",
                     allowClear: true,
                     width: '300px'
                 });
-            } else {
-                // Hide the department filter for regular users
-                $('#department-filter').closest('.filter-dropdown').hide();
-            }
 
-            // Remove the "All" option initially
-            $('#project-filter option[value="All"]').remove();
-            $('#department-filter option[value="All"]').remove();
+                // Initialize Select2 on the department filter dropdown (only for admins/managers)
+                if (userRole === 'Admin' || userRole === 'Manager') {
+                    $('#department-filter').select2({
+                        placeholder: "Select departments to filter",
+                        allowClear: true,
+                        width: '300px'
+                    });
+                } else {
+                    // Hide the department filter for regular users
+                    $('#department-filter').closest('.filter-dropdown').hide();
+                }
 
-            // Trigger combined filtering when any filter changes
-            $('#project-filter, #department-filter, #start-date, #end-date').on('change', function () {
-                applyAllFilters();
-            });
+                // Remove the "All" option initially
+                $('#project-filter option[value="All"]').remove();
+                $('#department-filter option[value="All"]').remove();
 
-            // Function to apply all filters (project, department, and date)
-            function applyAllFilters() {
-                const selectedProjects = $('#project-filter').val();
-                const selectedDepartments = $('#department-filter').val();
-                const startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
-                const endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value) : null;
+                // Trigger combined filtering when any filter changes
+                $('#project-filter, #department-filter, #start-date, #end-date').on('change', function () {
+                    applyAllFilters();
+                });
 
-                // Define tables and their corresponding alerts
-                const tables = [
-                    { id: 'pending-tasks', alertId: 'no-data-alert-pending' },
-                    { id: 'remaining-tasks', alertId: 'no-data-alert-completed' }
-                ];
+                // Function to apply all filters (project, department, and date)
+                function applyAllFilters() {
+                    const selectedProjects = $('#project-filter').val();
+                    const selectedDepartments = $('#department-filter').val();
+                    const startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
+                    const endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value) : null;
 
-                tables.forEach(table => {
-                    const rows = document.querySelectorAll(`#${table.id} tbody tr`);
-                    let hasVisibleRows = false; // Flag to track if any rows are visible in this table
+                    // Define tables and their corresponding alerts
+                    const tables = [
+                        { id: 'pending-tasks', alertId: 'no-data-alert-pending' },
+                        { id: 'remaining-tasks', alertId: 'no-data-alert-completed' }
+                    ];
 
-                    rows.forEach(row => {
-                        const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
-                        const assignedToText = row.querySelector('td:nth-child(10)').textContent.trim(); // Assigned To column (9th column)
+                    // Flag to track if any rows are visible across all tables
+                    let anyRowsVisible = false;
 
-                        // Extract the department names from the "Assigned To" column
-                        const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Extract department(s) from parentheses
-                        const departmentNames = departmentMatch ? departmentMatch[1].trim().split(', ') : [];
+                    tables.forEach(table => {
+                        const rows = document.querySelectorAll(`#${table.id} tbody tr`);
+                        let hasVisibleRows = false; // Flag to track if any rows are visible in this table
 
-                        const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
-                        const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
+                        rows.forEach(row => {
+                            const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
+                            const assignedToText = row.querySelector('td:nth-child(10)').textContent.trim(); // Assigned To column (9th column)
 
-                        // Check if the row matches the selected projects
-                        const projectMatch = selectedProjects === null || selectedProjects.length === 0 || selectedProjects.includes(projectName);
+                            // Extract the department names from the "Assigned To" column
+                            const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Extract department(s) from parentheses
+                            const departmentNames = departmentMatch ? departmentMatch[1].trim().split(', ') : [];
 
-                        // Check if the row matches the selected departments (only for admins/managers)
-                        let isDepartmentMatch = true; // Default to true for regular users
-                        if (userRole === 'Admin' || userRole === 'Manager') {
-                            // Only check the assigned to department
-                            isDepartmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.some(department => departmentNames.includes(department));
-                        }
+                            const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
+                            const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
 
-                        // Check if the task falls within the selected date range
-                        let dateMatch = true;
-                        if (startDate && taskStartDate < startDate) {
-                            dateMatch = false;
-                        }
-                        if (endDate && taskEndDate > endDate) {
-                            dateMatch = false;
-                        }
+                            // Check if the row matches the selected projects
+                            const projectMatch = selectedProjects === null || selectedProjects.length === 0 || selectedProjects.includes(projectName);
 
-                        // Display the row only if it matches all filters
-                        if (projectMatch && isDepartmentMatch && dateMatch) {
-                            row.style.display = ''; // Show the row
-                            hasVisibleRows = true; // At least one row is visible in this table
+                            // Check if the row matches the selected departments (only for admins/managers)
+                            let isDepartmentMatch = true; // Default to true for regular users
+                            if (userRole === 'Admin' || userRole === 'Manager') {
+                                // Only check the assigned to department
+                                isDepartmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.some(department => departmentNames.includes(department));
+                            }
+
+                            // Check if the task falls within the selected date range
+                            let dateMatch = true;
+                            if (startDate && taskStartDate < startDate) {
+                                dateMatch = false;
+                            }
+                            if (endDate && taskEndDate > endDate) {
+                                dateMatch = false;
+                            }
+
+                            // Display the row only if it matches all filters
+                            if (projectMatch && isDepartmentMatch && dateMatch) {
+                                row.style.display = ''; // Show the row
+                                hasVisibleRows = true; // At least one row is visible in this table
+                                anyRowsVisible = true; // At least one row is visible across all tables
+                            } else {
+                                row.style.display = 'none'; // Hide the row
+                            }
+                        });
+
+                        // Show/hide the "No data found" alert for this table
+                        const noDataAlert = document.getElementById(table.alertId);
+                        if (hasVisibleRows) {
+                            noDataAlert.style.display = 'none'; // Hide the alert if rows are visible
                         } else {
-                            row.style.display = 'none'; // Hide the row
+                            noDataAlert.style.display = 'block'; // Show the alert if no rows are visible
                         }
                     });
 
-                    // Show/hide the "No data found" alert for this table
-                    const noDataAlert = document.getElementById(table.alertId);
-                    if (hasVisibleRows) {
-                        noDataAlert.style.display = 'none'; // Hide the alert if rows are visible
-                    } else {
-                        noDataAlert.style.display = 'block'; // Show the alert if no rows are visible
+                    // Redirect to the first page of both tables if no rows are visible after filtering
+                    if (!anyRowsVisible) {
+                        const queryParams = new URLSearchParams();
+
+                        // Add filter parameters to the URL
+                        if (selectedProjects && selectedProjects.length > 0) {
+                            queryParams.set('project', selectedProjects.join(','));
+                        }
+                        if (selectedDepartments && selectedDepartments.length > 0) {
+                            queryParams.set('department', selectedDepartments.join(','));
+                        }
+                        if (document.getElementById('start-date').value) {
+                            queryParams.set('start_date', document.getElementById('start-date').value);
+                        }
+                        if (document.getElementById('end-date').value) {
+                            queryParams.set('end_date', document.getElementById('end-date').value);
+                        }
+
+                        // Reset pagination to the first page for both tables
+                        queryParams.set('page_pending', 1);
+                        queryParams.set('page_completed', 1);
+
+                        // Redirect to the new URL with filters and pagination
+                        window.location.href = `?${queryParams.toString()}`;
                     }
-                });
-            }
+                }
+                // Reset filters
+                function resetFilters() {
+                    // Clear the selected values in the dropdowns
+                    $('#project-filter').val(null).trigger('change');
+                    $('#department-filter').val(null).trigger('change');
 
-            // Reset filters
-            function resetFilters() {
-                // Clear the selected values in the dropdowns
-                $('#project-filter').val(null).trigger('change');
-                $('#department-filter').val(null).trigger('change');
+                    // Clear date inputs
+                    document.getElementById('start-date').value = '';
+                    document.getElementById('end-date').value = '';
 
-                // Clear date inputs
-                document.getElementById('start-date').value = '';
-                document.getElementById('end-date').value = '';
+                    // Reapply filters to show all tasks
+                    applyAllFilters();
+                }
 
-                // Reapply filters to show all tasks
-                applyAllFilters();
-            }
-
-            // Attach event listener for reset button
-            document.querySelector('.btn-primary[onclick="resetFilters()"]').onclick = resetFilters;
-        });
-    </script>
-
-    <!-- JS for task description modal -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const taskDescriptionModal = document.getElementById('taskDescriptionModal');
-            taskDescriptionModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget; // Button/link that triggered the modal
-                const description = button.getAttribute('data-description'); // Extract description from data attribute
-                const modalBody = taskDescriptionModal.querySelector('.modal-body p');
-                modalBody.textContent = description; // Set the modal content
+                // Attach event listener for reset button
+                document.querySelector('.btn-primary[onclick="resetFilters()"]').onclick = resetFilters;
             });
-        });
-    </script>
+        </script>
 
-    <!-- To check if task desc is more than 2 lines -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Function to check if the description exceeds 2 lines
-            function checkDescriptionHeight() {
-                const descriptionContainers = document.querySelectorAll('.task-description-container');
-
-                descriptionContainers.forEach(container => {
-                    const descriptionElement = container.querySelector('.task-description');
-                    const seeMoreLink = container.querySelector('.see-more-link');
-
-                    // Calculate the height of the description element
-                    const lineHeight = parseInt(window.getComputedStyle(descriptionElement).lineHeight);
-                    const maxHeight = lineHeight * 2; // Max height for 2 lines
-
-                    if (descriptionElement.scrollHeight > maxHeight) {
-                        // If the description exceeds 2 lines, show the "See more" link
-                        seeMoreLink.style.display = 'block';
-                    }
+        <!-- JS for task description modal -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const taskDescriptionModal = document.getElementById('taskDescriptionModal');
+                taskDescriptionModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget; // Button/link that triggered the modal
+                    const description = button.getAttribute('data-description'); // Extract description from data attribute
+                    const modalBody = taskDescriptionModal.querySelector('.modal-body p');
+                    modalBody.textContent = description; // Set the modal content
                 });
-            }
+            });
+        </script>
 
-            // Run the check when the page loads
-            checkDescriptionHeight();
+        <!-- To check if task desc is more than 2 lines -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Function to check if the description exceeds 2 lines
+                function checkDescriptionHeight() {
+                    const descriptionContainers = document.querySelectorAll('.task-description-container');
 
-            // Optional: Re-check if the window is resized (in case of dynamic content or layout changes)
-            window.addEventListener('resize', checkDescriptionHeight);
-        });
-    </script>
+                    descriptionContainers.forEach(container => {
+                        const descriptionElement = container.querySelector('.task-description');
+                        const seeMoreLink = container.querySelector('.see-more-link');
+
+                        // Calculate the height of the description element
+                        const lineHeight = parseInt(window.getComputedStyle(descriptionElement).lineHeight);
+                        const maxHeight = lineHeight * 2; // Max height for 2 lines
+
+                        if (descriptionElement.scrollHeight > maxHeight) {
+                            // If the description exceeds 2 lines, show the "See more" link
+                            seeMoreLink.style.display = 'block';
+                        }
+                    });
+                }
+
+                // Run the check when the page loads
+                checkDescriptionHeight();
+
+                // Optional: Re-check if the window is resized (in case of dynamic content or layout changes)
+                window.addEventListener('resize', checkDescriptionHeight);
+            });
+        </script>
 </body>
 
 </html>
