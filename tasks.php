@@ -864,14 +864,17 @@ function getWeekdays($start, $end)
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <div class="task-description">
-                                        <?= htmlspecialchars($row['task_description']) ?>
+                                    <div class="task-description-container">
+                                        <div class="task-description">
+                                            <?= htmlspecialchars($row['task_description']) ?>
+                                        </div>
+                                        <a href="#" class="see-more-link" data-bs-toggle="modal"
+                                            data-bs-target="#taskDescriptionModal"
+                                            data-description="<?= htmlspecialchars($row['task_description']) ?>"
+                                            style="display: none;">
+                                            See more
+                                        </a>
                                     </div>
-                                    <a href="#" class="see-more-link" data-bs-toggle="modal"
-                                        data-bs-target="#taskDescriptionModal"
-                                        data-description="<?= htmlspecialchars($row['task_description']) ?>">
-                                        See more
-                                    </a>
                                 </td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
@@ -990,14 +993,17 @@ function getWeekdays($start, $end)
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <div class="task-description">
-                                        <?= htmlspecialchars($row['task_description']) ?>
+                                    <div class="task-description-container">
+                                        <div class="task-description">
+                                            <?= htmlspecialchars($row['task_description']) ?>
+                                        </div>
+                                        <a href="#" class="see-more-link" data-bs-toggle="modal"
+                                            data-bs-target="#taskDescriptionModal"
+                                            data-description="<?= htmlspecialchars($row['task_description']) ?>"
+                                            style="display: none;">
+                                            See more
+                                        </a>
                                     </div>
-                                    <a href="#" class="see-more-link" data-bs-toggle="modal"
-                                        data-bs-target="#taskDescriptionModal"
-                                        data-description="<?= htmlspecialchars($row['task_description']) ?>">
-                                        See more
-                                    </a>
                                 </td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
                                 <td>
@@ -1465,6 +1471,36 @@ function getWeekdays($start, $end)
                 const modalBody = taskDescriptionModal.querySelector('.modal-body p');
                 modalBody.textContent = description; // Set the modal content
             });
+        });
+    </script>
+
+    <!-- To check if task desc is more than 2 lines -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to check if the description exceeds 2 lines
+            function checkDescriptionHeight() {
+                const descriptionContainers = document.querySelectorAll('.task-description-container');
+
+                descriptionContainers.forEach(container => {
+                    const descriptionElement = container.querySelector('.task-description');
+                    const seeMoreLink = container.querySelector('.see-more-link');
+
+                    // Calculate the height of the description element
+                    const lineHeight = parseInt(window.getComputedStyle(descriptionElement).lineHeight);
+                    const maxHeight = lineHeight * 2; // Max height for 2 lines
+
+                    if (descriptionElement.scrollHeight > maxHeight) {
+                        // If the description exceeds 2 lines, show the "See more" link
+                        seeMoreLink.style.display = 'block';
+                    }
+                });
+            }
+
+            // Run the check when the page loads
+            checkDescriptionHeight();
+
+            // Optional: Re-check if the window is resized (in case of dynamic content or layout changes)
+            window.addEventListener('resize', checkDescriptionHeight);
         });
     </script>
 </body>
