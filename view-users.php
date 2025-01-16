@@ -421,15 +421,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         /* Fix the position of the "x" (remove button) in the selected items */
-        .select2-selection--multiple .select2-selection__choice__remove {
-            color: white !important;
-            /* Color of the "x" (remove button) */
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            position: relative !important;
+            /* Change from absolute to relative */
+            left: auto !important;
+            /* Reset the left position */
+            top: auto !important;
+            /* Reset the top position */
             margin-right: 5px !important;
-            /* Move the "x" to the right */
+            /* Add margin to the right */
+            color: white !important;
+            /* Ensure the "x" is visible */
+            border: none !important;
+            /* Remove any borders */
+            background-color: transparent !important;
+            /* Ensure the background is transparent */
+            font-size: 1em !important;
+            /* Ensure consistent font size */
+            font-weight: bold !important;
+            /* Ensure consistent font weight */
+            cursor: pointer !important;
+            /* Ensure the cursor is a pointer */
         }
 
         /* Hover effect for the "x" (remove button) */
-        .select2-selection--multiple .select2-selection__choice__remove:hover {
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
             color: #e63946 !important;
             /* Change color on hover */
         }
