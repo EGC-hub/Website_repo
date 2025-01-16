@@ -290,14 +290,40 @@ $taskQuery = $user_role === 'Admin'
                 recorded_timestamp DESC
         ");
 
+// Number of tasks per table per page
+$tasksPerPage = 10;
+
+// Get current page from query string, default to 1
+$currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+
+// Calculate offset for the query
+$offset = ($currentPage - 1) * $tasksPerPage;
+
+// Fetch all tasks based on user role
 $stmt = $conn->prepare($taskQuery);
 if ($user_role === 'Manager' || $user_role === 'User') {
     $stmt->bind_param("i", $user_id);
 }
-
 $stmt->execute();
 $result = $stmt->get_result();
 $allTasks = $result->fetch_all(MYSQLI_ASSOC);
+
+// Split tasks into Pending/Started and Completed
+$pendingStartedTasks = array_filter($allTasks, function ($task) {
+    return in_array($task['status'], ['Pending', 'Started']);
+});
+
+$completedTasks = array_filter($allTasks, function ($task) {
+    return !in_array($task['status'], ['Pending', 'Started']);
+});
+
+// Calculate total pages for the entire page
+$totalTasks = count($pendingStartedTasks) + count($completedTasks);
+$totalPages = ceil($totalTasks / $tasksPerPage);
+
+// Slice the arrays to get tasks for the current page
+$pendingStartedTasksPage = array_slice($pendingStartedTasks, $offset, $tasksPerPage);
+$completedTasksPage = array_slice($completedTasks, $offset, $tasksPerPage);
 ?>
 
 <!-- Delay logic -->
@@ -316,33 +342,6 @@ function getWeekdays($start, $end)
     }
     return $weekdays;
 }
-?>
-
-<!-- Logic for pagination -->
-<?php
-// Split tasks into Pending/Started and Completed
-$pendingStartedTasks = array_filter($allTasks, function ($task) {
-    return in_array($task['status'], ['Pending', 'Started']);
-});
-
-$completedTasks = array_filter($allTasks, function ($task) {
-    return !in_array($task['status'], ['Pending', 'Started']);
-});
-
-// Number of tasks per page
-$tasksPerPage = 10;
-
-// Get current page from query string, default to 1
-$currentPagePending = isset($_GET['page_pending']) ? (int) $_GET['page_pending'] : 1;
-$currentPageCompleted = isset($_GET['page_completed']) ? (int) $_GET['page_completed'] : 1;
-
-// Calculate total pages for each table
-$totalPagesPending = ceil(count($pendingStartedTasks) / $tasksPerPage);
-$totalPagesCompleted = ceil(count($completedTasks) / $tasksPerPage);
-
-// Slice the arrays to get tasks for the current page
-$pendingStartedTasksPage = array_slice($pendingStartedTasks, ($currentPagePending - 1) * $tasksPerPage, $tasksPerPage);
-$completedTasksPage = array_slice($completedTasks, ($currentPageCompleted - 1) * $tasksPerPage, $tasksPerPage);
 ?>
 
 <!DOCTYPE html>
@@ -893,11 +892,11 @@ $completedTasksPage = array_slice($completedTasks, ($currentPageCompleted - 1) *
                 </thead>
                 <tbody>
                     <?php
-                    $taskCount = 1; // Initialize task count
+                    $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
                     foreach ($pendingStartedTasksPage as $row): ?>
                         <?php if ($row['status'] === 'Pending' || $row['status'] === 'Started'): ?>
                             <tr class="align-middle">
-                                <td><?= $taskCount++ ?></td> <!-- Display task count and increment -->
+                                <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td>
                                     <?php if ($row['status'] === 'Completed on Time'): ?>
@@ -981,22 +980,6 @@ $completedTasksPage = array_slice($completedTasks, ($currentPageCompleted - 1) *
                 No data found in Pending & Started Tasks matching the selected filters.
             </div>
 
-            <div class="pagination">
-                <?php if ($currentPagePending > 1): ?>
-                    <a
-                        href="?page_pending=<?= $currentPagePending - 1 ?>&page_completed=<?= $currentPageCompleted ?>">Previous</a>
-                <?php endif; ?>
-
-                <?php for ($i = 1; $i <= $totalPagesPending; $i++): ?>
-                    <a href="?page_pending=<?= $i ?>&page_completed=<?= $currentPageCompleted ?>" <?= $i == $currentPagePending ? 'class="active"' : '' ?>><?= $i ?></a>
-                <?php endfor; ?>
-
-                <?php if ($currentPagePending < $totalPagesPending): ?>
-                    <a
-                        href="?page_pending=<?= $currentPagePending + 1 ?>&page_completed=<?= $currentPageCompleted ?>">Next</a>
-                <?php endif; ?>
-            </div>
-
             <!-- Completed Tasks Table -->
             <h3>Completed Tasks</h3>
             <table class="table table-striped table-hover align-middle text-center custom-table" id="remaining-tasks">
@@ -1019,7 +1002,7 @@ $completedTasksPage = array_slice($completedTasks, ($currentPageCompleted - 1) *
                 </thead>
                 <tbody>
                     <?php
-                    $taskCount = 1; // Initialize task count
+                    $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
                     foreach ($completedTasksPage as $row): ?>
                         <?php if ($row['status'] !== 'Pending' && $row['status'] !== 'Started'): ?>
                             <?php
@@ -1042,7 +1025,7 @@ $completedTasksPage = array_slice($completedTasks, ($currentPageCompleted - 1) *
                             <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
                                 data-status="<?= htmlspecialchars($row['status']) ?>" class="align-middle <?php if ($row['status'] === 'Delayed Completion')
                                       echo 'delayed-task'; ?>">
-                                <td><?= $taskCount++ ?></td> <!-- Display task count and increment -->
+                                <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
                                 <td>
                                     <?php if ($row['status'] === 'Completed on Time'): ?>
@@ -1132,19 +1115,18 @@ $completedTasksPage = array_slice($completedTasks, ($currentPageCompleted - 1) *
                 No data found in Completed Tasks matching the selected filters.
             </div>
 
+            <!-- Pagination for the entire page -->
             <div class="pagination">
-                <?php if ($currentPageCompleted > 1): ?>
-                    <a
-                        href="?page_pending=<?= $currentPagePending ?>&page_completed=<?= $currentPageCompleted - 1 ?>">Previous</a>
+                <?php if ($currentPage > 1): ?>
+                    <a href="?page=<?= $currentPage - 1 ?>">Previous</a>
                 <?php endif; ?>
 
-                <?php for ($i = 1; $i <= $totalPagesCompleted; $i++): ?>
-                    <a href="?page_pending=<?= $currentPagePending ?>&page_completed=<?= $i ?>" <?= $i == $currentPageCompleted ? 'class="active"' : '' ?>><?= $i ?></a>
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="?page=<?= $i ?>" <?= $i == $currentPage ? 'class="active"' : '' ?>><?= $i ?></a>
                 <?php endfor; ?>
 
-                <?php if ($currentPageCompleted < $totalPagesCompleted): ?>
-                    <a
-                        href="?page_pending=<?= $currentPagePending ?>&page_completed=<?= $currentPageCompleted + 1 ?>">Next</a>
+                <?php if ($currentPage < $totalPages): ?>
+                    <a href="?page=<?= $currentPage + 1 ?>">Next</a>
                 <?php endif; ?>
             </div>
         </div>
