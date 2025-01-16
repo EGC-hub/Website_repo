@@ -631,6 +631,33 @@ function getWeekdays($start, $end)
             font-size: 14px;
             margin-top: 10px;
         }
+
+        /* Add this to your existing CSS */
+        .task-description {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            /* Limit to 2 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            /* Allow wrapping */
+            max-width: 300px;
+            /* Adjust as needed */
+        }
+
+        .see-more-link {
+            color: #002c5f;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .see-more-link:hover {
+            color: #004080;
+        }
     </style>
 </head>
 
@@ -836,7 +863,16 @@ function getWeekdays($start, $end)
                                         <?php echo htmlspecialchars($row['task_name']); ?>
                                     <?php endif; ?>
                                 </td>
-                                <td><?= htmlspecialchars($row['task_description']) ?></td>
+                                <td>
+                                    <div class="task-description">
+                                        <?= htmlspecialchars($row['task_description']) ?>
+                                    </div>
+                                    <a href="#" class="see-more-link" data-bs-toggle="modal"
+                                        data-bs-target="#taskDescriptionModal"
+                                        data-description="<?= htmlspecialchars($row['task_description']) ?>">
+                                        See more
+                                    </a>
+                                </td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
                                 <td>
@@ -953,7 +989,16 @@ function getWeekdays($start, $end)
                                         <?php echo htmlspecialchars($row['task_name']); ?>
                                     <?php endif; ?>
                                 </td>
-                                <td><?= htmlspecialchars($row['task_description']) ?></td>
+                                <td>
+                                    <div class="task-description">
+                                        <?= htmlspecialchars($row['task_description']) ?>
+                                    </div>
+                                    <a href="#" class="see-more-link" data-bs-toggle="modal"
+                                        data-bs-target="#taskDescriptionModal"
+                                        data-description="<?= htmlspecialchars($row['task_description']) ?>">
+                                        See more
+                                    </a>
+                                </td>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
                                 <td>
                                     <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?>
@@ -1112,6 +1157,25 @@ function getWeekdays($start, $end)
                 <div class="modal-body">
                     <p><strong>Task Name:</strong> <span id="success-task-name"></span></p>
                     <p><strong>Message:</strong> <span id="success-message"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for task description -->
+    <div class="modal fade" id="taskDescriptionModal" tabindex="-1" aria-labelledby="taskDescriptionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskDescriptionModalLabel">Task Description</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="full-task-description"></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -1388,6 +1452,19 @@ function getWeekdays($start, $end)
 
             // Attach event listener for reset button
             document.querySelector('.btn-primary[onclick="resetFilters()"]').onclick = resetFilters;
+        });
+    </script>
+
+    <!-- JS for task description modal -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const taskDescriptionModal = document.getElementById('taskDescriptionModal');
+            taskDescriptionModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Button/link that triggered the modal
+                const description = button.getAttribute('data-description'); // Extract description from data attribute
+                const modalBody = taskDescriptionModal.querySelector('.modal-body p');
+                modalBody.textContent = description; // Set the modal content
+            });
         });
     </script>
 </body>
