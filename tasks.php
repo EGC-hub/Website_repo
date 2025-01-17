@@ -226,7 +226,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     }
 }
 
-// Fetch tasks for the logged-in user
+// Get filter parameters from the query string
+$selectedProject = isset($_GET['project']) ? $_GET['project'] : null;
+$selectedDepartment = isset($_GET['department']) ? $_GET['department'] : null;
+$startDateFilter = isset($_GET['start_date']) ? $_GET['start_date'] : null;
+$endDateFilter = isset($_GET['end_date']) ? $_GET['end_date'] : null;
+
+// Modify the task query to include all filters
 $taskQuery = $user_role === 'Admin'
     ? "
         SELECT tasks.*, 
@@ -241,6 +247,11 @@ $taskQuery = $user_role === 'Admin'
         JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
+        WHERE 1=1
+        " . ($selectedProject ? " AND tasks.project_name = '$selectedProject'" : "") . "
+        " . ($selectedDepartment ? " AND assigned_to_department.name = '$selectedDepartment'" : "") . "
+        " . ($startDateFilter ? " AND tasks.expected_start_date >= '$startDateFilter'" : "") . "
+        " . ($endDateFilter ? " AND tasks.expected_finish_date <= '$endDateFilter'" : "") . "
         GROUP BY tasks.task_id
         ORDER BY 
             CASE 
@@ -264,6 +275,10 @@ $taskQuery = $user_role === 'Admin'
             JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
             JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
             WHERE assigned_to_ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
+            " . ($selectedProject ? " AND tasks.project_name = '$selectedProject'" : "") . "
+            " . ($selectedDepartment ? " AND assigned_to_department.name = '$selectedDepartment'" : "") . "
+            " . ($startDateFilter ? " AND tasks.expected_start_date >= '$startDateFilter'" : "") . "
+            " . ($endDateFilter ? " AND tasks.expected_finish_date <= '$endDateFilter'" : "") . "
             GROUP BY tasks.task_id
             ORDER BY 
                 CASE 
@@ -281,6 +296,10 @@ $taskQuery = $user_role === 'Admin'
             JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
             JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
             WHERE tasks.user_id = ? 
+            " . ($selectedProject ? " AND tasks.project_name = '$selectedProject'" : "") . "
+            " . ($selectedDepartment ? " AND assigned_by_department.name = '$selectedDepartment'" : "") . "
+            " . ($startDateFilter ? " AND tasks.expected_start_date >= '$startDateFilter'" : "") . "
+            " . ($endDateFilter ? " AND tasks.expected_finish_date <= '$endDateFilter'" : "") . "
             GROUP BY tasks.task_id
             ORDER BY 
                 CASE 
@@ -1129,15 +1148,18 @@ function getWeekdays($start, $end)
             <!-- Pagination for the entire page -->
             <div class="pagination">
                 <?php if ($currentPage > 1): ?>
-                    <a href="?page=<?= $currentPage - 1 ?>">Previous</a>
+                    <a
+                        href="?page=<?= $currentPage - 1 ?>&project=<?= $selectedProject ?>&department=<?= $selectedDepartment ?>&start_date=<?= $startDateFilter ?>&end_date=<?= $endDateFilter ?>">Previous</a>
                 <?php endif; ?>
 
                 <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <a href="?page=<?= $i ?>" <?= $i == $currentPage ? 'class="active"' : '' ?>><?= $i ?></a>
+                    <a href="?page=<?= $i ?>&project=<?= $selectedProject ?>&department=<?= $selectedDepartment ?>&start_date=<?= $startDateFilter ?>&end_date=<?= $endDateFilter ?>"
+                        <?= $i == $currentPage ? 'class="active"' : '' ?>><?= $i ?></a>
                 <?php endfor; ?>
 
                 <?php if ($currentPage < $totalPages): ?>
-                    <a href="?page=<?= $currentPage + 1 ?>">Next</a>
+                    <a
+                        href="?page=<?= $currentPage + 1 ?>&project=<?= $selectedProject ?>&department=<?= $selectedDepartment ?>&start_date=<?= $startDateFilter ?>&end_date=<?= $endDateFilter ?>">Next</a>
                 <?php endif; ?>
             </div>
         </div>
@@ -1458,8 +1480,8 @@ function getWeekdays($start, $end)
                 function applyAllFilters() {
                     const selectedProjects = $('#project-filter').val();
                     const selectedDepartments = $('#department-filter').val();
-                    const startDate = document.getElementById('start-date').value ? new Date(document.getElementById('start-date').value) : null;
-                    const endDate = document.getElementById('end-date').value ? new Date(document.getElementById('end-date').value) : null;
+                    const startDate = document.getElementById('start-date').value;
+                    const endDate = document.getElementById('end-date').value;
 
                     // Define tables and their corresponding alerts
                     const tables = [
@@ -1497,10 +1519,10 @@ function getWeekdays($start, $end)
 
                             // Check if the task falls within the selected date range
                             let dateMatch = true;
-                            if (startDate && taskStartDate < startDate) {
+                            if (startDate && taskStartDate < new Date(startDate)) {
                                 dateMatch = false;
                             }
-                            if (endDate && taskEndDate > endDate) {
+                            if (endDate && taskEndDate > new Date(endDate)) {
                                 dateMatch = false;
                             }
 
@@ -1534,16 +1556,15 @@ function getWeekdays($start, $end)
                         if (selectedDepartments && selectedDepartments.length > 0) {
                             queryParams.set('department', selectedDepartments.join(','));
                         }
-                        if (document.getElementById('start-date').value) {
-                            queryParams.set('start_date', document.getElementById('start-date').value);
+                        if (startDate) {
+                            queryParams.set('start_date', startDate);
                         }
-                        if (document.getElementById('end-date').value) {
-                            queryParams.set('end_date', document.getElementById('end-date').value);
+                        if (endDate) {
+                            queryParams.set('end_date', endDate);
                         }
 
                         // Reset pagination to the first page for both tables
-                        queryParams.set('page_pending', 1);
-                        queryParams.set('page_completed', 1);
+                        queryParams.set('page', 1);
 
                         // Redirect to the new URL with filters and pagination
                         window.location.href = `?${queryParams.toString()}`;
