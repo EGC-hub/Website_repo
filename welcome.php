@@ -918,7 +918,7 @@ try {
             });
 
             function fetchTaskData(status) {
-                fetch(`fetch_tasks.php?status=${status}`)
+                fetch(`fetch-tasks.php?status=${status}`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error(`HTTP error! Status: ${response.status}`);
