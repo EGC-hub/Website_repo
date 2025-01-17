@@ -330,6 +330,20 @@ $totalPages = max(
 // Slice the arrays to get tasks for the current page
 $pendingStartedTasksPage = array_slice($pendingStartedTasks, $offset, $tasksPerPage);
 $completedTasksPage = array_slice($completedTasks, $offset, $tasksPerPage);
+
+// Check if there are no tasks for Pending & Started Tasks on the current page
+if (empty($pendingStartedTasksPage)) {
+    echo '<script>document.getElementById("no-data-alert-pending").style.display = "block";</script>';
+} else {
+    echo '<script>document.getElementById("no-data-alert-pending").style.display = "none";</script>';
+}
+
+// Check if there are no tasks for Completed Tasks on the current page
+if (empty($completedTasksPage)) {
+    echo '<script>document.getElementById("no-data-alert-completed").style.display = "block";</script>';
+} else {
+    echo '<script>document.getElementById("no-data-alert-completed").style.display = "none";</script>';
+}
 ?>
 
 <!-- Delay logic -->
@@ -983,7 +997,7 @@ function getWeekdays($start, $end)
 
             <!-- Alert for Pending & Started Tasks -->
             <div id="no-data-alert-pending" class="alert alert-warning mt-3" style="display: none;">
-                No data found in Pending & Started Tasks matching the selected filters.
+                No data found in Pending & Started Tasks.
             </div>
 
             <!-- Completed Tasks Table -->
@@ -1118,7 +1132,7 @@ function getWeekdays($start, $end)
 
             <!-- Alert for Completed Tasks -->
             <div id="no-data-alert-completed" class="alert alert-warning mt-3" style="display: none;">
-                No data found in Completed Tasks matching the selected filters.
+                No data found in Completed Tasks.
             </div>
 
             <!-- Pagination for the entire page -->
