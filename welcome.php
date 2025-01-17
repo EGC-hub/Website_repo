@@ -900,10 +900,18 @@ try {
                             text: 'Task Distribution by Status'
                         }
                     },
+                    const statusMapping = {
+                        'Pending': 'Pending',
+                        'In Progress': 'Started',
+                        'Completed': 'Completed on Time',
+                        'Delayed': 'Delayed Completion'
+                    };
+
                     onClick: (event, elements) => {
                         if (elements.length > 0) {
                             const index = elements[0].index;
-                            const status = ['Pending', 'In Progress', 'Completed', 'Delayed'][index];
+                            const statusLabel = ['Pending', 'In Progress', 'Completed', 'Delayed'][index];
+                            const status = statusMapping[statusLabel]; // Map to the correct status value
                             fetchTaskData(status);
                         }
                     }
@@ -978,7 +986,6 @@ try {
                 const modal = new bootstrap.Modal(document.getElementById(modalId));
                 modal.show();
             }
-
             // Task Completion Over Time (Line Chart)
             const taskCompletionChart = new Chart(document.getElementById('taskCompletionChart'), {
                 type: 'line',

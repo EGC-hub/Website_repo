@@ -29,7 +29,8 @@ try {
     $userRole = $_SESSION['role'] ?? '';
 
     // Validate status
-    if (!in_array($status, ['Pending', 'Started', 'Completed on Time', 'Delayed Completion'])) {
+    $validStatuses = ['Pending', 'Started', 'Completed on Time', 'Delayed Completion'];
+    if (!in_array($status, $validStatuses)) {
         http_response_code(400);
         echo json_encode(['error' => 'Invalid status']);
         exit;
@@ -70,7 +71,11 @@ try {
     $stmt->execute();
     $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    echo json_encode($tasks);
+    if (empty($tasks)) {
+        echo json_encode([]); // Return an empty array if no tasks are found
+    } else {
+        echo json_encode($tasks);
+    }
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
