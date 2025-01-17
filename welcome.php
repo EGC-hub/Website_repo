@@ -912,7 +912,7 @@ try {
 
             // Function to fetch task data based on status
             function fetchTaskData(status) {
-                fetch(`fetch_tasks.php?status=${status}`)
+                fetch(`fetch-tasks.php?status=${status}`)
                     .then(response => response.json())
                     .then(data => {
                         populateModal(status, data);
