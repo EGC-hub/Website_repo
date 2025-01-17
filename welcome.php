@@ -866,6 +866,12 @@ try {
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <script>
+            const statusMapping = {
+                        'Pending': 'Pending',
+                        'In Progress': 'Started',
+                        'Completed': 'Completed on Time',
+                        'Delayed': 'Delayed Completion'
+                    };
             // Task Distribution Chart (Pie Chart)
             const taskDistributionChart = new Chart(document.getElementById('taskDistributionChart'), {
                 type: 'pie',
@@ -900,13 +906,6 @@ try {
                             text: 'Task Distribution by Status'
                         }
                     },
-                    const statusMapping = {
-                        'Pending': 'Pending',
-                        'In Progress': 'Started',
-                        'Completed': 'Completed on Time',
-                        'Delayed': 'Delayed Completion'
-                    };
-
                     onClick: (event, elements) => {
                         if (elements.length > 0) {
                             const index = elements[0].index;
