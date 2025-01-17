@@ -867,11 +867,11 @@ try {
 
         <script>
             const statusMapping = {
-                        'Pending': 'Pending',
-                        'In Progress': 'Started',
-                        'Completed': 'Completed on Time',
-                        'Delayed': 'Delayed Completion'
-                    };
+                'Pending': 'Pending',
+                'In Progress': 'Started',
+                'Completed': 'Completed on Time',
+                'Delayed': 'Delayed Completion'
+            };
             // Task Distribution Chart (Pie Chart)
             const taskDistributionChart = new Chart(document.getElementById('taskDistributionChart'), {
                 type: 'pie',
@@ -968,10 +968,11 @@ try {
                 if (data.length === 0) {
                     tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No tasks found.</td></tr>';
                 } else {
-                    data.forEach(task => {
+                    // Use the index of the data array to generate the count number
+                    data.forEach((task, index) => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                <td>${task.task_id}</td>
+                <td>${index + 1}</td>
                 <td>${task.task_name}</td>
                 <td>${task.assigned_to}</td>
                 <td>${task.department}</td>
