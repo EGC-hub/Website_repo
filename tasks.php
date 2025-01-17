@@ -317,9 +317,15 @@ $completedTasks = array_filter($allTasks, function ($task) {
     return !in_array($task['status'], ['Pending', 'Started']);
 });
 
-// Calculate total pages for the entire page
-$totalTasks = count($pendingStartedTasks) + count($completedTasks);
-$totalPages = ceil($totalTasks / $tasksPerPage);
+// Calculate total pages for each table separately
+$totalPendingStartedTasks = count($pendingStartedTasks);
+$totalCompletedTasks = count($completedTasks);
+
+// Calculate total pages for the entire page based on the larger of the two sets
+$totalPages = max(
+    ceil($totalPendingStartedTasks / $tasksPerPage),
+    ceil($totalCompletedTasks / $tasksPerPage)
+);
 
 // Slice the arrays to get tasks for the current page
 $pendingStartedTasksPage = array_slice($pendingStartedTasks, $offset, $tasksPerPage);
