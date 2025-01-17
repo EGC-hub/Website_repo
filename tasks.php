@@ -864,7 +864,9 @@ function getWeekdays($start, $end)
                         <select id="project-filter" multiple="multiple">
                             <option value="All">All</option>
                             <?php foreach ($projects as $project): ?>
-                                <option value="<?= htmlspecialchars($project) ?>"><?= htmlspecialchars($project) ?></option>
+                                <option value="<?= htmlspecialchars($project) ?>" <?= (isset($_GET['project']) && in_array($project, explode(',', $_GET['project']))) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($project) ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -875,7 +877,7 @@ function getWeekdays($start, $end)
                         <select id="department-filter" multiple="multiple">
                             <option value="All">All</option>
                             <?php foreach ($departments as $department): ?>
-                                <option value="<?= htmlspecialchars($department['name']) ?>">
+                                <option value="<?= htmlspecialchars($department['name']) ?>" <?= (isset($_GET['department']) && in_array($department['name'], explode(',', $_GET['department']))) ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($department['name']) ?>
                                 </option>
                             <?php endforeach; ?>
@@ -886,11 +888,13 @@ function getWeekdays($start, $end)
                     <div class="filter-date">
                         <div class="filter-dropdown">
                             <label for="start-date">Start Date:</label>
-                            <input type="date" id="start-date" onchange="filterByDate()">
+                            <input type="date" id="start-date"
+                                value="<?= isset($_GET['start_date']) ? htmlspecialchars($_GET['start_date']) : '' ?>">
                         </div>
                         <div class="filter-dropdown">
                             <label for="end-date">End Date:</label>
-                            <input type="date" id="end-date" onchange="filterByDate()">
+                            <input type="date" id="end-date"
+                                value="<?= isset($_GET['end_date']) ? htmlspecialchars($_GET['end_date']) : '' ?>">
                         </div>
                     </div>
                 </div>
@@ -1572,20 +1576,23 @@ function getWeekdays($start, $end)
                 }
                 // Reset filters
                 function resetFilters() {
-                    // Clear the selected values in the dropdowns
+                    // Clear the filter inputs
                     $('#project-filter').val(null).trigger('change');
                     $('#department-filter').val(null).trigger('change');
-
-                    // Clear date inputs
                     document.getElementById('start-date').value = '';
                     document.getElementById('end-date').value = '';
 
-                    // Reapply filters to show all tasks
-                    applyAllFilters();
+                    // Redirect to the page without any filter parameters
+                    window.location.href = window.location.pathname; // Reload the page without query string
                 }
 
                 // Attach event listener for reset button
                 document.querySelector('.btn-primary[onclick="resetFilters()"]').onclick = resetFilters;
+
+                // Reload the page when a filter is deselected
+                $('#project-filter, #department-filter, #start-date, #end-date').on('change', function () {
+                    applyAllFilters();
+                });
             });
         </script>
 
