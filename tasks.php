@@ -987,7 +987,7 @@ function getWeekdays($start, $end)
 
             <!-- Alert for Pending & Started Tasks -->
             <div id="no-data-alert-pending" class="alert alert-warning mt-3" style="display: <?= $showPendingAlert ?>;">
-                No data found in Pending & Started Tasks.
+                No data to be displayed.
             </div>
 
             <!-- Completed Tasks Table -->
@@ -1123,7 +1123,7 @@ function getWeekdays($start, $end)
             <!-- Alert for Completed Tasks -->
             <div id="no-data-alert-completed" class="alert alert-warning mt-3"
                 style="display: <?= $showCompletedAlert ?>;">
-                No data found in Completed Tasks.
+                No data to be displayed.
             </div>
 
             <!-- Pagination for the entire page -->
