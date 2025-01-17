@@ -531,6 +531,29 @@ try {
             width: 100% !important;
             height: 300px !important;
         }
+
+        .modal-content {
+            border-radius: 10px;
+        }
+
+        .modal-header {
+            background-color: #002c5f;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .modal-title {
+            font-weight: bold;
+        }
+
+        .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 44, 95, 0.05);
+        }
     </style>
 </head>
 
@@ -698,6 +721,144 @@ try {
             </div>
         </div>
 
+        <!-- Modals for Task Status -->
+
+        <!-- Completed Tasks Modal -->
+        <div class="modal fade" id="completedTasksModal" tabindex="-1" aria-labelledby="completedTasksModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="completedTasksModalLabel">Completed Tasks (Last 3 Months)</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Task ID</th>
+                                        <th>Task Name</th>
+                                        <th>Assigned To</th>
+                                        <th>Department</th>
+                                        <th>Completion Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="completedTasksTableBody">
+                                    <!-- Rows will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Tasks Modal -->
+        <div class="modal fade" id="pendingTasksModal" tabindex="-1" aria-labelledby="pendingTasksModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="pendingTasksModalLabel">Pending Tasks (Last 3 Months)</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Task ID</th>
+                                        <th>Task Name</th>
+                                        <th>Assigned To</th>
+                                        <th>Department</th>
+                                        <th>Expected Start Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingTasksTableBody">
+                                    <!-- Rows will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- In Progress Tasks Modal -->
+        <div class="modal fade" id="inProgressTasksModal" tabindex="-1" aria-labelledby="inProgressTasksModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="inProgressTasksModalLabel">In Progress Tasks (Last 3 Months)</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Task ID</th>
+                                        <th>Task Name</th>
+                                        <th>Assigned To</th>
+                                        <th>Department</th>
+                                        <th>Start Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inProgressTasksTableBody">
+                                    <!-- Rows will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delayed Tasks Modal -->
+        <div class="modal fade" id="delayedTasksModal" tabindex="-1" aria-labelledby="delayedTasksModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="delayedTasksModalLabel">Delayed Tasks (Last 3 Months)</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Task ID</th>
+                                        <th>Task Name</th>
+                                        <th>Assigned To</th>
+                                        <th>Department</th>
+                                        <th>Expected Finish Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="delayedTasksTableBody">
+                                    <!-- Rows will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Bootstrap JS (with Popper.js) -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -728,8 +889,8 @@ try {
                     }]
                 },
                 options: {
-                    responsive: true, // Make the chart responsive
-                    maintainAspectRatio: false, // Allow custom sizing
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             position: 'bottom',
@@ -738,9 +899,70 @@ try {
                             display: true,
                             text: 'Task Distribution by Status'
                         }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const status = ['Pending', 'In Progress', 'Completed', 'Delayed'][index];
+                            fetchTaskData(status);
+                        }
                     }
                 }
             });
+
+            // Function to fetch task data based on status
+            function fetchTaskData(status) {
+                fetch(`fetch_tasks.php?status=${status}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        populateModal(status, data);
+                    })
+                    .catch(error => console.error('Error fetching task data:', error));
+            }
+
+            // Function to populate the modal with task data
+            function populateModal(status, data) {
+                let modalId, tableBodyId;
+                switch (status) {
+                    case 'Pending':
+                        modalId = 'pendingTasksModal';
+                        tableBodyId = 'pendingTasksTableBody';
+                        break;
+                    case 'In Progress':
+                        modalId = 'inProgressTasksModal';
+                        tableBodyId = 'inProgressTasksTableBody';
+                        break;
+                    case 'Completed':
+                        modalId = 'completedTasksModal';
+                        tableBodyId = 'completedTasksTableBody';
+                        break;
+                    case 'Delayed':
+                        modalId = 'delayedTasksModal';
+                        tableBodyId = 'delayedTasksTableBody';
+                        break;
+                    default:
+                        return;
+                }
+
+                const tableBody = document.getElementById(tableBodyId);
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                data.forEach(task => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                <td>${task.task_id}</td>
+                <td>${task.task_name}</td>
+                <td>${task.assigned_to}</td>
+                <td>${task.department}</td>
+                <td>${task.completion_date}</td>
+            `;
+                    tableBody.appendChild(row);
+                });
+
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById(modalId));
+                modal.show();
+            }
 
             // Task Completion Over Time (Line Chart)
             const taskCompletionChart = new Chart(document.getElementById('taskCompletionChart'), {
