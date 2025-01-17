@@ -910,17 +910,28 @@ try {
                 }
             });
 
-            // Function to fetch task data based on status
             function fetchTaskData(status) {
-                fetch(`fetch-tasks.php?status=${status}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        populateModal(status, data);
+                fetch(`fetch_tasks.php?status=${status}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
                     })
-                    .catch(error => console.error('Error fetching task data:', error));
+                    .then(data => {
+                        if (Array.isArray(data)) {
+                            populateModal(status, data);
+                        } else {
+                            console.error('Unexpected response format:', data);
+                            alert('Failed to fetch task data. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching task data:', error);
+                        alert('Failed to fetch task data. Please try again.');
+                    });
             }
 
-            // Function to populate the modal with task data
             function populateModal(status, data) {
                 let modalId, tableBodyId;
                 switch (status) {
@@ -928,15 +939,15 @@ try {
                         modalId = 'pendingTasksModal';
                         tableBodyId = 'pendingTasksTableBody';
                         break;
-                    case 'In Progress':
+                    case 'Started':
                         modalId = 'inProgressTasksModal';
                         tableBodyId = 'inProgressTasksTableBody';
                         break;
-                    case 'Completed':
+                    case 'Completed on Time':
                         modalId = 'completedTasksModal';
                         tableBodyId = 'completedTasksTableBody';
                         break;
-                    case 'Delayed':
+                    case 'Delayed Completion':
                         modalId = 'delayedTasksModal';
                         tableBodyId = 'delayedTasksTableBody';
                         break;
@@ -947,17 +958,21 @@ try {
                 const tableBody = document.getElementById(tableBodyId);
                 tableBody.innerHTML = ''; // Clear existing rows
 
-                data.forEach(task => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+                if (data.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No tasks found.</td></tr>';
+                } else {
+                    data.forEach(task => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
                 <td>${task.task_id}</td>
                 <td>${task.task_name}</td>
                 <td>${task.assigned_to}</td>
                 <td>${task.department}</td>
-                <td>${task.completion_date}</td>
+                <td>${task.completion_date || task.start_date || task.expected_finish_date}</td>
             `;
-                    tableBody.appendChild(row);
-                });
+                        tableBody.appendChild(row);
+                    });
+                }
 
                 // Show the modal
                 const modal = new bootstrap.Modal(document.getElementById(modalId));
