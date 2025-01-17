@@ -59,7 +59,7 @@ try {
     }
 
     // Limit to the last 3 months
-    $query .= " AND t.expected_finish_date >= DATE_SUB(NOW(), INTERVAL 3 MONTH)";
+    $query .= " AND t.expected_finish_date >= DATE_SUB(NOW(), INTERVAL 3 MONTH) ORDER BY t.expected_finish_date DESC";
 
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(':status', $status, PDO::PARAM_STR);
