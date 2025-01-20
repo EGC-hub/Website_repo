@@ -1432,7 +1432,7 @@ function getWeekdays($start, $end)
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            alert('An error occurred while updating the status.');
+                            alert('An error occurred while updating the status. Check the console for details.');
                         });
                 } else {
                     // For other statuses, submit the form directly
@@ -1462,7 +1462,7 @@ function getWeekdays($start, $end)
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            alert('An error occurred while updating the status.');
+                            alert('An error occurred while updating the status. Check the console for details.');
                         });
                 }
             }
