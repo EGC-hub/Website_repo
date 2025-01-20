@@ -119,12 +119,17 @@ try {
 
         // Fetch task distribution by status
         $stmt = $pdo->prepare("
-        SELECT 
-            SUM(CASE WHEN status = 'Assigned' THEN 1 ELSE 0 END) as assigned,
-            SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
-            SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
-            SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as 'delayed'
-        FROM tasks
+            SELECT 
+                SUM(CASE WHEN status = 'Assigned' THEN 1 ELSE 0 END) as assigned,
+                SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
+                SUM(CASE WHEN status = 'Hold' THEN 1 ELSE 0 END) as hold,
+                SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled,
+                SUM(CASE WHEN status = 'Reinstated' THEN 1 ELSE 0 END) as reinstated,
+                SUM(CASE WHEN status = 'Reassigned' THEN 1 ELSE 0 END) as reassigned,
+                SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
+                SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as delayed,
+                SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) as closed
+            FROM tasks
         ");
         $stmt->execute();
         $taskDistribution = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -247,8 +252,13 @@ try {
             SELECT 
                 SUM(CASE WHEN status = 'Assigned' THEN 1 ELSE 0 END) as assigned,
                 SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
+                SUM(CASE WHEN status = 'Hold' THEN 1 ELSE 0 END) as hold,
+                SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled,
+                SUM(CASE WHEN status = 'Reinstated' THEN 1 ELSE 0 END) as reinstated,
+                SUM(CASE WHEN status = 'Reassigned' THEN 1 ELSE 0 END) as reassigned,
                 SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
-                SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as 'delayed'
+                SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as delayed,
+                SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) as closed
             FROM tasks t
             JOIN user_departments ud ON t.user_id = ud.user_id
             WHERE ud.department_id IN (
@@ -350,14 +360,19 @@ try {
 
         // Fetch task distribution by status for the user
         $stmt = $pdo->prepare("
-        SELECT 
-            SUM(CASE WHEN status = 'Assigned' THEN 1 ELSE 0 END) as assigned,
-            SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
-            SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
-            SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as 'delayed'
-        FROM tasks
-        WHERE user_id = :user_id
-    ");
+            SELECT 
+                SUM(CASE WHEN status = 'Assigned' THEN 1 ELSE 0 END) as assigned,
+                SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
+                SUM(CASE WHEN status = 'Hold' THEN 1 ELSE 0 END) as hold,
+                SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled,
+                SUM(CASE WHEN status = 'Reinstated' THEN 1 ELSE 0 END) as reinstated,
+                SUM(CASE WHEN status = 'Reassigned' THEN 1 ELSE 0 END) as reassigned,
+                SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
+                SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as delayed,
+                SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) as closed
+            FROM tasks
+            WHERE user_id = :user_id
+        ");
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
         $taskDistribution = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -859,6 +874,176 @@ try {
             </div>
         </div>
 
+        <!-- Hold Tasks Modal -->
+        <div class="modal fade" id="holdTasksModal" tabindex="-1" aria-labelledby="holdTasksModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="holdTasksModalLabel">Hold Tasks</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Task ID</th>
+                                        <th>Task Name</th>
+                                        <th>Assigned To</th>
+                                        <th>Department</th>
+                                        <th>Start Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="holdTasksTableBody">
+                                    <!-- Rows will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cancelled tasks modal -->
+        <div class="modal fade" id="cancelledTasksModal" tabindex="-1" aria-labelledby="cancelledTasksModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelledTasksModalLabel">Cancelled Tasks</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Task ID</th>
+                                        <th>Task Name</th>
+                                        <th>Assigned To</th>
+                                        <th>Department</th>
+                                        <th>Start Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cancelledTasksTableBody">
+                                    <!-- Rows will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reinstated tasks modal -->
+        <div class="modal fade" id="reinstatedTasksModal" tabindex="-1" aria-labelledby="reinstatedTasksModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reinstatedTasksModalLabel">Reinstated Tasks</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Task ID</th>
+                                        <th>Task Name</th>
+                                        <th>Assigned To</th>
+                                        <th>Department</th>
+                                        <th>Start Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reinstatedTasksTableBody">
+                                    <!-- Rows will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reassigned tasks modal -->
+        <div class="modal fade" id="reassignedTasksModal" tabindex="-1" aria-labelledby="reassignedTasksModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="reassignedTasksModalLabel">Reassigned Tasks</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Task ID</th>
+                                        <th>Task Name</th>
+                                        <th>Assigned To</th>
+                                        <th>Department</th>
+                                        <th>Start Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reassignedTasksTableBody">
+                                    <!-- Rows will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Closed tasks modal -->
+        <div class="modal fade" id="closedTasksModal" tabindex="-1" aria-labelledby="closedTasksModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="closedTasksModalLabel">Closed Tasks</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Task ID</th>
+                                        <th>Task Name</th>
+                                        <th>Assigned To</th>
+                                        <th>Department</th>
+                                        <th>Start Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="closedTasksTableBody">
+                                    <!-- Rows will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Bootstrap JS (with Popper.js) -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -876,20 +1061,40 @@ try {
             const taskDistributionChart = new Chart(document.getElementById('taskDistributionChart'), {
                 type: 'pie',
                 data: {
-                    labels: ['Assigned', 'In Progress', 'Completed', 'Delayed'],
+                    labels: [
+                        'Assigned',
+                        'In Progress',
+                        'Hold',
+                        'Cancelled',
+                        'Reinstated',
+                        'Reassigned',
+                        'Completed on Time',
+                        'Delayed Completion',
+                        'Closed'
+                    ],
                     datasets: [{
                         label: 'Task Distribution',
                         data: [
                             <?= $taskDistribution['assigned'] ?>,
                             <?= $taskDistribution['in_progress'] ?>,
+                            <?= $taskDistribution['hold'] ?>,
+                            <?= $taskDistribution['cancelled'] ?>,
+                            <?= $taskDistribution['reinstated'] ?>,
+                            <?= $taskDistribution['reassigned'] ?>,
                             <?= $taskDistribution['completed'] ?>,
-                            <?= $taskDistribution['delayed'] ?>
+                            <?= $taskDistribution['delayed'] ?>,
+                            <?= $taskDistribution['closed'] ?>
                         ],
                         backgroundColor: [
-                            '#FF6384', // Red for assigned
+                            '#FF6384', // Red for Assigned
                             '#36A2EB', // Blue for In Progress
-                            '#4BC0C0', // Teal for Completed
-                            '#FFCE56'  // Yellow for Delayed
+                            '#4BC0C0', // Teal for Hold
+                            '#FFCE56', // Yellow for Cancelled
+                            '#9966FF', // Purple for Reinstated
+                            '#FF8A80', // Coral for Reassigned
+                            '#7CB342', // Green for Completed on Time
+                            '#FFD54F', // Amber for Delayed Completion
+                            '#64B5F6'  // Light Blue for Closed
                         ],
                         hoverOffset: 4
                     }]
@@ -909,9 +1114,18 @@ try {
                     onClick: (event, elements) => {
                         if (elements.length > 0) {
                             const index = elements[0].index;
-                            const statusLabel = ['Assigned', 'In Progress', 'Completed', 'Delayed'][index];
-                            const status = statusMapping[statusLabel]; // Map to the correct status value
-                            fetchTaskData(status);
+                            const statusLabel = [
+                                'Assigned',
+                                'In Progress',
+                                'Hold',
+                                'Cancelled',
+                                'Reinstated',
+                                'Reassigned',
+                                'Completed on Time',
+                                'Delayed Completion',
+                                'Closed'
+                            ][index];
+                            fetchTaskData(statusLabel);
                         }
                     }
                 }
@@ -950,6 +1164,22 @@ try {
                         modalId = 'inProgressTasksModal';
                         tableBodyId = 'inProgressTasksTableBody';
                         break;
+                    case 'Hold':
+                        modalId = 'holdTasksModal';
+                        tableBodyId = 'holdTasksTableBody';
+                        break;
+                    case 'Cancelled':
+                        modalId = 'cancelledTasksModal';
+                        tableBodyId = 'cancelledTasksTableBody';
+                        break;
+                    case 'Reinstated':
+                        modalId = 'reinstatedTasksModal';
+                        tableBodyId = 'reinstatedTasksTableBody';
+                        break;
+                    case 'Reassigned':
+                        modalId = 'reassignedTasksModal';
+                        tableBodyId = 'reassignedTasksTableBody';
+                        break;
                     case 'Completed on Time':
                         modalId = 'completedTasksModal';
                         tableBodyId = 'completedTasksTableBody';
@@ -957,6 +1187,10 @@ try {
                     case 'Delayed Completion':
                         modalId = 'delayedTasksModal';
                         tableBodyId = 'delayedTasksTableBody';
+                        break;
+                    case 'Closed':
+                        modalId = 'closedTasksModal';
+                        tableBodyId = 'closedTasksTableBody';
                         break;
                     default:
                         return;
@@ -968,7 +1202,6 @@ try {
                 if (data.length === 0) {
                     tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No tasks found.</td></tr>';
                 } else {
-                    // Use the index of the data array to generate the count number
                     data.forEach((task, index) => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
