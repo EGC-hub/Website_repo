@@ -329,11 +329,11 @@ $allTasks = $result->fetch_all(MYSQLI_ASSOC);
 
 // Split tasks into Pending/Started and Completed
 $pendingStartedTasks = array_filter($allTasks, function ($task) {
-    return in_array($task['status'], ['Assigned', 'In Progress']);
+    return in_array($task['status'], ['Assigned', 'In Progress', 'Hold', 'Reinstated', 'Reassigned']);
 });
 
 $completedTasks = array_filter($allTasks, function ($task) {
-    return !in_array($task['status'], ['Assigned', 'In Progress']);
+    return !in_array($task['status'], ['Assigned', 'In Progress', 'Closed']);
 });
 
 // Calculate total pages for each table separately
@@ -927,7 +927,6 @@ function getWeekdays($start, $end)
                     <?php
                     $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
                     foreach ($pendingStartedTasksPage as $row): ?>
-                        <?php if ($row['status'] === 'Assigned' || $row['status'] === 'In Progress' || $row['status'] === 'Hold'): ?>
                             <tr class="align-middle">
                                 <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
@@ -1003,7 +1002,6 @@ function getWeekdays($start, $end)
 
                                 <?php endif; ?>
                             </tr>
-                        <?php endif; ?>
                     <?php endforeach; ?>
                 </tbody>
             </table>
@@ -1037,7 +1035,6 @@ function getWeekdays($start, $end)
                     <?php
                     $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
                     foreach ($completedTasksPage as $row): ?>
-                        <?php if ($row['status'] !== 'Assigned' && $row['status'] !== 'In Progress'): ?>
                             <?php
                             $delayInfo = '';
                             if ($row['status'] === 'Delayed Completion') {
@@ -1138,7 +1135,6 @@ function getWeekdays($start, $end)
                                 <?php endif; ?>
                                 <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
                             </tr>
-                        <?php endif; ?>
                     <?php endforeach; ?>
                 </tbody>
             </table>
