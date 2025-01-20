@@ -901,7 +901,7 @@ function getWeekdays($start, $end)
             </div>
 
             <!-- Pending & Started Tasks Table -->
-            <h3>Pending & Started Tasks</h3>
+            <h3>Assigned & In Progress Tasks</h3>
             <table class="table table-striped table-hover align-middle text-center" id="pending-tasks">
                 <thead>
                     <tr class="align-middle">
@@ -1008,7 +1008,7 @@ function getWeekdays($start, $end)
                 </tbody>
             </table>
 
-            <!-- Alert for Pending & Started Tasks -->
+            <!-- Alert for Pending & In Progress Tasks -->
             <div id="no-data-alert-pending" class="alert alert-warning mt-3" style="display: <?= $showPendingAlert ?>;">
                 No data to be displayed.
             </div>

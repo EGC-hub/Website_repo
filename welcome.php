@@ -79,7 +79,7 @@ try {
         $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
 
         // Fetch tasks in progress
-        $stmt = $pdo->prepare("SELECT COUNT(*) as tasks_in_progress FROM tasks WHERE status = 'Started'");
+        $stmt = $pdo->prepare("SELECT COUNT(*) as tasks_in_progress FROM tasks WHERE status = 'In Progress'");
         $stmt->execute();
         $tasksInProgress = $stmt->fetch(PDO::FETCH_ASSOC)['tasks_in_progress'];
 
@@ -120,8 +120,8 @@ try {
         // Fetch task distribution by status
         $stmt = $pdo->prepare("
         SELECT 
-            SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
-            SUM(CASE WHEN status = 'Started' THEN 1 ELSE 0 END) as in_progress,
+            SUM(CASE WHEN status = 'Assigned' THEN 1 ELSE 0 END) as assigned,
+            SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
             SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
             SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as 'delayed'
         FROM tasks
@@ -182,7 +182,7 @@ try {
         $stmt = $pdo->prepare("SELECT COUNT(*) as tasks_in_progress 
         FROM tasks t
         JOIN user_departments ud ON t.user_id = ud.user_id
-        WHERE t.status = 'Started' AND ud.department_id IN (
+        WHERE t.status = 'In Progress' AND ud.department_id IN (
             SELECT department_id 
             FROM user_departments 
             WHERE user_id = :user_id
@@ -245,8 +245,8 @@ try {
         // Fetch task distribution by status for manager's departments
         $stmt = $pdo->prepare("
             SELECT 
-                SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
-                SUM(CASE WHEN status = 'Started' THEN 1 ELSE 0 END) as in_progress,
+                SUM(CASE WHEN status = 'Assigned' THEN 1 ELSE 0 END) as assigned,
+                SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
                 SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
                 SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as 'delayed'
             FROM tasks t
@@ -331,7 +331,7 @@ try {
         $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
 
         // Fetch tasks in progress for the user
-        $stmt = $pdo->prepare("SELECT COUNT(*) as tasks_in_progress FROM tasks WHERE user_id = :user_id AND status = 'Started'");
+        $stmt = $pdo->prepare("SELECT COUNT(*) as tasks_in_progress FROM tasks WHERE user_id = :user_id AND status = 'In Progress'");
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
         $tasksInProgress = $stmt->fetch(PDO::FETCH_ASSOC)['tasks_in_progress'];
@@ -351,8 +351,8 @@ try {
         // Fetch task distribution by status for the user
         $stmt = $pdo->prepare("
         SELECT 
-            SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
-            SUM(CASE WHEN status = 'Started' THEN 1 ELSE 0 END) as in_progress,
+            SUM(CASE WHEN status = 'Assigned' THEN 1 ELSE 0 END) as assigned,
+            SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
             SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
             SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as 'delayed'
         FROM tasks
@@ -757,13 +757,13 @@ try {
             </div>
         </div>
 
-        <!-- Pending Tasks Modal -->
+        <!-- Assigned Tasks Modal -->
         <div class="modal fade" id="pendingTasksModal" tabindex="-1" aria-labelledby="pendingTasksModalLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="pendingTasksModalLabel">Pending Tasks (Last 3 Months)</h5>
+                        <h5 class="modal-title" id="pendingTasksModalLabel">Assigned Tasks (Last 3 Months)</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -867,8 +867,8 @@ try {
 
         <script>
             const statusMapping = {
-                'Pending': 'Pending',
-                'In Progress': 'Started',
+                'Assigned': 'Assigned',
+                'In Progress': 'In Progress',
                 'Completed': 'Completed on Time',
                 'Delayed': 'Delayed Completion'
             };
@@ -876,17 +876,17 @@ try {
             const taskDistributionChart = new Chart(document.getElementById('taskDistributionChart'), {
                 type: 'pie',
                 data: {
-                    labels: ['Pending', 'In Progress', 'Completed', 'Delayed'],
+                    labels: ['Assigned', 'In Progress', 'Completed', 'Delayed'],
                     datasets: [{
                         label: 'Task Distribution',
                         data: [
-                            <?= $taskDistribution['pending'] ?>,
+                            <?= $taskDistribution['assigned'] ?>,
                             <?= $taskDistribution['in_progress'] ?>,
                             <?= $taskDistribution['completed'] ?>,
                             <?= $taskDistribution['delayed'] ?>
                         ],
                         backgroundColor: [
-                            '#FF6384', // Red for Pending
+                            '#FF6384', // Red for assigned
                             '#36A2EB', // Blue for In Progress
                             '#4BC0C0', // Teal for Completed
                             '#FFCE56'  // Yellow for Delayed
@@ -909,7 +909,7 @@ try {
                     onClick: (event, elements) => {
                         if (elements.length > 0) {
                             const index = elements[0].index;
-                            const statusLabel = ['Pending', 'In Progress', 'Completed', 'Delayed'][index];
+                            const statusLabel = ['Assigned', 'In Progress', 'Completed', 'Delayed'][index];
                             const status = statusMapping[statusLabel]; // Map to the correct status value
                             fetchTaskData(status);
                         }
@@ -942,11 +942,11 @@ try {
             function populateModal(status, data) {
                 let modalId, tableBodyId;
                 switch (status) {
-                    case 'Pending':
+                    case 'Assigned':
                         modalId = 'pendingTasksModal';
                         tableBodyId = 'pendingTasksTableBody';
                         break;
-                    case 'Started':
+                    case 'In Progress':
                         modalId = 'inProgressTasksModal';
                         tableBodyId = 'inProgressTasksTableBody';
                         break;
