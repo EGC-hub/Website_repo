@@ -1089,7 +1089,7 @@ try {
                             '#FF0000', // Red for Assigned
                             '#0000FF', // Blue for In Progress
                             '#800080', // Teal for Hold
-                            '#FFCE56', // Yellow for Cancelled
+                            '#EE2C2C', // Yellow for Cancelled
                             '#00FF00', // Purple for Reinstated
                             '#FF6600', // Coral for Reassigned
                             '#660000', // Green for Completed on Time
