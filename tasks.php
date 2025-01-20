@@ -1152,7 +1152,9 @@ function getWeekdays($start, $end)
                                     if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
                                         // Admin or the user who assigned the task can change status to "Closed" if the task is "Completed on Time" or "Delayed Completion"
                                         if (in_array($currentStatus, ['Completed on Time', 'Delayed Completion'])) {
-                                            $statuses = ['Closed'];
+                                            $statuses = [$currentStatus, 'Closed']; // Show the current status and "Closed"
+                                        } elseif ($currentStatus === 'Closed') {
+                                            $statuses = ['Closed']; // Only show "Closed" if the status is already "Closed"
                                         }
                                     } elseif ($user_role === 'User') {
                                         // Regular user cannot change status in the second table
