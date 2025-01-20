@@ -333,7 +333,7 @@ $pendingStartedTasks = array_filter($allTasks, function ($task) {
 });
 
 $completedTasks = array_filter($allTasks, function ($task) {
-    return !in_array($task['status'], ['Completed on Time', 'Delayed Completion', 'Closed']);
+    return in_array($task['status'], ['Completed on Time', 'Delayed Completion', 'Closed']);
 });
 
 // Calculate total pages for each table separately
