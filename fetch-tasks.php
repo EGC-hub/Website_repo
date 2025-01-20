@@ -29,7 +29,7 @@ try {
     $userRole = $_SESSION['role'] ?? '';
 
     // Validate status
-    $validStatuses = ['Pending', 'Started', 'Completed on Time', 'Delayed Completion'];
+    $validStatuses = ['Assigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
     if (!in_array($status, $validStatuses)) {
         http_response_code(400);
         echo json_encode(['error' => 'Invalid status']);
