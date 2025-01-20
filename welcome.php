@@ -127,7 +127,7 @@ try {
                 SUM(CASE WHEN status = 'Reinstated' THEN 1 ELSE 0 END) as reinstated,
                 SUM(CASE WHEN status = 'Reassigned' THEN 1 ELSE 0 END) as reassigned,
                 SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
-                SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as delayed,
+                SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as `delayed`,
                 SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) as closed
             FROM tasks
         ");
@@ -257,7 +257,7 @@ try {
                 SUM(CASE WHEN status = 'Reinstated' THEN 1 ELSE 0 END) as reinstated,
                 SUM(CASE WHEN status = 'Reassigned' THEN 1 ELSE 0 END) as reassigned,
                 SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
-                SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as delayed,
+                SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as `delayed`,
                 SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) as closed
             FROM tasks t
             JOIN user_departments ud ON t.user_id = ud.user_id
@@ -368,7 +368,7 @@ try {
                 SUM(CASE WHEN status = 'Reinstated' THEN 1 ELSE 0 END) as reinstated,
                 SUM(CASE WHEN status = 'Reassigned' THEN 1 ELSE 0 END) as reassigned,
                 SUM(CASE WHEN status = 'Completed on Time' THEN 1 ELSE 0 END) as completed,
-                SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as delayed,
+                SUM(CASE WHEN status = 'Delayed Completion' THEN 1 ELSE 0 END) as `delayed`,
                 SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) as closed
             FROM tasks
             WHERE user_id = :user_id
