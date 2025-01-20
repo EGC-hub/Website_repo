@@ -1092,7 +1092,7 @@ try {
                             '#EE2C2C', // Yellow for Cancelled
                             '#660000', // Purple for Reinstated
                             '#FF6600', // Coral for Reassigned
-                            '#00FF00', // Green for Completed on Time
+                            '#00CD00', // Green for Completed on Time
                             '#FFD54F', // Amber for Delayed Completion
                             '#64B5F6'  // Light Blue for Closed
                         ],
