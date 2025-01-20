@@ -1150,25 +1150,20 @@ function getWeekdays($start, $end)
                                     // Define the available statuses based on the user role and current status
                                     $statuses = [];
                                     if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
-                                        // Admin or the user who assigned the task can change status to anything in the first table
-                                        if (in_array($currentStatus, ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'])) {
-                                            $statuses = ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned', 'Completed on Time', 'Delayed Completion'];
-                                        } elseif (in_array($currentStatus, ['Completed on Time', 'Delayed Completion'])) {
-                                            // In the second table, only allow changing to "Closed"
+                                        // Admin or the user who assigned the task can change status to "Closed" if the task is "Completed on Time" or "Delayed Completion"
+                                        if (in_array($currentStatus, ['Completed on Time', 'Delayed Completion'])) {
                                             $statuses = ['Closed'];
                                         }
                                     } elseif ($user_role === 'User') {
-                                        // Regular user can only change status from "Assigned" to "Completed on Time" or "Delayed Completion"
-                                        if ($currentStatus === 'Assigned') {
-                                            $statuses = ['Assigned', 'Completed on Time', 'Delayed Completion'];
-                                        }
+                                        // Regular user cannot change status in the second table
+                                        $statuses = [];
                                     }
 
                                     // Generate the status dropdown
                                     if (!empty($statuses)) {
                                         echo '<select id="status" name="status" onchange="handleStatusChange(event, ' . $row['task_id'] . ')"';
-                                        if (in_array($currentStatus, ['Completed on Time', 'Delayed Completion', 'Closed'])) {
-                                            echo ' disabled';
+                                        if ($currentStatus === 'Closed') {
+                                            echo ' disabled'; // Lock the dropdown if the status is "Closed"
                                         }
                                         echo '>';
                                         foreach ($statuses as $statusValue) {
