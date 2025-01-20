@@ -29,7 +29,18 @@ try {
     $userRole = $_SESSION['role'] ?? '';
 
     // Validate status
-    $validStatuses = ['Assigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
+    $validStatuses = [
+        'Assigned', 
+        'In Progress', 
+        'Hold', 
+        'Cancelled', 
+        'Reinstated', 
+        'Reassigned', 
+        'Completed on Time', 
+        'Delayed Completion', 
+        'Closed'
+    ];
+
     if (!in_array($status, $validStatuses)) {
         http_response_code(400);
         echo json_encode(['error' => 'Invalid status']);
@@ -43,7 +54,8 @@ try {
             t.task_name, 
             u.username as assigned_to, 
             d.name as department, 
-            DATE_FORMAT(t.expected_finish_date, '%Y-%m-%d') as completion_date
+            DATE_FORMAT(t.expected_finish_date, '%Y-%m-%d') as completion_date,
+            DATE_FORMAT(t.expected_start_date, '%Y-%m-%d') as start_date
         FROM tasks t
         JOIN users u ON t.user_id = u.id
         JOIN user_departments ud ON u.id = ud.user_id
