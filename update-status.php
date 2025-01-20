@@ -1,9 +1,34 @@
 <?php
+// Enable error reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     die(json_encode(['success' => false, 'message' => 'Unauthorized access.']));
+}
+
+// Include the configuration file for database credentials
+$config = include '../config.php';
+
+// Database connection details
+$dbHost = 'localhost';
+$dbUsername = $config['dbUsername'];
+$dbPassword = $config['dbPassword'];
+$dbName = 'euro_login_system';
+
+// DSN for PDO
+$dsn = "mysql:host=$dbHost;dbname=$dbName;charset=utf8";
+
+try {
+    // Establish database connection using PDO
+    $pdo = new PDO($dsn, $dbUsername, $dbPassword);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die(json_encode(['success' => false, 'message' => 'Database connection failed: ' . $e->getMessage()]));
 }
 
 $user_role = $_SESSION['role'] ?? null;
@@ -15,55 +40,40 @@ if ($task_id === null || $new_status === null) {
     die(json_encode(['success' => false, 'message' => 'Invalid request.']));
 }
 
-// Database connection
-$conn = new mysqli('localhost', 'dbUsername', 'dbPassword', 'euro_login_system');
-if ($conn->connect_error) {
-    die(json_encode(['success' => false, 'message' => 'Database connection failed.']));
-}
-
 // Fetch the current task status and assigned_by_id from the database
-$stmt = $conn->prepare("SELECT status, assigned_by_id FROM tasks WHERE task_id = ?");
-if (!$stmt) {
-    die(json_encode(['success' => false, 'message' => 'Database query preparation failed.']));
-}
-$stmt->bind_param("i", $task_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$task = $result->fetch_assoc();
+try {
+    $stmt = $pdo->prepare("SELECT status, assigned_by_id FROM tasks WHERE task_id = ?");
+    $stmt->execute([$task_id]);
+    $task = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$task) {
-    die(json_encode(['success' => false, 'message' => 'Task not found.']));
-}
-
-$current_status = $task['status'];
-$assigned_by_id = $task['assigned_by_id'];
-
-// Validate the status change based on the user's role and assigned_by_id
-if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
-    // Admin or the user who assigned the task can change status to "Closed" if the task is "Completed on Time" or "Delayed Completion"
-    if (in_array($current_status, ['Completed on Time', 'Delayed Completion']) && $new_status === 'Closed') {
-        // Allow changing to "Closed"
-    } else {
-        die(json_encode(['success' => false, 'message' => 'Invalid status change.']));
+    if (!$task) {
+        die(json_encode(['success' => false, 'message' => 'Task not found.']));
     }
-} elseif ($user_role === 'User') {
-    // Regular user cannot change status in the second table
-    die(json_encode(['success' => false, 'message' => 'Unauthorized access.']));
-} else {
-    die(json_encode(['success' => false, 'message' => 'Unauthorized access.']));
-}
 
-// Update the task status in the database
-$stmt = $conn->prepare("UPDATE tasks SET status = ? WHERE task_id = ?");
-if (!$stmt) {
-    die(json_encode(['success' => false, 'message' => 'Database query preparation failed.']));
-}
-$stmt->bind_param("si", $new_status, $task_id);
-if ($stmt->execute()) {
+    $current_status = $task['status'];
+    $assigned_by_id = $task['assigned_by_id'];
+
+    // Validate the status change based on the user's role and assigned_by_id
+    if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
+        // Admin or the user who assigned the task can change status to "Closed" if the task is "Completed on Time" or "Delayed Completion"
+        if (in_array($current_status, ['Completed on Time', 'Delayed Completion']) && $new_status === 'Closed') {
+            // Allow changing to "Closed"
+        } else {
+            die(json_encode(['success' => false, 'message' => 'Invalid status change.']));
+        }
+    } elseif ($user_role === 'User') {
+        // Regular user cannot change status in the second table
+        die(json_encode(['success' => false, 'message' => 'Unauthorized access.']));
+    } else {
+        die(json_encode(['success' => false, 'message' => 'Unauthorized access.']));
+    }
+
+    // Update the task status in the database
+    $stmt = $pdo->prepare("UPDATE tasks SET status = ? WHERE task_id = ?");
+    $stmt->execute([$new_status, $task_id]);
+
     echo json_encode(['success' => true, 'message' => 'Status updated successfully.', 'task_name' => 'Task Name']); // Replace 'Task Name' with the actual task name
-} else {
-    echo json_encode(['success' => false, 'message' => 'Failed to update status.']);
+} catch (PDOException $e) {
+    die(json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]));
 }
-
-$conn->close();
 ?>
