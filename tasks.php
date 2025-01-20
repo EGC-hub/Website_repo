@@ -329,11 +329,11 @@ $allTasks = $result->fetch_all(MYSQLI_ASSOC);
 
 // Split tasks into Pending/Started and Completed
 $pendingStartedTasks = array_filter($allTasks, function ($task) {
-    return in_array($task['status'], ['Assigned', 'Started']);
+    return in_array($task['status'], ['Assigned', 'In Progress']);
 });
 
 $completedTasks = array_filter($allTasks, function ($task) {
-    return !in_array($task['status'], ['Assigned', 'Started']);
+    return !in_array($task['status'], ['Assigned', 'In Progress']);
 });
 
 // Calculate total pages for each table separately
@@ -927,7 +927,7 @@ function getWeekdays($start, $end)
                     <?php
                     $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
                     foreach ($pendingStartedTasksPage as $row): ?>
-                        <?php if ($row['status'] === 'Assigned' || $row['status'] === 'Started'): ?>
+                        <?php if ($row['status'] === 'Assigned' || $row['status'] === 'In Progress'): ?>
                             <tr class="align-middle">
                                 <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
@@ -971,7 +971,7 @@ function getWeekdays($start, $end)
                                             onchange="handleStatusChange(event, <?= $row['task_id'] ?>)"
                                             <?= in_array($row['status'], ['Completed on Time', 'Delayed Completion']) ? 'disabled' : '' ?>>
                                             <?php
-                                            $statuses = ['Assigned', 'Started', 'Completed on Time', 'Delayed Completion'];
+                                            $statuses = ['Assigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
                                             foreach ($statuses as $statusValue) {
                                                 $selected = ($row['status'] === $statusValue) ? 'selected' : '';
                                                 echo "<option value='$statusValue' $selected>$statusValue</option>";
@@ -1037,7 +1037,7 @@ function getWeekdays($start, $end)
                     <?php
                     $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
                     foreach ($completedTasksPage as $row): ?>
-                        <?php if ($row['status'] !== 'Assigned' && $row['status'] !== 'Started'): ?>
+                        <?php if ($row['status'] !== 'Assigned' && $row['status'] !== 'In Progress'): ?>
                             <?php
                             $delayInfo = '';
                             if ($row['status'] === 'Delayed Completion') {
@@ -1118,7 +1118,7 @@ function getWeekdays($start, $end)
                                             onchange="handleStatusChange(event, <?= $row['task_id'] ?>)"
                                             <?= in_array($row['status'], ['Completed on Time', 'Delayed Completion']) ? 'disabled' : '' ?>>
                                             <?php
-                                            $statuses = ['Assigned', 'Started', 'Completed on Time', 'Delayed Completion'];
+                                            $statuses = ['Assigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
                                             foreach ($statuses as $statusValue) {
                                                 $selected = ($row['status'] === $statusValue) ? 'selected' : '';
                                                 echo "<option value='$statusValue' $selected>$statusValue</option>";
