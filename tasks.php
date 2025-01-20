@@ -1328,12 +1328,13 @@ function getWeekdays($start, $end)
         <script>
             function handleStatusChange(event, taskId) {
                 event.preventDefault();
-
                 const status = event.target.value;
+                console.log("Selected status:", status); // Debugging: Log the selected status
+
                 const form = event.target.form;
 
-                // If the status is 'Delayed Completion' or 'Completed on Time', show the modal
                 if (status === 'Delayed Completion' || status === 'Completed on Time') {
+                    // Show modal for these statuses
                     document.getElementById('task-id').value = taskId;
                     document.getElementById('modal-status').value = status;
 
@@ -1351,7 +1352,7 @@ function getWeekdays($start, $end)
                     const modal = new bootstrap.Modal(document.getElementById('completionModal'));
                     modal.show();
                 } else {
-                    // For other statuses, submit the form directly
+                    // Submit the form directly for other statuses
                     fetch('update-status.php', {
                         method: 'POST',
                         body: new FormData(form)
@@ -1360,19 +1361,15 @@ function getWeekdays($start, $end)
                             if (!response.ok) {
                                 throw new Error('Network response was not ok');
                             }
-                            return response.json(); // Parse the response as JSON
+                            return response.json();
                         })
                         .then(data => {
                             if (data.success) {
-                                // Update the modal content with the task name and message
-                                document.getElementById('success-task-name').innerText = data.task_name;
-                                document.getElementById('success-message').innerText = data.message;
-
-                                // Show the success modal
-                                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                                successModal.show();
+                                console.log("Status updated successfully:", data); // Debugging: Log success
+                                // Show success modal or refresh the page
+                                window.location.reload();
                             } else {
-                                // If the update was not successful, show an alert with the error message
+                                console.error("Failed to update status:", data.message); // Debugging: Log failure
                                 alert(data.message);
                             }
                         })
