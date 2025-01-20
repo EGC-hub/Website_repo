@@ -53,17 +53,29 @@ try {
     $current_status = $task['status'];
     $assigned_by_id = $task['assigned_by_id'];
 
+    // Define valid statuses for the top table (Pending & Started Tasks)
+    $top_table_statuses = ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned', 'Completed on Time', 'Delayed Completion'];
+
+    // Define valid statuses for the bottom table (Completed Tasks)
+    $bottom_table_statuses = ['Closed'];
+
     // Validate the status change based on the user's role and assigned_by_id
     if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
-        // Admin or the user who assigned the task can change status to "Closed" if the task is "Completed on Time" or "Delayed Completion"
-        if (in_array($current_status, ['Completed on Time', 'Delayed Completion']) && $new_status === 'Closed') {
-            // Allow changing to "Closed"
+        // Admin or the user who assigned the task can change status to any status except "Closed" in the top table
+        if (in_array($current_status, $top_table_statuses) && $new_status !== 'Closed') {
+            // Allow the status change
+        } elseif (in_array($current_status, ['Completed on Time', 'Delayed Completion']) && $new_status === 'Closed') {
+            // Allow changing to "Closed" in the bottom table
         } else {
             die(json_encode(['success' => false, 'message' => 'Invalid status change.']));
         }
     } elseif ($user_role === 'User') {
-        // Regular user cannot change status in the second table
-        die(json_encode(['success' => false, 'message' => 'Unauthorized access.']));
+        // Regular user can only change status from "Assigned" to "Completed on Time" or "Delayed Completion" in the top table
+        if ($current_status === 'Assigned' && in_array($new_status, ['Completed on Time', 'Delayed Completion'])) {
+            // Allow the status change
+        } else {
+            die(json_encode(['success' => false, 'message' => 'Unauthorized status change.']));
+        }
     } else {
         die(json_encode(['success' => false, 'message' => 'Unauthorized access.']));
     }
