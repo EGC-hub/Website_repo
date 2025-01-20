@@ -927,7 +927,7 @@ function getWeekdays($start, $end)
                     <?php
                     $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
                     foreach ($pendingStartedTasksPage as $row): ?>
-                        <?php if ($row['status'] === 'Assigned' || $row['status'] === 'In Progress'): ?>
+                        <?php if ($row['status'] === 'Assigned' || $row['status'] === 'In Progress' || $row['status'] === 'Hold'): ?>
                             <tr class="align-middle">
                                 <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
                                 <td><?= htmlspecialchars($row['project_name']) ?></td>
