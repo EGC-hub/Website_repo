@@ -329,11 +329,11 @@ $allTasks = $result->fetch_all(MYSQLI_ASSOC);
 
 // Split tasks into Pending/Started and Completed
 $pendingStartedTasks = array_filter($allTasks, function ($task) {
-    return in_array($task['status'], ['Assigned', 'In Progress', 'Hold', 'Reinstated', 'Reassigned']);
+    return in_array($task['status'], ['Assigned', 'In Progress', 'Hold', 'Reinstated', 'Reassigned', 'Cancelled']);
 });
 
 $completedTasks = array_filter($allTasks, function ($task) {
-    return !in_array($task['status'], ['Assigned', 'In Progress', 'Closed']);
+    return !in_array($task['status'], ['Completed on Time', 'Delayed Completion', 'Closed']);
 });
 
 // Calculate total pages for each table separately
