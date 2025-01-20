@@ -1422,6 +1422,9 @@ function getWeekdays($start, $end)
                                 // Show the success modal
                                 const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                                 successModal.show();
+
+                                // Disable the dropdown after changing the status to "Closed"
+                                event.target.disabled = true;
                             } else {
                                 // If the update was not successful, show an alert with the error message
                                 alert(data.message);
