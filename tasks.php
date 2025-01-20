@@ -305,6 +305,7 @@ $taskQuery = $user_role === 'Admin'
                 CASE 
                     WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
                     WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date 
+                    WHEN tasks.status = 'Closed' THEN tasks.expected_finish_date 
                 END DESC, 
                 recorded_timestamp DESC
         ");
