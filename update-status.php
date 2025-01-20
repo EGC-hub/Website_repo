@@ -73,7 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bindParam(':completion_description', $completionDescription);
             $stmt->bindParam(':task_id', $taskId, PDO::PARAM_INT);
         } else {
-            // Update without additional data
             $stmt = $pdo->prepare(
                 "UPDATE tasks 
                  SET status = :status 
