@@ -1086,13 +1086,13 @@ try {
                             <?= $taskDistribution['closed'] ?>
                         ],
                         backgroundColor: [
-                            '#FF6384', // Red for Assigned
-                            '#36A2EB', // Blue for In Progress
-                            '#4BC0C0', // Teal for Hold
+                            '#FF0000', // Red for Assigned
+                            '#0000FF', // Blue for In Progress
+                            '#800080', // Teal for Hold
                             '#FFCE56', // Yellow for Cancelled
-                            '#9966FF', // Purple for Reinstated
-                            '#FF8A80', // Coral for Reassigned
-                            '#7CB342', // Green for Completed on Time
+                            '#00FF00', // Purple for Reinstated
+                            '#FF6600', // Coral for Reassigned
+                            '#660000', // Green for Completed on Time
                             '#FFD54F', // Amber for Delayed Completion
                             '#64B5F6'  // Light Blue for Closed
                         ],
