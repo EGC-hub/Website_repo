@@ -971,7 +971,7 @@ function getWeekdays($start, $end)
                                             onchange="handleStatusChange(event, <?= $row['task_id'] ?>)"
                                             <?= in_array($row['status'], ['Completed on Time', 'Delayed Completion']) ? 'disabled' : '' ?>>
                                             <?php
-                                            $statuses = ['Assigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
+                                            $statuses = ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned', 'Completed on Time', 'Delayed Completion', 'Closed'];
                                             foreach ($statuses as $statusValue) {
                                                 $selected = ($row['status'] === $statusValue) ? 'selected' : '';
                                                 echo "<option value='$statusValue' $selected>$statusValue</option>";
@@ -1118,7 +1118,7 @@ function getWeekdays($start, $end)
                                             onchange="handleStatusChange(event, <?= $row['task_id'] ?>)"
                                             <?= in_array($row['status'], ['Completed on Time', 'Delayed Completion']) ? 'disabled' : '' ?>>
                                             <?php
-                                            $statuses = ['Assigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
+                                            $statuses = ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned', 'Completed on Time', 'Delayed Completion', 'Closed'];
                                             foreach ($statuses as $statusValue) {
                                                 $selected = ($row['status'] === $statusValue) ? 'selected' : '';
                                                 echo "<option value='$statusValue' $selected>$statusValue</option>";
