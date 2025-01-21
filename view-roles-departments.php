@@ -408,17 +408,6 @@ try {
                         <div class="success"><?= htmlspecialchars($successMsg) ?></div>
                     <?php endif; ?>
 
-                    <!-- Centered modal buttons -->
-                    <div class="modal-buttons">
-                        <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
-                            Add Role
-                        </a>
-                        <a type="button" class="back-button" data-bs-toggle="modal"
-                            data-bs-target="#createDepartmentModal">
-                            Add Department
-                        </a>
-                    </div>
-
                     <!-- Roles Table -->
                     <h2>Roles</h2>
                     <?php if (!empty($roles)): ?>
@@ -498,9 +487,16 @@ try {
                     <?php else: ?>
                         <p>No departments found.</p>
                     <?php endif; ?>
+                </div>
 
-                    <!-- Back Button -->
-                    <a href="welcome.php" class="back-button">Back to Dashboard</a>
+                <!-- Centered modal buttons -->
+                <div class="modal-buttons" style="position: fixed; bottom: 20px; right: 20px;">
+                    <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
+                        Add Role
+                    </a>
+                    <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createDepartmentModal">
+                        Add Department
+                    </a>
                 </div>
             </div>
         </div>
