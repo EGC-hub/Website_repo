@@ -164,12 +164,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         /* Your original styling */
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
+            margin: 0;
             padding: 0;
         }
 
@@ -497,16 +494,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button class="back-btn" onclick="window.location.href='welcome.php'">Back</button>
             </div>
             <div class="main-container">
-                <div class="user-info">
-                    <p>Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong></p>
-                    <p>Departments:
-                        <strong>
-                            <?= !empty($user_departments) ? htmlspecialchars(implode(', ', $user_departments)) : 'None' ?>
-                        </strong>
-                    </p>
-                    <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.
-                    </p>
-                </div>
                 <div class="container">
                     <h1>Users</h1>
 
