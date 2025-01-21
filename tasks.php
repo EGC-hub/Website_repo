@@ -944,7 +944,7 @@ function getWeekdays($start, $end)
                             <tbody>
                                 <?php
                                 $taskCountStart = 1;
-                                foreach ($pendingStartedTasksPage as $row): ?>
+                                foreach ($pendingStartedTasks as $row): ?>
                                     <tr class="align-middle">
                                         <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
                                         <td><?= htmlspecialchars($row['project_name']) ?></td>
@@ -1086,7 +1086,7 @@ function getWeekdays($start, $end)
                             <tbody>
                                 <?php
                                 $taskCountStart = 1;
-                                foreach ($completedTasksPage as $row): ?>
+                                foreach ($completedTasks as $row): ?>
                                     <?php
                                     $delayInfo = '';
                                     if ($row['status'] === 'Delayed Completion') {
