@@ -1626,8 +1626,8 @@ function getWeekdays($start, $end)
 
             <script>
                 $(document).ready(function () {
-                    const tasksPerPage = 10; // Number of tasks per page
-                    let currentPage = 1; // Current page
+                    const tasksPerPage = 10; // Number of tasks per table per page
+                    let currentPage = 1; // Current page for both tables
 
                     // Initialize Select2 for project and department filters
                     $('#project-filter').select2({
@@ -1649,8 +1649,22 @@ function getWeekdays($start, $end)
                         const startDate = $('#start-date').val();
                         const endDate = $('#end-date').val();
 
-                        // Loop through all rows in both tables
-                        $('table tbody tr').each(function () {
+                        // Filter and paginate Pending Tasks
+                        filterAndPaginateTable('#pending-tasks', selectedProjects, selectedDepartments, startDate, endDate, currentPage);
+
+                        // Filter and paginate Completed Tasks
+                        filterAndPaginateTable('#remaining-tasks', selectedProjects, selectedDepartments, startDate, endDate, currentPage);
+
+                        // Update pagination controls
+                        updatePagination();
+                    }
+
+                    // Function to filter and paginate a table
+                    function filterAndPaginateTable(tableId, selectedProjects, selectedDepartments, startDate, endDate, currentPage) {
+                        const rows = $(`${tableId} tbody tr`);
+                        let visibleRows = [];
+
+                        rows.each(function () {
                             const projectName = $(this).find('td:nth-child(2)').text().trim();
                             const departmentName = $(this).find('td:nth-child(10)').text().trim().match(/\(([^)]+)\)/)?.[1] || '';
                             const taskStartDate = new Date($(this).find('td:nth-child(5)').text().trim());
@@ -1661,30 +1675,35 @@ function getWeekdays($start, $end)
                             const departmentMatch = selectedDepartments.length === 0 || selectedDepartments.includes('All') || departmentName.split(', ').some(dept => selectedDepartments.includes(dept));
                             const dateMatch = (!startDate || taskStartDate >= new Date(startDate)) && (!endDate || taskEndDate <= new Date(endDate));
 
-                            // Show or hide the row based on filter matches
                             if (projectMatch && departmentMatch && dateMatch) {
-                                $(this).show();
-                            } else {
-                                $(this).hide();
+                                visibleRows.push(this);
                             }
                         });
 
-                        // Update pagination
-                        updatePagination();
-                    }
-
-                    // Function to update pagination
-                    function updatePagination() {
-                        const visibleRows = $('table tbody tr:visible');
-                        const totalPages = Math.ceil(visibleRows.length / tasksPerPage);
-
                         // Hide all rows
-                        visibleRows.hide();
+                        rows.hide();
 
                         // Show rows for the current page
-                        visibleRows.slice((currentPage - 1) * tasksPerPage, currentPage * tasksPerPage).show();
+                        const startIndex = (currentPage - 1) * tasksPerPage;
+                        const endIndex = startIndex + tasksPerPage;
+                        visibleRows.slice(startIndex, endIndex).forEach(row => $(row).show());
 
-                        // Update pagination controls
+                        // Show/hide "No data" alert
+                        const noDataAlert = $(`${tableId} + .alert`);
+                        noDataAlert.toggle(visibleRows.length === 0);
+                    }
+
+                    // Function to update pagination controls
+                    function updatePagination() {
+                        const pendingVisibleRows = $('#pending-tasks tbody tr:visible').length;
+                        const completedVisibleRows = $('#remaining-tasks tbody tr:visible').length;
+
+                        // Calculate total pages based on the larger of the two tables
+                        const totalPages = Math.max(
+                            Math.ceil(pendingVisibleRows / tasksPerPage),
+                            Math.ceil(completedVisibleRows / tasksPerPage)
+                        );
+
                         const pagination = $('.pagination');
                         pagination.empty();
 
@@ -1699,21 +1718,14 @@ function getWeekdays($start, $end)
                         if (currentPage < totalPages) {
                             pagination.append(`<a href="#" class="page-link" data-page="${currentPage + 1}">Next</a>`);
                         }
-
-                        // Attach click event to pagination links
-                        $('.page-link').on('click', function (e) {
-                            e.preventDefault();
-                            currentPage = parseInt($(this).data('page'));
-                            applyFilters();
-                        });
-
-                        // Show/hide "No data" alerts
-                        const pendingTasksVisible = $('#pending-tasks tbody tr:visible').length > 0;
-                        const completedTasksVisible = $('#remaining-tasks tbody tr:visible').length > 0;
-
-                        $('#no-data-alert-pending').toggle(!pendingTasksVisible);
-                        $('#no-data-alert-completed').toggle(!completedTasksVisible);
                     }
+
+                    // Attach click event to pagination links
+                    $(document).on('click', '.page-link', function (e) {
+                        e.preventDefault();
+                        currentPage = parseInt($(this).data('page'));
+                        applyFilters();
+                    });
 
                     // Attach filter change events
                     $('#project-filter, #department-filter, #start-date, #end-date').on('change', function () {
