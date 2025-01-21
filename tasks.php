@@ -903,6 +903,7 @@ function getWeekdays($start, $end)
                 </div>
 
                 <div class="task-container">
+                    <h2>Tasks</h2>
                     <div class="container mt-4">
                         <!-- Filter Buttons -->
                         <!-- Filter Container -->
