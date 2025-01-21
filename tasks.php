@@ -668,31 +668,6 @@ function getWeekdays($start, $end)
             /* Dark red text */
         }
 
-        .user-info {
-            text-align: center;
-            margin: 25px auto;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 1400px;
-        }
-
-        .user-info p {
-            margin: 5px 0;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .user-info .session-warning {
-            color: grey;
-            /* Red color for warning */
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        /* Add this to your existing CSS */
         .task-description {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -806,13 +781,6 @@ function getWeekdays($start, $end)
 </head>
 
 <body>
-    <div class="user-info">
-        <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
-            <strong><?= htmlspecialchars($loggedInDepartment ?? 'Unknown') ?></strong>
-        </p>
-        <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
-    </div>
-
     <!-- Task Management Modal -->
     <div class="modal fade" id="taskManagementModal" tabindex="-1" aria-labelledby="taskManagementModalLabel"
         aria-hidden="true">
