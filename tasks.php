@@ -1226,20 +1226,7 @@ function getWeekdays($start, $end)
                         </div>
 
                         <!-- Pagination for the entire page -->
-                        <div class="pagination">
-                            <?php if ($currentPage > 1): ?>
-                                <a href="#" class="page-link" data-page="<?= $currentPage - 1 ?>">Previous</a>
-                            <?php endif; ?>
-
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                <a href="#" class="page-link <?= $i == $currentPage ? 'active' : '' ?>"
-                                    data-page="<?= $i ?>"><?= $i ?></a>
-                            <?php endfor; ?>
-
-                            <?php if ($currentPage < $totalPages): ?>
-                                <a href="#" class="page-link" data-page="<?= $currentPage + 1 ?>">Next</a>
-                            <?php endif; ?>
-                        </div>
+                        <div class="pagination"></div>
                     </div>
                 </div>
             </div>
