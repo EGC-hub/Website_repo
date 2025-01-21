@@ -1650,10 +1650,24 @@ function getWeekdays($start, $end)
                 </script>
             <!-- Fix for Select2 and Filtering -->
             <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
             <script>
                 $(document).ready(function () {
                     const tasksPerPage = 10; // Number of tasks per page
                     let currentPage = 1; // Current page
+
+                    // Initialize Select2 for project and department filters
+                    $('#project-filter').select2({
+                        placeholder: "Select projects to filter",
+                        allowClear: true,
+                        width: '300px'
+                    });
+
+                    $('#department-filter').select2({
+                        placeholder: "Select departments to filter",
+                        allowClear: true,
+                        width: '300px'
+                    });
 
                     // Function to apply filters and update pagination
                     function applyFilters() {
@@ -1746,6 +1760,26 @@ function getWeekdays($start, $end)
 
                     // Attach reset button event
                     $('.btn-primary[onclick="resetFilters()"]').on('click', resetFilters);
+
+                    // Populate project filter options dynamically
+                    const projects = [...new Set($('table tbody tr').map(function () {
+                        return $(this).find('td:nth-child(2)').text().trim();
+                    }).get())];
+
+                    $('#project-filter').empty().append('<option value="All">All</option>');
+                    projects.forEach(project => {
+                        $('#project-filter').append(`<option value="${project}">${project}</option>`);
+                    });
+
+                    // Populate department filter options dynamically
+                    const departments = [...new Set($('table tbody tr').map(function () {
+                        return $(this).find('td:nth-child(10)').text().trim().match(/\(([^)]+)\)/)?.[1]?.split(', ') || [];
+                    }).get().flat())];
+
+                    $('#department-filter').empty().append('<option value="All">All</option>');
+                    departments.forEach(department => {
+                        $('#department-filter').append(`<option value="${department}">${department}</option>`);
+                    });
 
                     // Initialize pagination
                     applyFilters();
