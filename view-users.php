@@ -162,7 +162,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <title>View Users</title>
     <style>
-        /* Your original styling */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -170,13 +169,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 0;
         }
 
-        /* Apply box-sizing to all elements */
         * {
             box-sizing: border-box;
         }
 
         .main-container {
-            width: 90%;
+            width: 100%;
             max-width: 1200px;
             display: flex;
             flex-direction: column;
@@ -185,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .container {
-            width: 90%;
+            width: 100%;
             max-width: 1200px;
             margin: 20px auto;
             padding: 20px;
@@ -400,6 +398,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .dashboard-container {
             display: flex;
             min-height: 100vh;
+            width: 100%;
         }
 
         .sidebar {
@@ -427,6 +426,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flex-grow: 1;
             padding: 20px;
             background-color: #ffffff;
+            width: 100%;
         }
 
         .navbar {
@@ -435,6 +435,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 10px 20px;
             background-color: #ffffff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
         }
 
         .user-info {
