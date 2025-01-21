@@ -756,6 +756,7 @@ function getWeekdays($start, $end)
             align-items: center;
             padding: 10px 20px;
             background-color: #ffffff;
+            border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
