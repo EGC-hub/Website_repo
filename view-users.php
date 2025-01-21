@@ -184,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 20px auto;
             padding: 20px;
             background-color: #fff;
@@ -456,6 +456,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .back-btn:hover {
             background-color: #004080;
+        }
+
+        .user-info p {
+            color: black;
         }
     </style>
 </head>
