@@ -354,6 +354,10 @@ try {
         .back-btn:hover {
             background-color: #004080;
         }
+
+        .user-info p {
+            color: black;
+        }
     </style>
 </head>
 
