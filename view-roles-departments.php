@@ -388,9 +388,9 @@ try {
 
                 <!-- User Info -->
                 <div class="user-info me-3 ms-auto">
-                    <p class="mb-0">Logged in as: <strong><?= htmlspecialchars($_SESSION('username')) ?></strong></p>
+                    <p class="mb-0">Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong></p>
                     <p class="mb-0">Departments:
-                        <strong><?= !empty($user_departments) ? htmlspecialchars(implode(', ', $user_departments)) : 'None' ?></strong>
+                        <strong><?= htmlspecialchars($loggedInDepartment ?? 'Unknown') ?></strong>
                     </p>
                 </div>
 
@@ -398,6 +398,14 @@ try {
                 <button class="back-btn" onclick="window.location.href='welcome.php'">Back</button>
             </div>
             <div class="main-container">
+                <div class="user-info">
+                    <p>Logged in as: <strong><?= htmlspecialchars($_SESSION['username']) ?></strong></p>
+                    <p>Department(s):
+                        <strong><?= !empty($user_departments) ? htmlspecialchars(implode(', ', $user_departments)) : 'None' ?></strong>
+                    </p>
+                    <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.
+                    </p>
+                </div>
                 <div class="container">
                     <h1>Roles & Departments</h1>
 
