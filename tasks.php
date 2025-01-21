@@ -1667,7 +1667,19 @@ function getWeekdays($start, $end)
                         // Show rows for the current page
                         const startIndex = (currentPage - 1) * tasksPerPage;
                         const endIndex = startIndex + tasksPerPage;
-                        visibleRows.slice(startIndex, endIndex).forEach(row => $(row).show());
+                        const rowsToShow = visibleRows.slice(startIndex, endIndex);
+
+                        if (rowsToShow.length > 0) {
+                            rowsToShow.forEach((row, index) => {
+                                $(row).find('td:first-child').text(startIndex + index + 1); // Update task numbering
+                                $(row).show();
+                            });
+                        } else {
+                            // Show "No data to be displayed" for empty pages
+                            $(`${tableId} tbody`).append(
+                                `<tr><td colspan="12" class="text-center">No data to be displayed</td></tr>`
+                            );
+                        }
 
                         // Show/hide "No data" alert
                         const noDataAlert = $(`${tableId} + .alert`);
@@ -1675,6 +1687,13 @@ function getWeekdays($start, $end)
 
                         // Return the number of visible rows for pagination
                         return visibleRows.length;
+                    }
+
+                    function resetTaskNumbering(tableId) {
+                        const rows = $(`${tableId} tbody tr`);
+                        rows.each(function (index) {
+                            $(this).find('td:first-child').text(index + 1); // Reset task numbering
+                        });
                     }
 
                     function updatePagination(pendingVisibleRows, completedVisibleRows) {
@@ -1720,6 +1739,11 @@ function getWeekdays($start, $end)
                         $('#start-date').val('');
                         $('#end-date').val('');
                         currentPage = 1; // Reset to the first page
+
+                        // Reset task numbering for both tables
+                        resetTaskNumbering('#pending-tasks');
+                        resetTaskNumbering('#remaining-tasks');
+
                         applyFilters();
                     }
 
