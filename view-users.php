@@ -237,7 +237,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .back-button {
             display: inline-block;
-            margin-top: 20px;
             padding: 10px 20px;
             background-color: #002c5f;
             color: #fff;
@@ -245,6 +244,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 5px;
             font-size: 1rem;
             transition: background-color 0.3s ease;
+            margin-top: 20px;
+            /* Add margin to separate it from the table */
         }
 
         .back-button:hover {
@@ -517,11 +518,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php unset($_SESSION['deletionMsg']); ?>
                     <?php endif; ?>
 
-                    <!-- Replace the "Back to Dashboard" button with the "Create User" button -->
-                    <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createUserModal">
-                        Create User
-                    </a>
-
                     <?php if ($user_role === 'Admin'): ?>
                         <p>Viewing all users</p>
                         <?php if (!empty($users)): ?>
@@ -593,6 +589,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <p>No users found.</p>
                         <?php endif; ?>
                     <?php endif; ?>
+
+                    <!-- Move the "Create User" button to the bottom right -->
+                    <div style="text-align: right; margin-top: 20px;">
+                        <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                            Create User
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
