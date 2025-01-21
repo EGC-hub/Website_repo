@@ -486,9 +486,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- User Info -->
                 <div class="user-info me-3 ms-auto">
-                    <p class="mb-0">Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong></p>
+                    <p class="mb-0">Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong></p>
                     <p class="mb-0">Departments:
-                        <strong><?= htmlspecialchars($loggedInDepartment ?? 'Unknown') ?></strong>
+                        <strong><?= htmlspecialchars($user_departments ?? 'Unknown') ?></strong>
                     </p>
                 </div>
 
