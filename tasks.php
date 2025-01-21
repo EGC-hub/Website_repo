@@ -903,11 +903,6 @@ function getWeekdays($start, $end)
                 </div>
 
                 <div class="task-container">
-                    <div class="logout-button">
-                        <a href="welcome.php">Back to Dashboard</a>
-                    </div>
-                    <h2>Tasks</h2>
-
                     <div class="container mt-4">
                         <!-- Filter Buttons -->
                         <!-- Filter Container -->
