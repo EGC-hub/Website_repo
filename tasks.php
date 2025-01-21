@@ -1421,6 +1421,47 @@ function getWeekdays($start, $end)
                 </div>
             </div>
 
+            <!-- Modal for Reassignment -->
+            <div class="modal fade" id="reassignmentModal" tabindex="-1" aria-labelledby="reassignmentModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form id="reassignmentForm" method="POST" onsubmit="handleReassignmentForm(event)">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="reassignmentModalLabel">Reassign Task</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Hidden input for Task ID -->
+                                <input type="hidden" id="reassign-task-id" name="task_id">
+                                <!-- Hidden input for Status (will be set to "Assigned") -->
+                                <input type="hidden" id="reassign-status" name="status" value="Assigned">
+
+                                <!-- Dropdown for selecting the user to reassign to -->
+                                <div class="mb-3">
+                                    <label for="reassign-user-id" class="form-label">Reassign To:</label>
+                                    <select id="reassign-user-id" name="reassign_user_id" class="form-control" required>
+                                        <option value="">Select a user</option>
+                                        <?php foreach ($users as $user): ?>
+                                            <option value="<?= $user['id'] ?>">
+                                                <?= htmlspecialchars($user['username']) ?>
+                                                (<?= htmlspecialchars($user['departments']) ?> -
+                                                <?= htmlspecialchars($user['role']) ?>)
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Reassign</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <!-- Jquery -->
             <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 
@@ -1459,8 +1500,13 @@ function getWeekdays($start, $end)
                     const status = event.target.value;
                     const form = event.target.form;
 
-                    // If the status is 'Delayed Completion' or 'Completed on Time', show the modal
-                    if (status === 'Delayed Completion' || status === 'Completed on Time') {
+                    if (status === 'Reassigned') {
+                        // Show the reassignment modal
+                        document.getElementById('reassign-task-id').value = taskId;
+                        const reassignmentModal = new bootstrap.Modal(document.getElementById('reassignmentModal'));
+                        reassignmentModal.show();
+                    } else if (status === 'Delayed Completion' || status === 'Completed on Time') {
+                        // Existing logic for completion modal
                         document.getElementById('task-id').value = taskId;
                         document.getElementById('modal-status').value = status;
 
@@ -1478,69 +1524,86 @@ function getWeekdays($start, $end)
                         const modal = new bootstrap.Modal(document.getElementById('completionModal'));
                         modal.show();
                     } else if (status === 'Closed') {
-                        // For 'Closed' status, submit the form directly
+                        // Existing logic for 'Closed' status
                         fetch('update-status.php', {
                             method: 'POST',
                             body: new FormData(form)
                         })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Network response was not ok');
-                                }
-                                return response.json(); // Parse the response as JSON
-                            })
+                            .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
-                                    // Update the modal content with the task name and message
                                     document.getElementById('success-task-name').innerText = data.task_name;
                                     document.getElementById('success-message').innerText = data.message;
-
-                                    // Show the success modal
                                     const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                                     successModal.show();
-
-                                    // Disable the dropdown after changing the status to "Closed"
                                     event.target.disabled = true;
                                 } else {
-                                    // If the update was not successful, show an alert with the error message
                                     alert(data.message);
                                 }
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                alert('An error occurred while updating the status. Check the console for details.');
+                                alert('An error occurred while updating the status.');
                             });
                     } else {
-                        // For other statuses, submit the form directly
+                        // Existing logic for other statuses
                         fetch('update-status.php', {
                             method: 'POST',
                             body: new FormData(form)
                         })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Network response was not ok');
-                                }
-                                return response.json(); // Parse the response as JSON
-                            })
+                            .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
-                                    // Update the modal content with the task name and message
                                     document.getElementById('success-task-name').innerText = data.task_name;
                                     document.getElementById('success-message').innerText = data.message;
-
-                                    // Show the success modal
                                     const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                                     successModal.show();
                                 } else {
-                                    // If the update was not successful, show an alert with the error message
                                     alert(data.message);
                                 }
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                alert('An error occurred while updating the status. Check the console for details.');
+                                alert('An error occurred while updating the status.');
                             });
                     }
+                }
+
+                function handleReassignmentForm(event) {
+                    event.preventDefault(); // Prevent the default form submission
+
+                    const form = event.target;
+                    const formData = new FormData(form);
+
+                    fetch('reassign-task.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Close the reassignment modal
+                                const reassignmentModal = bootstrap.Modal.getInstance(document.getElementById('reassignmentModal'));
+                                reassignmentModal.hide();
+
+                                // Show the success modal
+                                document.getElementById('success-task-name').innerText = data.task_name;
+                                document.getElementById('success-message').innerText = data.message;
+                                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                                successModal.show();
+
+                                // Optionally, refresh the task list or update the UI
+                                setTimeout(() => {
+                                    window.location.reload(); // Reload the page to reflect the updated status
+                                }, 2000); // Reload after 2 seconds
+                            } else {
+                                alert(data.message); // Show an error message if the update failed
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while reassigning the task.');
+                        });
                 }
             </script>
 
@@ -1632,7 +1695,7 @@ function getWeekdays($start, $end)
                         $('#department-filter').closest('.filter-dropdown').hide();
                     }
 
-                    // Remove the "All" option initially
+                    c// Remove the "All" option initially
                     $('#project-filter option[value="All"]').remove();
                     $('#department-filter option[value="All"]').remove();
 
