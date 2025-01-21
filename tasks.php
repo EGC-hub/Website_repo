@@ -365,13 +365,21 @@ function getWeekdays($start, $end)
 {
     $weekdays = 0;
     $current = $start;
+
+    // Loop through each day between start and end dates
     while ($current <= $end) {
-        $dayOfWeek = date('N', $current); // 1 (Monday) to 7 (Sunday)
-        if ($dayOfWeek <= 5) { // Exclude Saturday (6) and Sunday (7)
+        // Get the day of the week (1 = Monday, 7 = Sunday)
+        $dayOfWeek = date('N', $current);
+
+        // Check if the day is a weekday (Monday to Friday)
+        if ($dayOfWeek <= 5) {
             $weekdays++;
         }
+
+        // Move to the next day
         $current = strtotime('+1 day', $current);
     }
+
     return $weekdays;
 }
 ?>
@@ -743,16 +751,75 @@ function getWeekdays($start, $end)
             background-color: #004080;
             color: white;
         }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #002c5f;
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #004080;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            margin-right: 20px;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            background-color: #002c5f;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: #004080;
+        }
     </style>
 </head>
 
 <body>
-    <div class="user-info">
+    <!-- <div class="user-info">
         <p>Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong> | Department:
             <strong><?= htmlspecialchars($loggedInDepartment ?? 'Unknown') ?></strong>
         </p>
         <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
-    </div>
+    </div> -->
 
     <!-- Task Management Modal -->
     <div class="modal fade" id="taskManagementModal" tabindex="-1" aria-labelledby="taskManagementModalLabel"
@@ -838,295 +905,282 @@ function getWeekdays($start, $end)
     }
     ?>
 
-    <div class="task-container">
-        <div class="logout-button">
-            <a href="welcome.php">Back to Dashboard</a>
+    <!-- Sidebar and Navbar -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>Menu</h3>
+            <a href="tasks.php">Tasks</a>
+            <?php if ($user_role === 'Admin' || $user_role === 'Manager'): ?>
+                <a href="view-users.php">View Users</a>
+            <?php endif; ?>
+            <?php if ($user_role === 'Admin'): ?>
+                <a href="view-roles-departments.php">View Role or Department</a>
+            <?php endif; ?>
         </div>
-        <h2>Tasks</h2>
 
-        <div class="container mt-4">
-            <!-- Filter Buttons -->
-            <!-- Filter Container -->
-            <div class="filter-container">
-                <div class="filter-buttons">
-                    <?php if ($user_role === 'Admin' || $user_role === 'Manager'): ?>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#taskManagementModal">
-                            Create New Task
-                        </button>
-                    <?php endif; ?>
-                    <button onclick="resetFilters()" class="btn btn-primary">Reset</button>
-                    <a href="export_tasks.php" class="btn btn-success">Export to CSV</a>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Navbar -->
+            <div class="navbar">
+                <!-- Logo Container -->
+                <div class="d-flex align-items-center me-3">
+                    <img src="images/logo/logo.webp" alt="Logo" class="logo" style="width: auto; height: 80px;">
                 </div>
 
-                <!-- Filter Dropdowns and Date Range -->
-                <div class="filter-row">
-                    <!-- Multi-select dropdown for filtering by project -->
-                    <div class="filter-dropdown">
-                        <label for="project-filter">Filter by Project:</label>
-                        <select id="project-filter" multiple="multiple">
-                            <option value="All">All</option>
-                            <?php foreach ($projects as $project): ?>
-                                <option value="<?= htmlspecialchars($project) ?>" <?= (isset($_GET['project']) && in_array($project, explode(',', $_GET['project']))) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($project) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <!-- Multi-select dropdown for filtering by department -->
-                    <div class="filter-dropdown">
-                        <label for="department-filter">Filter by Department of Assigned User:</label>
-                        <select id="department-filter" multiple="multiple">
-                            <option value="All">All</option>
-                            <?php foreach ($departments as $department): ?>
-                                <option value="<?= htmlspecialchars($department['name']) ?>" <?= (isset($_GET['department']) && in_array($department['name'], explode(',', $_GET['department']))) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($department['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <!-- Date Range Inputs -->
-                    <div class="filter-date">
-                        <div class="filter-dropdown">
-                            <label for="start-date">Start Date:</label>
-                            <input type="date" id="start-date"
-                                value="<?= isset($_GET['start_date']) ? htmlspecialchars($_GET['start_date']) : '' ?>">
-                        </div>
-                        <div class="filter-dropdown">
-                            <label for="end-date">End Date:</label>
-                            <input type="date" id="end-date"
-                                value="<?= isset($_GET['end_date']) ? htmlspecialchars($_GET['end_date']) : '' ?>">
-                        </div>
-                    </div>
+                <!-- User Info -->
+                <div class="user-info me-3 ms-auto">
+                    <p class="mb-0">Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong></p>
+                    <p class="mb-0">Departments:
+                        <strong><?= htmlspecialchars($loggedInDepartment ?? 'Unknown') ?></strong>
+                    </p>
                 </div>
+
+                <!-- Back Button -->
+                <button class="back-btn" onclick="window.location.href='welcome.php'">Back</button>
             </div>
 
-            <!-- Pending & Started Tasks Table -->
-            <h3>Assigned & In Progress Tasks</h3>
-            <table class="table table-striped table-hover align-middle text-center" id="pending-tasks">
-                <thead>
-                    <tr class="align-middle">
-                        <th>#</th>
-                        <th>Project Name</th>
-                        <th>Task Name</th>
-                        <th>Task Description</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Status</th>
-                        <th>Project Type</th>
-                        <th>Assigned By</th>
-                        <?php if ($user_role !== 'User'): ?>
-                            <th>Assigned To</th>
-                        <?php endif; ?>
-                        <th>Created On</th>
-                        <?php if ($user_role !== 'User'): ?>
-                            <th>Actions</th>
-                        <?php endif; ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
-                    foreach ($pendingStartedTasksPage as $row): ?>
-                        <tr class="align-middle">
-                            <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
-                            <td><?= htmlspecialchars($row['project_name']) ?></td>
-                            <td>
-                                <?php if ($row['status'] === 'Completed on Time'): ?>
-                                    <!-- Link to Completed on Time Modal -->
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
-                                        data-description="<?= htmlspecialchars($row['completion_description']); ?>">
-                                        <?= htmlspecialchars($row['task_name']); ?>
-                                    </a>
-                                <?php elseif ($row['status'] === 'Delayed Completion'): ?>
-                                    <!-- Link to Delayed Completion Modal -->
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                        onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
-                                        <?php echo htmlspecialchars($row['task_name']); ?>
-                                    </a>
-                                <?php else: ?>
-                                    <!-- Plain Text for Other Statuses -->
-                                    <?php echo htmlspecialchars($row['task_name']); ?>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <div class="task-description-container">
-                                    <div class="task-description">
-                                        <?= htmlspecialchars($row['task_description']) ?>
-                                    </div>
-                                    <a href="#" class="see-more-link" data-bs-toggle="modal"
-                                        data-bs-target="#taskDescriptionModal"
-                                        data-description="<?= htmlspecialchars($row['task_description']) ?>"
-                                        style="display: none;">
-                                        See more
-                                    </a>
-                                </div>
-                            </td>
-                            <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
-                            <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?></td>
-                            <td>
-                                <form method="POST" action="update-status.php">
-                                    <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                    <?php
-                                    // Fetch the current status of the task
-                                    $currentStatus = $row['status'];
+            <div class="task-container">
+                <div class="logout-button">
+                    <a href="welcome.php">Back to Dashboard</a>
+                </div>
+                <h2>Tasks</h2>
 
-                                    // Fetch the assigned_by_id for the task
-                                    $assigned_by_id = $row['assigned_by_id'];
-
-                                    // Define the available statuses based on the user role and current status
-                                    $statuses = [];
-                                    if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
-                                        // Admin or the user who assigned the task can change status to anything in the first table
-                                        if (in_array($currentStatus, ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'])) {
-                                            $statuses = ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned', 'Completed on Time', 'Delayed Completion'];
-                                        } elseif (in_array($currentStatus, ['Completed on Time', 'Delayed Completion'])) {
-                                            // In the second table, only allow changing to "Closed"
-                                            $statuses = ['Closed'];
-                                        }
-                                    } elseif ($user_role === 'User') {
-                                        // Regular user can only change status from "Assigned" to "Completed on Time" or "Delayed Completion"
-                                        if ($currentStatus === 'Assigned') {
-                                            $statuses = ['Assigned', 'Completed on Time', 'Delayed Completion'];
-                                        }
-                                    }
-
-                                    // Generate the status dropdown
-                                    if (!empty($statuses)) {
-                                        echo '<select id="status" name="status" onchange="handleStatusChange(event, ' . $row['task_id'] . ')"';
-                                        if (in_array($currentStatus, ['Completed on Time', 'Delayed Completion', 'Closed'])) {
-                                            echo ' disabled';
-                                        }
-                                        echo '>';
-                                        foreach ($statuses as $statusValue) {
-                                            $selected = ($currentStatus === $statusValue) ? 'selected' : '';
-                                            echo "<option value='$statusValue' $selected>$statusValue</option>";
-                                        }
-                                        echo '</select>';
-                                    } else {
-                                        echo $currentStatus; // Display the status as text if no changes are allowed
-                                    }
-                                    ?>
-                                </form>
-                            </td>
-                            <td><?= htmlspecialchars($row['project_type']) ?></td>
-                            <td><?= htmlspecialchars($row['assigned_by']) ?>
-                                (<?= htmlspecialchars($row['assigned_by_department']) ?>)
-                            </td>
-                            <?php if ($user_role !== 'User'): ?>
-                                <td><?= htmlspecialchars($row['assigned_to']) ?>
-                                    (<?= htmlspecialchars($row['assigned_to_department']) ?>)
-                                </td>
+                <div class="container mt-4">
+                    <!-- Filter Buttons -->
+                    <!-- Filter Container -->
+                    <div class="filter-container">
+                        <div class="filter-buttons">
+                            <?php if ($user_role === 'Admin' || $user_role === 'Manager'): ?>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#taskManagementModal">
+                                    Create New Task
+                                </button>
                             <?php endif; ?>
-                            <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
-                            <?php if (($user_role !== 'User' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'Admin'): ?>
-                                <td>
-                                    <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
-                                    <form method="POST" action="delete-task.php" style="display:inline;">
-                                        <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                        <button type="submit" class="delete-button"
-                                            onclick="return confirm('Are you sure?')">Delete</button>
-                                    </form>
-                                </td>
-                            <?php else: ?>
+                            <button onclick="resetFilters()" class="btn btn-primary">Reset</button>
+                            <a href="export_tasks.php" class="btn btn-success">Export to CSV</a>
+                        </div>
 
-                            <?php endif; ?>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                        <!-- Filter Dropdowns and Date Range -->
+                        <div class="filter-row">
+                            <!-- Multi-select dropdown for filtering by project -->
+                            <div class="filter-dropdown">
+                                <label for="project-filter">Filter by Project:</label>
+                                <select id="project-filter" multiple="multiple">
+                                    <option value="All">All</option>
+                                    <?php foreach ($projects as $project): ?>
+                                        <option value="<?= htmlspecialchars($project) ?>" <?= (isset($_GET['project']) && in_array($project, explode(',', $_GET['project']))) ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($project) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
 
-            <!-- Alert for Pending & In Progress Tasks -->
-            <div id="no-data-alert-pending" class="alert alert-warning mt-3" style="display: <?= $showPendingAlert ?>;">
-                No data to be displayed.
-            </div>
+                            <!-- Multi-select dropdown for filtering by department -->
+                            <div class="filter-dropdown">
+                                <label for="department-filter">Filter by Department of Assigned User:</label>
+                                <select id="department-filter" multiple="multiple">
+                                    <option value="All">All</option>
+                                    <?php foreach ($departments as $department): ?>
+                                        <option value="<?= htmlspecialchars($department['name']) ?>"
+                                            <?= (isset($_GET['department']) && in_array($department['name'], explode(',', $_GET['department']))) ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($department['name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
 
-            <!-- Completed Tasks Table -->
-            <h3>Completed Tasks</h3>
-            <table class="table table-striped table-hover align-middle text-center custom-table" id="remaining-tasks">
-                <thead>
-                    <tr class="align-middle">
-                        <th>#</th> <!-- New column for task count -->
-                        <th>Project Name</th>
-                        <th>Task Name</th>
-                        <th>Task Description</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Status</th>
-                        <th>Project Type</th>
-                        <th>Assigned By</th>
-                        <?php if ($user_role !== 'User'): ?>
-                            <th>Assigned To</th>
-                        <?php endif; ?>
-                        <th>Created On</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
-                    foreach ($completedTasksPage as $row): ?>
-                        <?php
-                        $delayInfo = '';
-                        if ($row['status'] === 'Delayed Completion') {
-                            $expectedFinishDate = strtotime($row['expected_finish_date']);
-                            $actualCompletionDate = strtotime($row['actual_completion_date']);
-
-                            if ($actualCompletionDate && $expectedFinishDate) {
-                                // Calculate the number of weekdays between the expected finish date and actual completion date
-                                $weekdays = getWeekdays($expectedFinishDate, $actualCompletionDate);
-
-                                // Convert the delay into days and hours, excluding weekends
-                                $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
-                                $delayHours = floor(($actualCompletionDate - $expectedFinishDate) % (60 * 60 * 24) / (60 * 60)); // Remaining hours
-                                $delayInfo = "{$delayDays} days, {$delayHours} hours delayed";
-                            }
-                        }
-                        ?>
-                        <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
-                            data-status="<?= htmlspecialchars($row['status']) ?>" class="align-middle <?php if ($row['status'] === 'Delayed Completion')
-                                  echo 'delayed-task'; ?>">
-                            <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
-                            <td><?= htmlspecialchars($row['project_name']) ?></td>
-                            <td>
-                                <?php if ($row['status'] === 'Completed on Time'): ?>
-                                    <!-- Link to Completed on Time Modal -->
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
-                                        data-description="<?= htmlspecialchars($row['completion_description']); ?>">
-                                        <?= htmlspecialchars($row['task_name']); ?>
-                                    </a>
-                                <?php elseif ($row['status'] === 'Delayed Completion'): ?>
-                                    <!-- Link to Delayed Completion Modal -->
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                        onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
-                                        <?php echo htmlspecialchars($row['task_name']); ?>
-                                    </a>
-                                <?php else: ?>
-                                    <!-- Plain Text for Other Statuses -->
-                                    <?php echo htmlspecialchars($row['task_name']); ?>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <div class="task-description-container">
-                                    <div class="task-description">
-                                        <?= htmlspecialchars($row['task_description']) ?>
-                                    </div>
-                                    <a href="#" class="see-more-link" data-bs-toggle="modal"
-                                        data-bs-target="#taskDescriptionModal"
-                                        data-description="<?= htmlspecialchars($row['task_description']) ?>"
-                                        style="display: none;">
-                                        See more
-                                    </a>
+                            <!-- Date Range Inputs -->
+                            <div class="filter-date">
+                                <div class="filter-dropdown">
+                                    <label for="start-date">Start Date:</label>
+                                    <input type="date" id="start-date"
+                                        value="<?= isset($_GET['start_date']) ? htmlspecialchars($_GET['start_date']) : '' ?>">
                                 </div>
-                            </td>
-                            <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?></td>
-                            <td>
-                                <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?>
-                                <?php if ($row['status'] === 'Delayed Completion'): ?>
-                                    <?php
+                                <div class="filter-dropdown">
+                                    <label for="end-date">End Date:</label>
+                                    <input type="date" id="end-date"
+                                        value="<?= isset($_GET['end_date']) ? htmlspecialchars($_GET['end_date']) : '' ?>">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending & Started Tasks Table -->
+                    <h3>Assigned & In Progress Tasks</h3>
+                    <table class="table table-striped table-hover align-middle text-center" id="pending-tasks">
+                        <thead>
+                            <tr class="align-middle">
+                                <th>#</th>
+                                <th>Project Name</th>
+                                <th>Task Name</th>
+                                <th>Task Description</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th>Project Type</th>
+                                <th>Assigned By</th>
+                                <?php if ($user_role !== 'User'): ?>
+                                    <th>Assigned To</th>
+                                <?php endif; ?>
+                                <th>Created On</th>
+                                <?php if ($user_role !== 'User'): ?>
+                                    <th>Actions</th>
+                                <?php endif; ?>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
+                            foreach ($pendingStartedTasksPage as $row): ?>
+                                <tr class="align-middle">
+                                    <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
+                                    <td><?= htmlspecialchars($row['project_name']) ?></td>
+                                    <td>
+                                        <?php if ($row['status'] === 'Completed on Time'): ?>
+                                            <!-- Link to Completed on Time Modal -->
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
+                                                data-description="<?= htmlspecialchars($row['completion_description']); ?>">
+                                                <?= htmlspecialchars($row['task_name']); ?>
+                                            </a>
+                                        <?php elseif ($row['status'] === 'Delayed Completion'): ?>
+                                            <!-- Link to Delayed Completion Modal -->
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
+                                                onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
+                                                <?php echo htmlspecialchars($row['task_name']); ?>
+                                            </a>
+                                        <?php else: ?>
+                                            <!-- Plain Text for Other Statuses -->
+                                            <?php echo htmlspecialchars($row['task_name']); ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <div class="task-description-container">
+                                            <div class="task-description">
+                                                <?= htmlspecialchars($row['task_description']) ?>
+                                            </div>
+                                            <a href="#" class="see-more-link" data-bs-toggle="modal"
+                                                data-bs-target="#taskDescriptionModal"
+                                                data-description="<?= htmlspecialchars($row['task_description']) ?>"
+                                                style="display: none;">
+                                                See more
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?>
+                                    </td>
+                                    <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="update-status.php">
+                                            <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
+                                            <?php
+                                            // Fetch the current status of the task
+                                            $currentStatus = $row['status'];
+
+                                            // Fetch the assigned_by_id for the task
+                                            $assigned_by_id = $row['assigned_by_id'];
+
+                                            // Define the available statuses based on the user role and current status
+                                            $statuses = [];
+                                            if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
+                                                // Admin or the user who assigned the task can change status to anything in the first table
+                                                if (in_array($currentStatus, ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'])) {
+                                                    $statuses = ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned', 'Completed on Time', 'Delayed Completion'];
+                                                } elseif (in_array($currentStatus, ['Completed on Time', 'Delayed Completion'])) {
+                                                    // In the second table, only allow changing to "Closed"
+                                                    $statuses = ['Closed'];
+                                                }
+                                            } elseif ($user_role === 'User') {
+                                                // Regular user can only change status from "Assigned" to "Completed on Time" or "Delayed Completion"
+                                                if ($currentStatus === 'Assigned') {
+                                                    $statuses = ['Assigned', 'Completed on Time', 'Delayed Completion'];
+                                                }
+                                            }
+
+                                            // Generate the status dropdown
+                                            if (!empty($statuses)) {
+                                                echo '<select id="status" name="status" onchange="handleStatusChange(event, ' . $row['task_id'] . ')"';
+                                                if (in_array($currentStatus, ['Completed on Time', 'Delayed Completion', 'Closed'])) {
+                                                    echo ' disabled';
+                                                }
+                                                echo '>';
+                                                foreach ($statuses as $statusValue) {
+                                                    $selected = ($currentStatus === $statusValue) ? 'selected' : '';
+                                                    echo "<option value='$statusValue' $selected>$statusValue</option>";
+                                                }
+                                                echo '</select>';
+                                            } else {
+                                                echo $currentStatus; // Display the status as text if no changes are allowed
+                                            }
+                                            ?>
+                                        </form>
+                                    </td>
+                                    <td><?= htmlspecialchars($row['project_type']) ?></td>
+                                    <td><?= htmlspecialchars($row['assigned_by']) ?>
+                                        (<?= htmlspecialchars($row['assigned_by_department']) ?>)
+                                    </td>
+                                    <?php if ($user_role !== 'User'): ?>
+                                        <td><?= htmlspecialchars($row['assigned_to']) ?>
+                                            (<?= htmlspecialchars($row['assigned_to_department']) ?>)
+                                        </td>
+                                    <?php endif; ?>
+                                    <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
+                                    </td>
+                                    <?php if (($user_role !== 'User' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'Admin'): ?>
+                                        <td>
+                                            <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
+                                            <form method="POST" action="delete-task.php" style="display:inline;">
+                                                <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
+                                                <button type="submit" class="delete-button"
+                                                    onclick="return confirm('Are you sure?')">Delete</button>
+                                            </form>
+                                        </td>
+                                    <?php else: ?>
+
+                                    <?php endif; ?>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+
+                    <!-- Alert for Pending & In Progress Tasks -->
+                    <div id="no-data-alert-pending" class="alert alert-warning mt-3"
+                        style="display: <?= $showPendingAlert ?>;">
+                        No data to be displayed.
+                    </div>
+
+                    <!-- Completed Tasks Table -->
+                    <h3>Completed Tasks</h3>
+                    <table class="table table-striped table-hover align-middle text-center custom-table"
+                        id="remaining-tasks">
+                        <thead>
+                            <tr class="align-middle">
+                                <th>#</th> <!-- New column for task count -->
+                                <th>Project Name</th>
+                                <th>Task Name</th>
+                                <th>Task Description</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th>Project Type</th>
+                                <th>Assigned By</th>
+                                <?php if ($user_role !== 'User'): ?>
+                                    <th>Assigned To</th>
+                                <?php endif; ?>
+                                <th>Created On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
+                            foreach ($completedTasksPage as $row): ?>
+                                <?php
+                                $delayInfo = '';
+                                if ($row['status'] === 'Delayed Completion') {
                                     $expectedFinishDate = strtotime($row['expected_finish_date']);
                                     $actualCompletionDate = strtotime($row['actual_completion_date']);
+
                                     if ($actualCompletionDate && $expectedFinishDate) {
                                         // Calculate the number of weekdays between the expected finish date and actual completion date
                                         $weekdays = getWeekdays($expectedFinishDate, $actualCompletionDate);
@@ -1134,367 +1188,341 @@ function getWeekdays($start, $end)
                                         // Convert the delay into days and hours, excluding weekends
                                         $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
                                         $delayHours = floor(($actualCompletionDate - $expectedFinishDate) % (60 * 60 * 24) / (60 * 60)); // Remaining hours
-                                        echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
-                                        echo "<br><small class='text-muted'>Completed on: " . date("d M Y, h:i A", $actualCompletionDate) . "</small>";
+                                        $delayInfo = "{$delayDays} days, {$delayHours} hours delayed";
                                     }
-                                    ?>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <form method="POST" action="update-status.php">
-                                    <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                    <?php
-                                    // Fetch the current status of the task
-                                    $currentStatus = $row['status'];
+                                }
+                                ?>
+                                <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
+                                    data-status="<?= htmlspecialchars($row['status']) ?>" class="align-middle <?php if ($row['status'] === 'Delayed Completion')
+                                          echo 'delayed-task'; ?>">
+                                    <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
+                                    <td><?= htmlspecialchars($row['project_name']) ?></td>
+                                    <td>
+                                        <?php if ($row['status'] === 'Completed on Time'): ?>
+                                            <!-- Link to Completed on Time Modal -->
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
+                                                data-description="<?= htmlspecialchars($row['completion_description']); ?>">
+                                                <?= htmlspecialchars($row['task_name']); ?>
+                                            </a>
+                                        <?php elseif ($row['status'] === 'Delayed Completion'): ?>
+                                            <!-- Link to Delayed Completion Modal -->
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
+                                                onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
+                                                <?php echo htmlspecialchars($row['task_name']); ?>
+                                            </a>
+                                        <?php else: ?>
+                                            <!-- Plain Text for Other Statuses -->
+                                            <?php echo htmlspecialchars($row['task_name']); ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <div class="task-description-container">
+                                            <div class="task-description">
+                                                <?= htmlspecialchars($row['task_description']) ?>
+                                            </div>
+                                            <a href="#" class="see-more-link" data-bs-toggle="modal"
+                                                data-bs-target="#taskDescriptionModal"
+                                                data-description="<?= htmlspecialchars($row['task_description']) ?>"
+                                                style="display: none;">
+                                                See more
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?>
+                                    </td>
+                                    <td>
+                                        <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?>
+                                        <?php if ($row['status'] === 'Delayed Completion'): ?>
+                                            <?php
+                                            $expectedFinishDate = strtotime($row['expected_finish_date']);
+                                            $actualCompletionDate = strtotime($row['actual_completion_date']);
+                                            if ($actualCompletionDate && $expectedFinishDate) {
+                                                // Calculate the number of weekdays between the expected finish date and actual completion date
+                                                $weekdays = getWeekdays($expectedFinishDate, $actualCompletionDate);
 
-                                    // Fetch the assigned_by_id for the task
-                                    $assigned_by_id = $row['assigned_by_id'];
+                                                // Convert the delay into days and hours, excluding weekends
+                                                $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
+                                                $delayHours = floor(($actualCompletionDate - $expectedFinishDate) % (60 * 60 * 24) / (60 * 60)); // Remaining hours
+                                                echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
+                                                echo "<br><small class='text-muted'>Completed on: " . date("d M Y, h:i A", $actualCompletionDate) . "</small>";
+                                            }
+                                            ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="update-status.php">
+                                            <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
+                                            <?php
+                                            // Fetch the current status of the task
+                                            $currentStatus = $row['status'];
 
-                                    // Define the available statuses based on the user role and current status
-                                    $statuses = [];
-                                    if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
-                                        // Admin or the user who assigned the task can change status to "Closed" if the task is "Completed on Time" or "Delayed Completion"
-                                        if (in_array($currentStatus, ['Completed on Time', 'Delayed Completion'])) {
-                                            $statuses = [$currentStatus, 'Closed']; // Show the current status and "Closed"
-                                        } elseif ($currentStatus === 'Closed') {
-                                            $statuses = ['Closed']; // Only show "Closed" if the status is already "Closed"
-                                        }
-                                    } elseif ($user_role === 'User') {
-                                        // Regular user cannot change status in the second table
-                                        $statuses = [];
-                                    }
+                                            // Fetch the assigned_by_id for the task
+                                            $assigned_by_id = $row['assigned_by_id'];
 
-                                    // Generate the status dropdown
-                                    if (!empty($statuses)) {
-                                        echo '<select id="status" name="status" onchange="handleStatusChange(event, ' . $row['task_id'] . ')"';
-                                        if ($currentStatus === 'Closed') {
-                                            echo ' disabled'; // Lock the dropdown if the status is "Closed"
-                                        }
-                                        echo '>';
-                                        foreach ($statuses as $statusValue) {
-                                            $selected = ($currentStatus === $statusValue) ? 'selected' : '';
-                                            echo "<option value='$statusValue' $selected>$statusValue</option>";
-                                        }
-                                        echo '</select>';
-                                    } else {
-                                        echo $currentStatus; // Display the status as text if no changes are allowed
-                                    }
-                                    ?>
-                                </form>
-                            </td>
-                            <td><?= htmlspecialchars($row['project_type']) ?></td>
-                            <td><?= htmlspecialchars($row['assigned_by']) ?>
-                                (<?= htmlspecialchars($row['assigned_by_department']) ?>)
-                            </td>
-                            <?php if ($user_role !== 'User'): ?>
-                                <td><?= htmlspecialchars($row['assigned_to']) ?>
-                                    (<?= htmlspecialchars($row['assigned_to_department']) ?>)
-                                </td>
-                            <?php endif; ?>
-                            <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                                            // Define the available statuses based on the user role and current status
+                                            $statuses = [];
+                                            if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
+                                                // Admin or the user who assigned the task can change status to "Closed" if the task is "Completed on Time" or "Delayed Completion"
+                                                if (in_array($currentStatus, ['Completed on Time', 'Delayed Completion'])) {
+                                                    $statuses = [$currentStatus, 'Closed']; // Show the current status and "Closed"
+                                                } elseif ($currentStatus === 'Closed') {
+                                                    $statuses = ['Closed']; // Only show "Closed" if the status is already "Closed"
+                                                }
+                                            } elseif ($user_role === 'User') {
+                                                // Regular user cannot change status in the second table
+                                                $statuses = [];
+                                            }
 
-            <!-- Alert for Completed Tasks -->
-            <div id="no-data-alert-completed" class="alert alert-warning mt-3"
-                style="display: <?= $showCompletedAlert ?>;">
-                No data to be displayed.
-            </div>
+                                            // Generate the status dropdown
+                                            if (!empty($statuses)) {
+                                                echo '<select id="status" name="status" onchange="handleStatusChange(event, ' . $row['task_id'] . ')"';
+                                                if ($currentStatus === 'Closed') {
+                                                    echo ' disabled'; // Lock the dropdown if the status is "Closed"
+                                                }
+                                                echo '>';
+                                                foreach ($statuses as $statusValue) {
+                                                    $selected = ($currentStatus === $statusValue) ? 'selected' : '';
+                                                    echo "<option value='$statusValue' $selected>$statusValue</option>";
+                                                }
+                                                echo '</select>';
+                                            } else {
+                                                echo $currentStatus; // Display the status as text if no changes are allowed
+                                            }
+                                            ?>
+                                        </form>
+                                    </td>
+                                    <td><?= htmlspecialchars($row['project_type']) ?></td>
+                                    <td><?= htmlspecialchars($row['assigned_by']) ?>
+                                        (<?= htmlspecialchars($row['assigned_by_department']) ?>)
+                                    </td>
+                                    <?php if ($user_role !== 'User'): ?>
+                                        <td><?= htmlspecialchars($row['assigned_to']) ?>
+                                            (<?= htmlspecialchars($row['assigned_to_department']) ?>)
+                                        </td>
+                                    <?php endif; ?>
+                                    <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
 
-            <!-- Pagination for the entire page -->
-            <div class="pagination">
-                <?php if ($currentPage > 1): ?>
-                    <a
-                        href="?page=<?= $currentPage - 1 ?>&project=<?= $selectedProject ?>&department=<?= $selectedDepartment ?>&start_date=<?= $startDateFilter ?>&end_date=<?= $endDateFilter ?>">Previous</a>
-                <?php endif; ?>
+                    <!-- Alert for Completed Tasks -->
+                    <div id="no-data-alert-completed" class="alert alert-warning mt-3"
+                        style="display: <?= $showCompletedAlert ?>;">
+                        No data to be displayed.
+                    </div>
 
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <a href="?page=<?= $i ?>&project=<?= $selectedProject ?>&department=<?= $selectedDepartment ?>&start_date=<?= $startDateFilter ?>&end_date=<?= $endDateFilter ?>"
-                        <?= $i == $currentPage ? 'class="active"' : '' ?>><?= $i ?></a>
-                <?php endfor; ?>
+                    <!-- Pagination for the entire page -->
+                    <div class="pagination">
+                        <?php if ($currentPage > 1): ?>
+                            <a
+                                href="?page=<?= $currentPage - 1 ?>&project=<?= $selectedProject ?>&department=<?= $selectedDepartment ?>&start_date=<?= $startDateFilter ?>&end_date=<?= $endDateFilter ?>">Previous</a>
+                        <?php endif; ?>
 
-                <?php if ($currentPage < $totalPages): ?>
-                    <a
-                        href="?page=<?= $currentPage + 1 ?>&project=<?= $selectedProject ?>&department=<?= $selectedDepartment ?>&start_date=<?= $startDateFilter ?>&end_date=<?= $endDateFilter ?>">Next</a>
-                <?php endif; ?>
+                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                            <a href="?page=<?= $i ?>&project=<?= $selectedProject ?>&department=<?= $selectedDepartment ?>&start_date=<?= $startDateFilter ?>&end_date=<?= $endDateFilter ?>"
+                                <?= $i == $currentPage ? 'class="active"' : '' ?>><?= $i ?></a>
+                        <?php endfor; ?>
+
+                        <?php if ($currentPage < $totalPages): ?>
+                            <a
+                                href="?page=<?= $currentPage + 1 ?>&project=<?= $selectedProject ?>&department=<?= $selectedDepartment ?>&start_date=<?= $startDateFilter ?>&end_date=<?= $endDateFilter ?>">Next</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Modal for Task Completion -->
-        <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form id="completionForm" method="POST" onsubmit="handleCompletionForm(event)">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="completionModalLabel">Task Completion</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Modal for Task Completion -->
+    <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="completionForm" method="POST" onsubmit="handleCompletionForm(event)">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="completionModalLabel">Task Completion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Hidden input for Task ID -->
+                        <input type="hidden" id="task-id" name="task_id">
+                        <!-- Hidden input for Status -->
+                        <input type="hidden" id="modal-status" name="status">
+
+                        <!-- Completion Description -->
+                        <div class="mb-3">
+                            <label for="completion-description" class="form-label">What was completed?</label>
+                            <textarea class="form-control" id="completion-description" name="completion_description"
+                                rows="3" required></textarea>
                         </div>
-                        <div class="modal-body">
-                            <!-- Hidden input for Task ID -->
-                            <input type="hidden" id="task-id" name="task_id">
-                            <!-- Hidden input for Status -->
-                            <input type="hidden" id="modal-status" name="status">
 
-                            <!-- Completion Description -->
-                            <div class="mb-3">
-                                <label for="completion-description" class="form-label">What was completed?</label>
-                                <textarea class="form-control" id="completion-description" name="completion_description"
-                                    rows="3" required></textarea>
-                            </div>
-
-                            <!-- Delayed Reason (Shown only for Delayed Completion) -->
-                            <div class="mb-3" id="delayed-reason-container" style="display: none;">
-                                <label for="delayed-reason" class="form-label">Why was it completed late?</label>
-                                <textarea class="form-control" id="delayed-reason" name="delayed_reason"
-                                    rows="3"></textarea>
-                            </div>
-
-                            <!-- Actual Completion Date -->
-                            <div class="mb-3" id="completion-date-container" style="display: none;">
-                                <label for="actual-completion-date" class="form-label">Actual Completion Date</label>
-                                <input type="datetime-local" class="form-control" id="actual-completion-date"
-                                    name="actual_completion_date">
-                            </div>
+                        <!-- Delayed Reason (Shown only for Delayed Completion) -->
+                        <div class="mb-3" id="delayed-reason-container" style="display: none;">
+                            <label for="delayed-reason" class="form-label">Why was it completed late?</label>
+                            <textarea class="form-control" id="delayed-reason" name="delayed_reason"
+                                rows="3"></textarea>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Submit</button>
+
+                        <!-- Actual Completion Date -->
+                        <div class="mb-3" id="completion-date-container" style="display: none;">
+                            <label for="actual-completion-date" class="form-label">Actual Completion
+                                Date</label>
+                            <input type="datetime-local" class="form-control" id="actual-completion-date"
+                                name="actual_completion_date">
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal for Viewing Completion Description -->
-        <div class="modal fade" id="viewDescriptionModal" tabindex="-1" aria-labelledby="viewDescriptionModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="viewDescriptionModalLabel">Task Completion Description</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p id="completion-description-text">No description provided.</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Viewing Completion Description -->
+    <div class="modal fade" id="viewDescriptionModal" tabindex="-1" aria-labelledby="viewDescriptionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewDescriptionModalLabel">Task Completion Description</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="completion-description-text">No description provided.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="delayedCompletionModal" tabindex="-1" aria-labelledby="delayedCompletionModalLabel"
-            aria-hidden="true">
-            <!-- Modal for delayed completion details viewing -->
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="delayedCompletionModalLabel">Delayed Completion Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>Task Name:</strong> <span id="delayed-task-name"></span></p>
-                        <p><strong>Completed On:</strong> <span id="delayed-completion-date"></span></p>
-                        <p><strong>Reason for Delay:</strong></p>
-                        <p id="delay-reason"></p>
-                        <p><strong>Completion Description:</strong></p>
-                        <p id="completion-description-delayed"></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
+    </div>
+    <div class="modal fade" id="delayedCompletionModal" tabindex="-1" aria-labelledby="delayedCompletionModalLabel"
+        aria-hidden="true">
+        <!-- Modal for delayed completion details viewing -->
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="delayedCompletionModalLabel">Delayed Completion Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Task Name:</strong> <span id="delayed-task-name"></span></p>
+                    <p><strong>Completed On:</strong> <span id="delayed-completion-date"></span></p>
+                    <p><strong>Reason for Delay:</strong></p>
+                    <p id="delay-reason"></p>
+                    <p><strong>Completion Description:</strong></p>
+                    <p id="completion-description-delayed"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Success modal for task updation -->
-        <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="successModalLabel">Status Updated</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>Task Name:</strong> <span id="success-task-name"></span></p>
-                        <p><strong>Message:</strong> <span id="success-message"></span></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
+    <!-- Success modal for task updation -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">Status Updated</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Task Name:</strong> <span id="success-task-name"></span></p>
+                    <p><strong>Message:</strong> <span id="success-message"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Modal for task description -->
-        <div class="modal fade" id="taskDescriptionModal" tabindex="-1" aria-labelledby="taskDescriptionModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="taskDescriptionModalLabel">Task Description</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p id="full-task-description"></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
+    <!-- Modal for task description -->
+    <div class="modal fade" id="taskDescriptionModal" tabindex="-1" aria-labelledby="taskDescriptionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskDescriptionModalLabel">Task Description</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="full-task-description"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Jquery -->
-        <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <!-- Jquery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 
-        <!-- Script for opening the modal to view details of completion -->
-        <script>
-            // Attach event listener for task name links
-            const viewDescriptionModal = document.getElementById('viewDescriptionModal');
-            viewDescriptionModal.addEventListener('show.bs.modal', function (event) {
-                // Button/link that triggered the modal
-                const button = event.relatedTarget;
+    <!-- Script for opening the modal to view details of completion -->
+    <script>
+        // Attach event listener for task name links
+        const viewDescriptionModal = document.getElementById('viewDescriptionModal');
+        viewDescriptionModal.addEventListener('show.bs.modal', function (event) {
+            // Button/link that triggered the modal
+            const button = event.relatedTarget;
 
-                // Extract completion description from data attribute
-                const description = button.getAttribute('data-description');
+            // Extract completion description from data attribute
+            const description = button.getAttribute('data-description');
 
-                // Update the modal content
-                const descriptionText = document.getElementById('completion-description-text');
-                descriptionText.textContent = description || "No description provided.";
-            });
-        </script>
+            // Update the modal content
+            const descriptionText = document.getElementById('completion-description-text');
+            descriptionText.textContent = description || "No description provided.";
+        });
+    </script>
 
-        <script>
-            const viewDescriptionModal = document.getElementById('viewDescriptionModal');
-            viewDescriptionModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const description = button.getAttribute('data-description');
-                const descriptionText = document.getElementById('completion-description-text');
-                descriptionText.textContent = description || "No description provided.";
-            });
-        </script>
+    <script>
+        const viewDescriptionModal = document.getElementById('viewDescriptionModal');
+        viewDescriptionModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const description = button.getAttribute('data-description');
+            const descriptionText = document.getElementById('completion-description-text');
+            descriptionText.textContent = description || "No description provided.";
+        });
+    </script>
 
-        <!-- JS for the dropdown handling -->
-        <script>
-            function handleStatusChange(event, taskId) {
-                event.preventDefault();
+    <!-- JS for the dropdown handling -->
+    <script>
+        function handleStatusChange(event, taskId) {
+            event.preventDefault();
 
-                const status = event.target.value;
-                const form = event.target.form;
+            const status = event.target.value;
+            const form = event.target.form;
 
-                // If the status is 'Delayed Completion' or 'Completed on Time', show the modal
-                if (status === 'Delayed Completion' || status === 'Completed on Time') {
-                    document.getElementById('task-id').value = taskId;
-                    document.getElementById('modal-status').value = status;
+            // If the status is 'Delayed Completion' or 'Completed on Time', show the modal
+            if (status === 'Delayed Completion' || status === 'Completed on Time') {
+                document.getElementById('task-id').value = taskId;
+                document.getElementById('modal-status').value = status;
 
-                    const delayedReasonContainer = document.getElementById('delayed-reason-container');
-                    const completionDateContainer = document.getElementById('completion-date-container');
+                const delayedReasonContainer = document.getElementById('delayed-reason-container');
+                const completionDateContainer = document.getElementById('completion-date-container');
 
-                    if (status === 'Delayed Completion') {
-                        delayedReasonContainer.style.display = 'block';
-                        completionDateContainer.style.display = 'block';
-                    } else {
-                        delayedReasonContainer.style.display = 'none';
-                        completionDateContainer.style.display = 'none';
-                    }
-
-                    const modal = new bootstrap.Modal(document.getElementById('completionModal'));
-                    modal.show();
-                } else if (status === 'Closed') {
-                    // For 'Closed' status, submit the form directly
-                    fetch('update-status.php', {
-                        method: 'POST',
-                        body: new FormData(form)
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json(); // Parse the response as JSON
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                // Update the modal content with the task name and message
-                                document.getElementById('success-task-name').innerText = data.task_name;
-                                document.getElementById('success-message').innerText = data.message;
-
-                                // Show the success modal
-                                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                                successModal.show();
-
-                                // Disable the dropdown after changing the status to "Closed"
-                                event.target.disabled = true;
-                            } else {
-                                // If the update was not successful, show an alert with the error message
-                                alert(data.message);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('An error occurred while updating the status. Check the console for details.');
-                        });
+                if (status === 'Delayed Completion') {
+                    delayedReasonContainer.style.display = 'block';
+                    completionDateContainer.style.display = 'block';
                 } else {
-                    // For other statuses, submit the form directly
-                    fetch('update-status.php', {
-                        method: 'POST',
-                        body: new FormData(form)
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json(); // Parse the response as JSON
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                // Update the modal content with the task name and message
-                                document.getElementById('success-task-name').innerText = data.task_name;
-                                document.getElementById('success-message').innerText = data.message;
-
-                                // Show the success modal
-                                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                                successModal.show();
-                            } else {
-                                // If the update was not successful, show an alert with the error message
-                                alert(data.message);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('An error occurred while updating the status. Check the console for details.');
-                        });
+                    delayedReasonContainer.style.display = 'none';
+                    completionDateContainer.style.display = 'none';
                 }
-            }
-        </script>
 
-        <!-- Script for viewing the delayed completion details -->
-        <script>
-            function showDelayedDetails(taskName, completionDate, delayReason, completionDescription) {
-                // Set the modal elements with the provided values
-                document.getElementById('delayed-task-name').innerText = taskName || "N/A";
-                document.getElementById('delayed-completion-date').innerText = completionDate || "N/A";
-                document.getElementById('delay-reason').innerText = delayReason || "N/A";
-
-                // Correctly set the completion description
-                const completionDescriptionElement = document.getElementById('completion-description-delayed');
-                completionDescriptionElement.innerText = completionDescription && completionDescription.trim() ? completionDescription : "No description provided.";
-            }
-        </script>
-        <!-- Script for handling completion form -->
-        <script>
-            function handleCompletionForm(event) {
-                event.preventDefault(); // Prevent the default form submission
-
-                const form = event.target;
-                const formData = new FormData(form);
-
+                const modal = new bootstrap.Modal(document.getElementById('completionModal'));
+                modal.show();
+            } else if (status === 'Closed') {
+                // For 'Closed' status, submit the form directly
                 fetch('update-status.php', {
                     method: 'POST',
-                    body: formData
+                    body: new FormData(form)
                 })
                     .then(response => {
                         if (!response.ok) {
@@ -1504,227 +1532,313 @@ function getWeekdays($start, $end)
                     })
                     .then(data => {
                         if (data.success) {
-                            // Close the completion modal
-                            const completionModal = bootstrap.Modal.getInstance(document.getElementById('completionModal'));
-                            completionModal.hide();
-
-                            // Show the success modal
+                            // Update the modal content with the task name and message
                             document.getElementById('success-task-name').innerText = data.task_name;
                             document.getElementById('success-message').innerText = data.message;
+
+                            // Show the success modal
                             const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                             successModal.show();
 
-                            // Optionally, refresh the task list or update the UI
-                            setTimeout(() => {
-                                window.location.reload(); // Reload the page to reflect the updated status
-                            }, 2000); // Reload after 2 seconds
+                            // Disable the dropdown after changing the status to "Closed"
+                            event.target.disabled = true;
                         } else {
-                            alert(data.message); // Show an error message if the update failed
+                            // If the update was not successful, show an alert with the error message
+                            alert(data.message);
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('An error occurred while updating the status.');
+                        alert('An error occurred while updating the status. Check the console for details.');
+                    });
+            } else {
+                // For other statuses, submit the form directly
+                fetch('update-status.php', {
+                    method: 'POST',
+                    body: new FormData(form)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json(); // Parse the response as JSON
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Update the modal content with the task name and message
+                            document.getElementById('success-task-name').innerText = data.task_name;
+                            document.getElementById('success-message').innerText = data.message;
+
+                            // Show the success modal
+                            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                            successModal.show();
+                        } else {
+                            // If the update was not successful, show an alert with the error message
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while updating the status. Check the console for details.');
                     });
             }
+        }
+    </script>
+
+    <!-- Script for viewing the delayed completion details -->
+    <script>
+        function showDelayedDetails(taskName, completionDate, delayReason, completionDescription) {
+            // Set the modal elements with the provided values
+            document.getElementById('delayed-task-name').innerText = taskName || "N/A";
+            document.getElementById('delayed-completion-date').innerText = completionDate || "N/A";
+            document.getElementById('delay-reason').innerText = delayReason || "N/A";
+
+            // Correctly set the completion description
+            const completionDescriptionElement = document.getElementById('completion-description-delayed');
+            completionDescriptionElement.innerText = completionDescription && completionDescription.trim() ? completionDescription : "No description provided.";
+        }
+    </script>
+    <!-- Script for handling completion form -->
+    <script>
+        function handleCompletionForm(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch('update-status.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // Parse the response as JSON
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Close the completion modal
+                        const completionModal = bootstrap.Modal.getInstance(document.getElementById('completionModal'));
+                        completionModal.hide();
+
+                        // Show the success modal
+                        document.getElementById('success-task-name').innerText = data.task_name;
+                        document.getElementById('success-message').innerText = data.message;
+                        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                        successModal.show();
+
+                        // Optionally, refresh the task list or update the UI
+                        setTimeout(() => {
+                            window.location.reload(); // Reload the page to reflect the updated status
+                        }, 2000); // Reload after 2 seconds
+                    } else {
+                        alert(data.message); // Show an error message if the update failed
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the status.');
+                });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
         </script>
+    <!-- Fix for Select2 and Filtering -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Get the user's role from the hidden input field
+            const userRole = document.getElementById('user-role').value;
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-            </script>
-        <!-- Fix for Select2 and Filtering -->
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-        <script>
-            $(document).ready(function () {
-                // Get the user's role from the hidden input field
-                const userRole = document.getElementById('user-role').value;
+            // Initialize Select2 on the project filter dropdown
+            $('#project-filter').select2({
+                placeholder: "Select projects to filter",
+                allowClear: true,
+                width: '300px'
+            });
 
-                // Initialize Select2 on the project filter dropdown
-                $('#project-filter').select2({
-                    placeholder: "Select projects to filter",
+            // Initialize Select2 on the department filter dropdown (only for admins/managers)
+            if (userRole === 'Admin' || userRole === 'Manager') {
+                $('#department-filter').select2({
+                    placeholder: "Select departments to filter",
                     allowClear: true,
                     width: '300px'
                 });
+            } else {
+                // Hide the department filter for regular users
+                $('#department-filter').closest('.filter-dropdown').hide();
+            }
 
-                // Initialize Select2 on the department filter dropdown (only for admins/managers)
-                if (userRole === 'Admin' || userRole === 'Manager') {
-                    $('#department-filter').select2({
-                        placeholder: "Select departments to filter",
-                        allowClear: true,
-                        width: '300px'
-                    });
-                } else {
-                    // Hide the department filter for regular users
-                    $('#department-filter').closest('.filter-dropdown').hide();
-                }
+            // Remove the "All" option initially
+            $('#project-filter option[value="All"]').remove();
+            $('#department-filter option[value="All"]').remove();
 
-                // Remove the "All" option initially
-                $('#project-filter option[value="All"]').remove();
-                $('#department-filter option[value="All"]').remove();
+            // Trigger combined filtering when any filter changes
+            $('#project-filter, #department-filter, #start-date, #end-date').on('change', function () {
+                applyAllFilters();
+            });
 
-                // Trigger combined filtering when any filter changes
-                $('#project-filter, #department-filter, #start-date, #end-date').on('change', function () {
-                    applyAllFilters();
-                });
+            // Function to apply all filters (project, department, and date)
+            function applyAllFilters() {
+                const selectedProjects = $('#project-filter').val();
+                const selectedDepartments = $('#department-filter').val();
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
 
-                // Function to apply all filters (project, department, and date)
-                function applyAllFilters() {
-                    const selectedProjects = $('#project-filter').val();
-                    const selectedDepartments = $('#department-filter').val();
-                    const startDate = document.getElementById('start-date').value;
-                    const endDate = document.getElementById('end-date').value;
+                // Define tables and their corresponding alerts
+                const tables = [
+                    { id: 'pending-tasks', alertId: 'no-data-alert-pending' },
+                    { id: 'remaining-tasks', alertId: 'no-data-alert-completed' }
+                ];
 
-                    // Define tables and their corresponding alerts
-                    const tables = [
-                        { id: 'pending-tasks', alertId: 'no-data-alert-pending' },
-                        { id: 'remaining-tasks', alertId: 'no-data-alert-completed' }
-                    ];
+                // Flag to track if any rows are visible across all tables
+                let anyRowsVisible = false;
 
-                    // Flag to track if any rows are visible across all tables
-                    let anyRowsVisible = false;
+                tables.forEach(table => {
+                    const rows = document.querySelectorAll(`#${table.id} tbody tr`);
+                    let hasVisibleRows = false; // Flag to track if any rows are visible in this table
 
-                    tables.forEach(table => {
-                        const rows = document.querySelectorAll(`#${table.id} tbody tr`);
-                        let hasVisibleRows = false; // Flag to track if any rows are visible in this table
+                    rows.forEach(row => {
+                        const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
+                        const assignedToText = row.querySelector('td:nth-child(10)').textContent.trim(); // Assigned To column (9th column)
 
-                        rows.forEach(row => {
-                            const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
-                            const assignedToText = row.querySelector('td:nth-child(10)').textContent.trim(); // Assigned To column (9th column)
+                        // Extract the department names from the "Assigned To" column
+                        const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Extract department(s) from parentheses
+                        const departmentNames = departmentMatch ? departmentMatch[1].trim().split(', ') : [];
 
-                            // Extract the department names from the "Assigned To" column
-                            const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Extract department(s) from parentheses
-                            const departmentNames = departmentMatch ? departmentMatch[1].trim().split(', ') : [];
+                        const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
+                        const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
 
-                            const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
-                            const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
+                        // Check if the row matches the selected projects
+                        const projectMatch = selectedProjects === null || selectedProjects.length === 0 || selectedProjects.includes(projectName);
 
-                            // Check if the row matches the selected projects
-                            const projectMatch = selectedProjects === null || selectedProjects.length === 0 || selectedProjects.includes(projectName);
+                        // Check if the row matches the selected departments (only for admins/managers)
+                        let isDepartmentMatch = true; // Default to true for regular users
+                        if (userRole === 'Admin' || userRole === 'Manager') {
+                            // Only check the assigned to department
+                            isDepartmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.some(department => departmentNames.includes(department));
+                        }
 
-                            // Check if the row matches the selected departments (only for admins/managers)
-                            let isDepartmentMatch = true; // Default to true for regular users
-                            if (userRole === 'Admin' || userRole === 'Manager') {
-                                // Only check the assigned to department
-                                isDepartmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.some(department => departmentNames.includes(department));
-                            }
+                        // Check if the task falls within the selected date range
+                        let dateMatch = true;
+                        if (startDate && taskStartDate < new Date(startDate)) {
+                            dateMatch = false;
+                        }
+                        if (endDate && taskEndDate > new Date(endDate)) {
+                            dateMatch = false;
+                        }
 
-                            // Check if the task falls within the selected date range
-                            let dateMatch = true;
-                            if (startDate && taskStartDate < new Date(startDate)) {
-                                dateMatch = false;
-                            }
-                            if (endDate && taskEndDate > new Date(endDate)) {
-                                dateMatch = false;
-                            }
-
-                            // Display the row only if it matches all filters
-                            if (projectMatch && isDepartmentMatch && dateMatch) {
-                                row.style.display = ''; // Show the row
-                                hasVisibleRows = true; // At least one row is visible in this table
-                                anyRowsVisible = true; // At least one row is visible across all tables
-                            } else {
-                                row.style.display = 'none'; // Hide the row
-                            }
-                        });
-
-                        // Show/hide the "No data found" alert for this table
-                        const noDataAlert = document.getElementById(table.alertId);
-                        if (hasVisibleRows) {
-                            noDataAlert.style.display = 'none'; // Hide the alert if rows are visible
+                        // Display the row only if it matches all filters
+                        if (projectMatch && isDepartmentMatch && dateMatch) {
+                            row.style.display = ''; // Show the row
+                            hasVisibleRows = true; // At least one row is visible in this table
+                            anyRowsVisible = true; // At least one row is visible across all tables
                         } else {
-                            noDataAlert.style.display = 'block'; // Show the alert if no rows are visible
+                            row.style.display = 'none'; // Hide the row
                         }
                     });
 
-                    // Redirect to the first page of both tables if no rows are visible after filtering
-                    if (!anyRowsVisible) {
-                        const queryParams = new URLSearchParams();
-
-                        // Add filter parameters to the URL
-                        if (selectedProjects && selectedProjects.length > 0) {
-                            queryParams.set('project', selectedProjects.join(','));
-                        }
-                        if (selectedDepartments && selectedDepartments.length > 0) {
-                            queryParams.set('department', selectedDepartments.join(','));
-                        }
-                        if (startDate) {
-                            queryParams.set('start_date', startDate);
-                        }
-                        if (endDate) {
-                            queryParams.set('end_date', endDate);
-                        }
-
-                        // Reset pagination to the first page for both tables
-                        queryParams.set('page', 1);
-
-                        // Redirect to the new URL with filters and pagination
-                        window.location.href = `?${queryParams.toString()}`;
+                    // Show/hide the "No data found" alert for this table
+                    const noDataAlert = document.getElementById(table.alertId);
+                    if (hasVisibleRows) {
+                        noDataAlert.style.display = 'none'; // Hide the alert if rows are visible
+                    } else {
+                        noDataAlert.style.display = 'block'; // Show the alert if no rows are visible
                     }
-                }
-                // Reset filters
-                function resetFilters() {
-                    // Clear the filter inputs
-                    $('#project-filter').val(null).trigger('change');
-                    $('#department-filter').val(null).trigger('change');
-                    document.getElementById('start-date').value = '';
-                    document.getElementById('end-date').value = '';
-
-                    // Redirect to the page without any filter parameters
-                    window.location.href = window.location.pathname; // Reload the page without query string
-                }
-
-                // Attach event listener for reset button
-                document.querySelector('.btn-primary[onclick="resetFilters()"]').onclick = resetFilters;
-
-                // Reload the page when a filter is deselected
-                $('#project-filter, #department-filter, #start-date, #end-date').on('change', function () {
-                    applyAllFilters();
                 });
-            });
-        </script>
 
-        <!-- JS for task description modal -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const taskDescriptionModal = document.getElementById('taskDescriptionModal');
-                taskDescriptionModal.addEventListener('show.bs.modal', function (event) {
-                    const button = event.relatedTarget; // Button/link that triggered the modal
-                    const description = button.getAttribute('data-description'); // Extract description from data attribute
-                    const modalBody = taskDescriptionModal.querySelector('.modal-body p');
-                    modalBody.textContent = description; // Set the modal content
-                });
-            });
-        </script>
+                // Redirect to the first page of both tables if no rows are visible after filtering
+                if (!anyRowsVisible) {
+                    const queryParams = new URLSearchParams();
 
-        <!-- To check if task desc is more than 2 lines -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                // Function to check if the description exceeds 2 lines
-                function checkDescriptionHeight() {
-                    const descriptionContainers = document.querySelectorAll('.task-description-container');
+                    // Add filter parameters to the URL
+                    if (selectedProjects && selectedProjects.length > 0) {
+                        queryParams.set('project', selectedProjects.join(','));
+                    }
+                    if (selectedDepartments && selectedDepartments.length > 0) {
+                        queryParams.set('department', selectedDepartments.join(','));
+                    }
+                    if (startDate) {
+                        queryParams.set('start_date', startDate);
+                    }
+                    if (endDate) {
+                        queryParams.set('end_date', endDate);
+                    }
 
-                    descriptionContainers.forEach(container => {
-                        const descriptionElement = container.querySelector('.task-description');
-                        const seeMoreLink = container.querySelector('.see-more-link');
+                    // Reset pagination to the first page for both tables
+                    queryParams.set('page', 1);
 
-                        // Calculate the height of the description element
-                        const lineHeight = parseInt(window.getComputedStyle(descriptionElement).lineHeight);
-                        const maxHeight = lineHeight * 2; // Max height for 2 lines
-
-                        if (descriptionElement.scrollHeight > maxHeight) {
-                            // If the description exceeds 2 lines, show the "See more" link
-                            seeMoreLink.style.display = 'block';
-                        }
-                    });
+                    // Redirect to the new URL with filters and pagination
+                    window.location.href = `?${queryParams.toString()}`;
                 }
+            }
+            // Reset filters
+            function resetFilters() {
+                // Clear the filter inputs
+                $('#project-filter').val(null).trigger('change');
+                $('#department-filter').val(null).trigger('change');
+                document.getElementById('start-date').value = '';
+                document.getElementById('end-date').value = '';
 
-                // Run the check when the page loads
-                checkDescriptionHeight();
+                // Redirect to the page without any filter parameters
+                window.location.href = window.location.pathname; // Reload the page without query string
+            }
 
-                // Optional: Re-check if the window is resized (in case of dynamic content or layout changes)
-                window.addEventListener('resize', checkDescriptionHeight);
+            // Attach event listener for reset button
+            document.querySelector('.btn-primary[onclick="resetFilters()"]').onclick = resetFilters;
+
+            // Reload the page when a filter is deselected
+            $('#project-filter, #department-filter, #start-date, #end-date').on('change', function () {
+                applyAllFilters();
             });
-        </script>
+        });
+    </script>
+
+    <!-- JS for task description modal -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const taskDescriptionModal = document.getElementById('taskDescriptionModal');
+            taskDescriptionModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Button/link that triggered the modal
+                const description = button.getAttribute('data-description'); // Extract description from data attribute
+                const modalBody = taskDescriptionModal.querySelector('.modal-body p');
+                modalBody.textContent = description; // Set the modal content
+            });
+        });
+    </script>
+
+    <!-- To check if task desc is more than 2 lines -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to check if the description exceeds 2 lines
+            function checkDescriptionHeight() {
+                const descriptionContainers = document.querySelectorAll('.task-description-container');
+
+                descriptionContainers.forEach(container => {
+                    const descriptionElement = container.querySelector('.task-description');
+                    const seeMoreLink = container.querySelector('.see-more-link');
+
+                    // Calculate the height of the description element
+                    const lineHeight = parseInt(window.getComputedStyle(descriptionElement).lineHeight);
+                    const maxHeight = lineHeight * 2; // Max height for 2 lines
+
+                    if (descriptionElement.scrollHeight > maxHeight) {
+                        // If the description exceeds 2 lines, show the "See more" link
+                        seeMoreLink.style.display = 'block';
+                    }
+                });
+            }
+
+            // Run the check when the page loads
+            checkDescriptionHeight();
+
+            // Optional: Re-check if the window is resized (in case of dynamic content or layout changes)
+            window.addEventListener('resize', checkDescriptionHeight);
+        });
+    </script>
 </body>
 
 </html>
