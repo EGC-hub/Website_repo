@@ -35,7 +35,8 @@ $taskQuery = $user_role === 'Admin'
               assigned_by_user.username AS assigned_by 
        FROM tasks 
        JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
-       JOIN departments ON assigned_to_user.department_id = departments.id
+       JOIN user_departments ON assigned_to_user.id = user_departments.user_id 
+       JOIN departments ON user_departments.department_id = departments.id
        JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
        ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Pending', 'Started'), recorded_timestamp DESC"
     : ($user_role === 'Manager'
@@ -45,9 +46,10 @@ $taskQuery = $user_role === 'Admin'
                   assigned_by_user.username AS assigned_by 
            FROM tasks 
            JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
-           JOIN departments ON assigned_to_user.department_id = departments.id
+           JOIN user_departments ON assigned_to_user.id = user_departments.user_id 
+           JOIN departments ON user_departments.department_id = departments.id
            JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-           WHERE assigned_to_user.department_id = (SELECT department_id FROM users WHERE id = ?) 
+           WHERE user_departments.department_id = (SELECT department_id FROM user_departments WHERE user_id = ?) 
            ORDER BY FIELD(status, 'Completed on Time', 'Delayed Completion', 'Pending', 'Started'), recorded_timestamp DESC"
         : "SELECT tasks.*, 
                   assigned_by_user.username AS assigned_by 
@@ -73,9 +75,20 @@ $output = fopen('php://output', 'w');
 
 // Write CSV headers
 $headers = [
-    'Project Name', 'Task Name', 'Task Description', 'Start Date', 'End Date', 'Status', 
-    'Project Type', 'Assigned By', 'Assigned To', 'Department', 'Created On', 'Completion Description', 
-    'Delayed Reason', 'Actual Completion Date'
+    'Project Name',
+    'Task Name',
+    'Task Description',
+    'Start Date',
+    'End Date',
+    'Status',
+    'Project Type',
+    'Assigned By',
+    'Assigned To',
+    'Department',
+    'Created On',
+    'Completion Description',
+    'Delayed Reason',
+    'Actual Completion Date'
 ];
 
 // Write Pending Tasks Section
