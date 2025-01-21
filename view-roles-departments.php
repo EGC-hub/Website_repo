@@ -63,7 +63,7 @@ try {
                 if ($insertStmt->execute()) {
                     $_SESSION['successMsg'] = "Role created successfully.";
                 } else {
-                    $_SESSION['errorMsg'] = "Failed to create role. Please try again.";
+                    $_SESSION['errorMsg'] = "Failed to add role. Please try again.";
                 }
             }
         }
@@ -95,7 +95,7 @@ try {
                 if ($insertStmt->execute()) {
                     $_SESSION['successMsg'] = "Department created successfully.";
                 } else {
-                    $_SESSION['errorMsg'] = "Failed to create department. Please try again.";
+                    $_SESSION['errorMsg'] = "Failed to add department. Please try again.";
                 }
             }
         }
@@ -142,300 +142,281 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            padding: 20px;
         }
 
-        .main-container {
-            width: 90%;
-            max-width: 1200px;
+        * {
+            box-sizing: border-box;
+        }
+
+        .dashboard-container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
+            min-height: 100vh;
         }
 
-        .user-info {
-            text-align: center;
-            width: 90%;
-            max-width: 1200px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .user-info p {
-            margin: 5px 0;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .user-info .session-warning {
-            color: grey;
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            font-size: 2.2rem;
-            text-align: center;
-            color: #1d3557;
-            margin-bottom: 20px;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            color: #457b9d;
-            margin-top: 30px;
-        }
-
-        p {
-            text-align: center;
-            font-size: 1rem;
-            color: #457b9d;
-            margin-bottom: 30px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        table th,
-        table td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-
-        table th {
-            background-color: #1d3557;
-            color: #fff;
-            font-weight: bold;
-        }
-
-        table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .back-button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
+        .sidebar {
+            width: 250px;
             background-color: #002c5f;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
+            color: white;
+            padding: 20px;
         }
 
-        .back-button:hover {
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
             background-color: #004080;
         }
 
-        .edit-button {
-            display: inline-block;
-            padding: 5px 10px;
-            background-color: #457b9d;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 0.9rem;
-            transition: background-color 0.3s ease;
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #ffffff;
         }
 
-        .edit-button:hover {
-            background-color: #1d3557;
+        .user-info {
+            margin-right: 20px;
+            font-size: 14px;
         }
 
-        .delete-button {
-            display: inline-block;
-            padding: 5px 10px;
-            background-color: #e63946;
+        .logout-btn {
+            background-color: #ff4d4d;
             color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 0.9rem;
             border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s;
         }
 
-        .delete-button:hover {
-            background-color: #d62828;
+        .logout-btn:hover {
+            background-color: #ff1a1a;
         }
 
-        button.delete-button {
-            font-family: 'Poppins', sans-serif;
+        .dashboard-content {
+            padding: 20px;
         }
 
-        .modal-buttons {
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #002c5f;
+        }
+
+        .card-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .text-muted {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .list-group-item {
+            border: none;
+            padding: 10px 15px;
+        }
+
+        .list-group-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
             display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
         }
 
-        .error {
-            color: red;
-            text-align: center;
-            margin-bottom: 20px;
+        .chart-canvas {
+            width: 100% !important;
+            height: 300px !important;
         }
 
-        .success {
-            color: green;
-            text-align: center;
-            margin-bottom: 20px;
+        .modal-content {
+            border-radius: 10px;
         }
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8rem;
-            }
+        .modal-header {
+            background-color: #002c5f;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
 
-            table th,
-            table td {
-                font-size: 0.9rem;
-                padding: 8px;
-            }
+        .modal-title {
+            font-weight: bold;
+        }
 
-            .back-button {
-                font-size: 0.9rem;
-            }
+        .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 44, 95, 0.05);
         }
     </style>
 </head>
 
 <body>
-    <div class="main-container">
-        <div class="user-info">
-            <p>Logged in as: <strong><?= htmlspecialchars($_SESSION['username']) ?></strong></p>
-            <p>Department(s):
-                <strong><?= !empty($user_departments) ? htmlspecialchars(implode(', ', $user_departments)) : 'None' ?></strong>
-            </p>
-            <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
-        </div>
-        <div class="container">
-            <h1>Roles & Departments</h1>
-
-            <!-- Display error or success messages -->
-            <?php if (!empty($errorMsg)): ?>
-                <div class="error"><?= htmlspecialchars($errorMsg) ?></div>
-            <?php elseif (!empty($successMsg)): ?>
-                <div class="success"><?= htmlspecialchars($successMsg) ?></div>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>Menu</h3>
+            <a href="tasks.php">Tasks</a>
+            <?php if ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'Manager'): ?>
+                <a href="view-users.php">View Users</a>
             <?php endif; ?>
+            <?php if ($_SESSION['role'] === 'Admin'): ?>
+                <a href="view-roles-departments.php">View Role or Department</a>
+            <?php endif; ?>
+        </div>
 
-            <!-- Centered modal buttons -->
-            <div class="modal-buttons">
-                <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
-                    Add Role
-                </a>
-                <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createDepartmentModal">
-                    Add Department
-                </a>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Navbar -->
+            <div class="navbar">
+                <!-- Logo Container -->
+                <div class="d-flex align-items-center me-3">
+                    <img src="images/logo/logo.webp" alt="Logo" class="logo" style="width: auto; height: 80px;">
+                </div>
+
+                <!-- User Info -->
+                <div class="user-info me-3 ms-auto">
+                    <p class="mb-0">Logged in as: <strong><?= htmlspecialchars($_SESSION['username']) ?></strong></p>
+                    <p class="mb-0">Departments:
+                        <strong><?= !empty($user_departments) ? htmlspecialchars(implode(', ', $user_departments)) : 'None' ?></strong>
+                    </p>
+                </div>
+
+                <!-- Logout Button -->
+                <button class="logout-btn" onclick="window.location.href='logout.php'">Log Out</button>
             </div>
 
-            <!-- Roles Table -->
-            <h2>Roles</h2>
-            <?php if (!empty($roles)): ?>
-                <table>
-                    <colgroup>
-                        <col style="width: 10%">
-                        <col style="width: 60%">
-                        <col style="width: 30%">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Role Name</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php $rcount = 1 ?>
-                        <?php foreach ($roles as $role): ?>
-                            <tr>
-                                <td><?= $rcount++ ?></td>
-                                <td><?= htmlspecialchars($role['name']) ?></td>
-                                <td>
-                                    <a href="edit-role.php?id=<?= urlencode($role['id']) ?>" class="edit-button">Edit</a>
-                                    <form action="delete-role.php" method="POST" style="display:inline;">
-                                        <input type="hidden" name="role_id" value="<?= htmlspecialchars($role['id']) ?>">
-                                        <button type="submit" class="delete-button"
-                                            onclick="return confirm('Are you sure you want to delete this role?')">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <p>No roles found.</p>
-            <?php endif; ?>
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <h1>Roles & Departments</h1>
 
-            <!-- Departments Table -->
-            <h2>Departments</h2>
-            <?php $dcount = 1 ?>
-            <?php if (!empty($departments)): ?>
-                <table>
-                    <colgroup>
-                        <col style="width: 10%">
-                        <col style="width: 60%">
-                        <col style="width: 30%">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Department Name</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($departments as $department): ?>
-                            <tr>
-                                <td><?= $dcount++ ?></td>
-                                <td><?= htmlspecialchars($department['name']) ?></td>
-                                <td>
-                                    <a href="edit-department.php?id=<?= urlencode($department['id']) ?>"
-                                        class="edit-button">Edit</a>
-                                    <form action="delete-department.php" method="POST" style="display:inline;">
-                                        <input type="hidden" name="department_id"
-                                            value="<?= htmlspecialchars($department['id']) ?>">
-                                        <button type="submit" class="delete-button"
-                                            onclick="return confirm('Are you sure you want to delete this department?')">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <p>No departments found.</p>
-            <?php endif; ?>
+                <!-- Display error or success messages -->
+                <?php if (!empty($errorMsg)): ?>
+                    <div class="error"><?= htmlspecialchars($errorMsg) ?></div>
+                <?php elseif (!empty($successMsg)): ?>
+                    <div class="success"><?= htmlspecialchars($successMsg) ?></div>
+                <?php endif; ?>
 
-            <!-- Back Button -->
-            <a href="welcome.php" class="back-button">Back to Dashboard</a>
+                <!-- Centered modal buttons -->
+                <div class="modal-buttons">
+                    <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
+                        Add Role
+                    </a>
+                    <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createDepartmentModal">
+                        Add Department
+                    </a>
+                </div>
+
+                <!-- Roles Table -->
+                <h2>Roles</h2>
+                <?php if (!empty($roles)): ?>
+                    <table>
+                        <colgroup>
+                            <col style="width: 10%">
+                            <col style="width: 60%">
+                            <col style="width: 30%">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Role Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $rcount = 1 ?>
+                            <?php foreach ($roles as $role): ?>
+                                <tr>
+                                    <td><?= $rcount++ ?></td>
+                                    <td><?= htmlspecialchars($role['name']) ?></td>
+                                    <td>
+                                        <a href="edit-role.php?id=<?= urlencode($role['id']) ?>" class="edit-button">Edit</a>
+                                        <form action="delete-role.php" method="POST" style="display:inline;">
+                                            <input type="hidden" name="role_id" value="<?= htmlspecialchars($role['id']) ?>">
+                                            <button type="submit" class="delete-button"
+                                                onclick="return confirm('Are you sure you want to delete this role?')">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <p>No roles found.</p>
+                <?php endif; ?>
+
+                <!-- Departments Table -->
+                <h2>Departments</h2>
+                <?php $dcount = 1 ?>
+                <?php if (!empty($departments)): ?>
+                    <table>
+                        <colgroup>
+                            <col style="width: 10%">
+                            <col style="width: 60%">
+                            <col style="width: 30%">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Department Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($departments as $department): ?>
+                                <tr>
+                                    <td><?= $dcount++ ?></td>
+                                    <td><?= htmlspecialchars($department['name']) ?></td>
+                                    <td>
+                                        <a href="edit-department.php?id=<?= urlencode($department['id']) ?>"
+                                            class="edit-button">Edit</a>
+                                        <form action="delete-department.php" method="POST" style="display:inline;">
+                                            <input type="hidden" name="department_id"
+                                                value="<?= htmlspecialchars($department['id']) ?>">
+                                            <button type="submit" class="delete-button"
+                                                onclick="return confirm('Are you sure you want to delete this department?')">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <p>No departments found.</p>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 
@@ -454,7 +435,7 @@ try {
                             <label for="role_name" class="form-label">Role Name</label>
                             <input type="text" class="form-control" id="role_name" name="role_name" required>
                         </div>
-                        <button type="submit" name="create_role" class="btn btn-primary">Create Role</button>
+                        <button type="submit" name="create_role" class="btn btn-primary">Add Role</button>
                     </form>
                 </div>
             </div>
