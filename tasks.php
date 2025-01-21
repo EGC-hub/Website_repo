@@ -1853,4 +1853,4 @@ function getWeekdays($start, $end)
     </body>
 
 </html>
-<?php $conn->close(); ?>c
+<?php $conn->close(); ?>
