@@ -436,6 +436,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: #ffffff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             width: 100%;
+            border-radius: 10px;
         }
 
         .user-info {
