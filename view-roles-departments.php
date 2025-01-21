@@ -206,79 +206,134 @@ try {
             padding: 20px;
         }
 
-        .card {
-            border: none;
+        /* Existing styles for tables and containers */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            color: #1d3557;
+            margin-bottom: 20px;
         }
 
-        .card-title {
-            font-size: 1.2rem;
+        h2 {
+            font-size: 1.5rem;
+            color: #457b9d;
+            margin-top: 30px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 1rem;
+            color: #457b9d;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #1d3557;
+            color: #fff;
             font-weight: bold;
-            color: #002c5f;
         }
 
-        .card-text {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #333;
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
 
-        .text-muted {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .list-group-item {
-            border: none;
-            padding: 10px 15px;
-        }
-
-        .list-group-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .navbar {
-            display: flex;
-            align-items: center;
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
             padding: 10px 20px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-
-        .chart-canvas {
-            width: 100% !important;
-            height: 300px !important;
-        }
-
-        .modal-content {
-            border-radius: 10px;
-        }
-
-        .modal-header {
             background-color: #002c5f;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #004080;
+        }
+
+        .edit-button {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #457b9d;
             color: white;
-            border-radius: 10px 10px 0 0;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
         }
 
-        .modal-title {
-            font-weight: bold;
+        .edit-button:hover {
+            background-color: #1d3557;
         }
 
-        .table-responsive {
-            max-height: 400px;
-            overflow-y: auto;
+        .delete-button {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #e63946;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: rgba(0, 44, 95, 0.05);
+        .delete-button:hover {
+            background-color: #d62828;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            color: green;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            table th,
+            table td {
+                font-size: 0.9rem;
+                padding: 8px;
+            }
+
+            .back-button {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -320,102 +375,107 @@ try {
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
-                <h1>Roles & Departments</h1>
+                <div class="container">
+                    <h1>Roles & Departments</h1>
 
-                <!-- Display error or success messages -->
-                <?php if (!empty($errorMsg)): ?>
-                    <div class="error"><?= htmlspecialchars($errorMsg) ?></div>
-                <?php elseif (!empty($successMsg)): ?>
-                    <div class="success"><?= htmlspecialchars($successMsg) ?></div>
-                <?php endif; ?>
+                    <!-- Display error or success messages -->
+                    <?php if (!empty($errorMsg)): ?>
+                        <div class="error"><?= htmlspecialchars($errorMsg) ?></div>
+                    <?php elseif (!empty($successMsg)): ?>
+                        <div class="success"><?= htmlspecialchars($successMsg) ?></div>
+                    <?php endif; ?>
 
-                <!-- Centered modal buttons -->
-                <div class="modal-buttons">
-                    <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
-                        Add Role
-                    </a>
-                    <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createDepartmentModal">
-                        Add Department
-                    </a>
+                    <!-- Centered modal buttons -->
+                    <div class="modal-buttons">
+                        <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
+                            Add Role
+                        </a>
+                        <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createDepartmentModal">
+                            Add Department
+                        </a>
+                    </div>
+
+                    <!-- Roles Table -->
+                    <h2>Roles</h2>
+                    <?php if (!empty($roles)): ?>
+                        <table>
+                            <colgroup>
+                                <col style="width: 10%">
+                                <col style="width: 60%">
+                                <col style="width: 30%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Role Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $rcount = 1 ?>
+                                <?php foreach ($roles as $role): ?>
+                                    <tr>
+                                        <td><?= $rcount++ ?></td>
+                                        <td><?= htmlspecialchars($role['name']) ?></td>
+                                        <td>
+                                            <a href="edit-role.php?id=<?= urlencode($role['id']) ?>" class="edit-button">Edit</a>
+                                            <form action="delete-role.php" method="POST" style="display:inline;">
+                                                <input type="hidden" name="role_id" value="<?= htmlspecialchars($role['id']) ?>">
+                                                <button type="submit" class="delete-button"
+                                                    onclick="return confirm('Are you sure you want to delete this role?')">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>No roles found.</p>
+                    <?php endif; ?>
+
+                    <!-- Departments Table -->
+                    <h2>Departments</h2>
+                    <?php $dcount = 1 ?>
+                    <?php if (!empty($departments)): ?>
+                        <table>
+                            <colgroup>
+                                <col style="width: 10%">
+                                <col style="width: 60%">
+                                <col style="width: 30%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Department Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($departments as $department): ?>
+                                    <tr>
+                                        <td><?= $dcount++ ?></td>
+                                        <td><?= htmlspecialchars($department['name']) ?></td>
+                                        <td>
+                                            <a href="edit-department.php?id=<?= urlencode($department['id']) ?>"
+                                                class="edit-button">Edit</a>
+                                            <form action="delete-department.php" method="POST" style="display:inline;">
+                                                <input type="hidden" name="department_id"
+                                                    value="<?= htmlspecialchars($department['id']) ?>">
+                                                <button type="submit" class="delete-button"
+                                                    onclick="return confirm('Are you sure you want to delete this department?')">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>No departments found.</p>
+                    <?php endif; ?>
+
+                    <!-- Back Button -->
+                    <a href="welcome.php" class="back-button">Back to Dashboard</a>
                 </div>
-
-                <!-- Roles Table -->
-                <h2>Roles</h2>
-                <?php if (!empty($roles)): ?>
-                    <table>
-                        <colgroup>
-                            <col style="width: 10%">
-                            <col style="width: 60%">
-                            <col style="width: 30%">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Role Name</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $rcount = 1 ?>
-                            <?php foreach ($roles as $role): ?>
-                                <tr>
-                                    <td><?= $rcount++ ?></td>
-                                    <td><?= htmlspecialchars($role['name']) ?></td>
-                                    <td>
-                                        <a href="edit-role.php?id=<?= urlencode($role['id']) ?>" class="edit-button">Edit</a>
-                                        <form action="delete-role.php" method="POST" style="display:inline;">
-                                            <input type="hidden" name="role_id" value="<?= htmlspecialchars($role['id']) ?>">
-                                            <button type="submit" class="delete-button"
-                                                onclick="return confirm('Are you sure you want to delete this role?')">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>No roles found.</p>
-                <?php endif; ?>
-
-                <!-- Departments Table -->
-                <h2>Departments</h2>
-                <?php $dcount = 1 ?>
-                <?php if (!empty($departments)): ?>
-                    <table>
-                        <colgroup>
-                            <col style="width: 10%">
-                            <col style="width: 60%">
-                            <col style="width: 30%">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Department Name</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($departments as $department): ?>
-                                <tr>
-                                    <td><?= $dcount++ ?></td>
-                                    <td><?= htmlspecialchars($department['name']) ?></td>
-                                    <td>
-                                        <a href="edit-department.php?id=<?= urlencode($department['id']) ?>"
-                                            class="edit-button">Edit</a>
-                                        <form action="delete-department.php" method="POST" style="display:inline;">
-                                            <input type="hidden" name="department_id"
-                                                value="<?= htmlspecialchars($department['id']) ?>">
-                                            <button type="submit" class="delete-button"
-                                                onclick="return confirm('Are you sure you want to delete this department?')">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>No departments found.</p>
-                <?php endif; ?>
             </div>
         </div>
     </div>
