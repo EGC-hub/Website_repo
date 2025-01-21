@@ -440,6 +440,10 @@ try {
             background-color: #f4f4f4;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         .dashboard-container {
             display: flex;
             min-height: 100vh;
