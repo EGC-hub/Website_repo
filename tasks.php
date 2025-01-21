@@ -1674,16 +1674,17 @@ function getWeekdays($start, $end)
                                 $(row).find('td:first-child').text(startIndex + index + 1); // Update task numbering
                                 $(row).show();
                             });
-                        } else {
-                            // Show "No data to be displayed" for empty pages
-                            $(`${tableId} tbody`).append(
-                                `<tr><td colspan="12" class="text-center">No data to be displayed</td></tr>`
-                            );
                         }
 
                         // Show/hide "No data" alert
                         const noDataAlert = $(`${tableId} + .alert`);
-                        noDataAlert.toggle(visibleRows.length === 0);
+                        if (visibleRows.length === 0) {
+                            noDataAlert.show(); // Show the alert if no rows match the filters
+                        } else if (rowsToShow.length === 0) {
+                            noDataAlert.show(); // Show the alert if no rows are on the current page
+                        } else {
+                            noDataAlert.hide(); // Hide the alert if there are rows to show
+                        }
 
                         // Return the number of visible rows for pagination
                         return visibleRows.length;
@@ -1743,6 +1744,10 @@ function getWeekdays($start, $end)
                         // Reset task numbering for both tables
                         resetTaskNumbering('#pending-tasks');
                         resetTaskNumbering('#remaining-tasks');
+
+                        // Hide the "No data" alerts
+                        $('#no-data-alert-pending').hide();
+                        $('#no-data-alert-completed').hide();
 
                         applyFilters();
                     }
