@@ -345,6 +345,20 @@ try {
             width: 100%;
             border-radius: 10px;
         }
+
+        .back-btn {
+            background-color: #002c5f;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: #004080;
+        }
     </style>
 </head>
 
@@ -379,8 +393,8 @@ try {
                     </p>
                 </div>
 
-                <!-- Logout Button -->
-                <button class="logout-btn" onclick="window.location.href='logout.php'">Log Out</button>
+                <!-- Back Button -->
+                <button class="back-btn" onclick="window.location.href='welcome.php'">Back</button>
             </div>
 
             <!-- Dashboard Content -->

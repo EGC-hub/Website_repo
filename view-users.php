@@ -590,7 +590,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php endif; ?>
                     <?php endif; ?>
 
-                    <!-- Move the "Create User" button to the bottom right -->
                     <div style="text-align: right; margin-top: 20px;">
                         <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createUserModal">
                             Create User
