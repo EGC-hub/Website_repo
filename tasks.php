@@ -1632,13 +1632,13 @@ function getWeekdays($start, $end)
                         const endDate = $('#end-date').val();
 
                         // Filter and paginate Pending Tasks
-                        filterAndPaginateTable('#pending-tasks', selectedProjects, selectedDepartments, startDate, endDate, currentPage);
+                        const pendingVisibleRows = filterAndPaginateTable('#pending-tasks', selectedProjects, selectedDepartments, startDate, endDate, currentPage);
 
                         // Filter and paginate Completed Tasks
-                        filterAndPaginateTable('#remaining-tasks', selectedProjects, selectedDepartments, startDate, endDate, currentPage);
+                        const completedVisibleRows = filterAndPaginateTable('#remaining-tasks', selectedProjects, selectedDepartments, startDate, endDate, currentPage);
 
                         // Update pagination controls
-                        updatePagination();
+                        updatePagination(pendingVisibleRows, completedVisibleRows);
                     }
 
                     function filterAndPaginateTable(tableId, selectedProjects, selectedDepartments, startDate, endDate, currentPage) {
@@ -1672,12 +1672,12 @@ function getWeekdays($start, $end)
                         // Show/hide "No data" alert
                         const noDataAlert = $(`${tableId} + .alert`);
                         noDataAlert.toggle(visibleRows.length === 0);
+
+                        // Return the number of visible rows for pagination
+                        return visibleRows.length;
                     }
 
-                    function updatePagination() {
-                        const pendingVisibleRows = $('#pending-tasks tbody tr:visible').length;
-                        const completedVisibleRows = $('#remaining-tasks tbody tr:visible').length;
-
+                    function updatePagination(pendingVisibleRows, completedVisibleRows) {
                         // Calculate total pages based on the larger of the two tables
                         const totalPages = Math.max(
                             Math.ceil(pendingVisibleRows / tasksPerPage),
@@ -1776,4 +1776,4 @@ function getWeekdays($start, $end)
     </body>
 
 </html>
-<?php $conn->close(); ?>
+<?php $conn->close(); ?>c
