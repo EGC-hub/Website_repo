@@ -226,13 +226,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     }
 }
 
-// Get filter parameters from the query string
-$selectedProject = isset($_GET['project']) ? $_GET['project'] : null;
-$selectedDepartment = isset($_GET['department']) ? $_GET['department'] : null;
-$startDateFilter = isset($_GET['start_date']) ? $_GET['start_date'] : null;
-$endDateFilter = isset($_GET['end_date']) ? $_GET['end_date'] : null;
-
-// Modify the task query to include all filters
+// Fetch all tasks based on user role
 $taskQuery = $user_role === 'Admin'
     ? "
         SELECT tasks.*, 
@@ -247,11 +241,6 @@ $taskQuery = $user_role === 'Admin'
         JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
-        WHERE 1=1
-        " . ($selectedProject ? " AND tasks.project_name = '$selectedProject'" : "") . "
-        " . ($selectedDepartment ? " AND assigned_to_department.name = '$selectedDepartment'" : "") . "
-        " . ($startDateFilter ? " AND tasks.expected_start_date >= '$startDateFilter'" : "") . "
-        " . ($endDateFilter ? " AND tasks.expected_finish_date <= '$endDateFilter'" : "") . "
         GROUP BY tasks.task_id
         ORDER BY 
             CASE 
@@ -276,10 +265,6 @@ $taskQuery = $user_role === 'Admin'
             JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
             JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
             WHERE assigned_to_ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
-            " . ($selectedProject ? " AND tasks.project_name = '$selectedProject'" : "") . "
-            " . ($selectedDepartment ? " AND assigned_to_department.name = '$selectedDepartment'" : "") . "
-            " . ($startDateFilter ? " AND tasks.expected_start_date >= '$startDateFilter'" : "") . "
-            " . ($endDateFilter ? " AND tasks.expected_finish_date <= '$endDateFilter'" : "") . "
             GROUP BY tasks.task_id
             ORDER BY 
                 CASE 
@@ -298,10 +283,6 @@ $taskQuery = $user_role === 'Admin'
             JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
             JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
             WHERE tasks.user_id = ? 
-            " . ($selectedProject ? " AND tasks.project_name = '$selectedProject'" : "") . "
-            " . ($selectedDepartment ? " AND assigned_by_department.name = '$selectedDepartment'" : "") . "
-            " . ($startDateFilter ? " AND tasks.expected_start_date >= '$startDateFilter'" : "") . "
-            " . ($endDateFilter ? " AND tasks.expected_finish_date <= '$endDateFilter'" : "") . "
             GROUP BY tasks.task_id
             ORDER BY 
                 CASE 
@@ -311,7 +292,7 @@ $taskQuery = $user_role === 'Admin'
                 END DESC, 
                 recorded_timestamp DESC
         ");
-
+        
 // Number of tasks per table per page
 $tasksPerPage = 10;
 
@@ -1673,149 +1654,87 @@ function getWeekdays($start, $end)
             <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
             <script>
                 $(document).ready(function () {
-                    // Get the user's role from the hidden input field
-                    const userRole = document.getElementById('user-role').value;
-
-                    // Initialize Select2 on the project filter dropdown
+                    // Initialize Select2 for project and department filters
                     $('#project-filter').select2({
                         placeholder: "Select projects to filter",
                         allowClear: true,
                         width: '300px'
                     });
 
-                    // Initialize Select2 on the department filter dropdown (only for admins/managers)
-                    if (userRole === 'Admin' || userRole === 'Manager') {
-                        $('#department-filter').select2({
-                            placeholder: "Select departments to filter",
-                            allowClear: true,
-                            width: '300px'
-                        });
-                    } else {
-                        // Hide the department filter for regular users
-                        $('#department-filter').closest('.filter-dropdown').hide();
-                    }
-
-                    c// Remove the "All" option initially
-                    $('#project-filter option[value="All"]').remove();
-                    $('#department-filter option[value="All"]').remove();
-
-                    // Trigger combined filtering when any filter changes
-                    $('#project-filter, #department-filter, #start-date, #end-date').on('change', function () {
-                        applyAllFilters();
+                    $('#department-filter').select2({
+                        placeholder: "Select departments to filter",
+                        allowClear: true,
+                        width: '300px'
                     });
 
-                    // Function to apply all filters (project, department, and date)
-                    function applyAllFilters() {
-                        const selectedProjects = $('#project-filter').val();
-                        const selectedDepartments = $('#department-filter').val();
-                        const startDate = document.getElementById('start-date').value;
-                        const endDate = document.getElementById('end-date').value;
+                    // Function to apply filters
+                    function applyFilters() {
+                        const selectedProjects = $('#project-filter').val() || [];
+                        const selectedDepartments = $('#department-filter').val() || [];
+                        const startDate = $('#start-date').val();
+                        const endDate = $('#end-date').val();
 
-                        // Define tables and their corresponding alerts
-                        const tables = [
-                            { id: 'pending-tasks', alertId: 'no-data-alert-pending' },
-                            { id: 'remaining-tasks', alertId: 'no-data-alert-completed' }
-                        ];
+                        // Loop through all rows in both tables
+                        $('table tbody tr').each(function () {
+                            const projectName = $(this).find('td:nth-child(2)').text().trim();
+                            const departmentName = $(this).find('td:nth-child(10)').text().trim().match(/\(([^)]+)\)/)?.[1] || '';
+                            const taskStartDate = new Date($(this).find('td:nth-child(5)').text().trim());
+                            const taskEndDate = new Date($(this).find('td:nth-child(6)').text().trim());
 
-                        // Flag to track if any rows are visible across all tables
-                        let anyRowsVisible = false;
+                            // Check if the row matches the selected filters
+                            const projectMatch = selectedProjects.length === 0 || selectedProjects.includes('All') || selectedProjects.includes(projectName);
+                            const departmentMatch = selectedDepartments.length === 0 || selectedDepartments.includes('All') || departmentName.split(', ').some(dept => selectedDepartments.includes(dept));
+                            const dateMatch = (!startDate || taskStartDate >= new Date(startDate)) && (!endDate || taskEndDate <= new Date(endDate));
 
-                        tables.forEach(table => {
-                            const rows = document.querySelectorAll(`#${table.id} tbody tr`);
-                            let hasVisibleRows = false; // Flag to track if any rows are visible in this table
-
-                            rows.forEach(row => {
-                                const projectName = row.querySelector('td:nth-child(2)').textContent.trim(); // Project name column
-                                const assignedToText = row.querySelector('td:nth-child(10)').textContent.trim(); // Assigned To column (9th column)
-
-                                // Extract the department names from the "Assigned To" column
-                                const departmentMatch = assignedToText.match(/\(([^)]+)\)/); // Extract department(s) from parentheses
-                                const departmentNames = departmentMatch ? departmentMatch[1].trim().split(', ') : [];
-
-                                const taskStartDate = new Date(row.querySelector('td:nth-child(5)').textContent.trim()); // Start Date column
-                                const taskEndDate = new Date(row.querySelector('td:nth-child(6)').textContent.trim()); // End Date column
-
-                                // Check if the row matches the selected projects
-                                const projectMatch = selectedProjects === null || selectedProjects.length === 0 || selectedProjects.includes(projectName);
-
-                                // Check if the row matches the selected departments (only for admins/managers)
-                                let isDepartmentMatch = true; // Default to true for regular users
-                                if (userRole === 'Admin' || userRole === 'Manager') {
-                                    // Only check the assigned to department
-                                    isDepartmentMatch = selectedDepartments === null || selectedDepartments.length === 0 || selectedDepartments.some(department => departmentNames.includes(department));
-                                }
-
-                                // Check if the task falls within the selected date range
-                                let dateMatch = true;
-                                if (startDate && taskStartDate < new Date(startDate)) {
-                                    dateMatch = false;
-                                }
-                                if (endDate && taskEndDate > new Date(endDate)) {
-                                    dateMatch = false;
-                                }
-
-                                // Display the row only if it matches all filters
-                                if (projectMatch && isDepartmentMatch && dateMatch) {
-                                    row.style.display = ''; // Show the row
-                                    hasVisibleRows = true; // At least one row is visible in this table
-                                    anyRowsVisible = true; // At least one row is visible across all tables
-                                } else {
-                                    row.style.display = 'none'; // Hide the row
-                                }
-                            });
-
-                            // Show/hide the "No data found" alert for this table
-                            const noDataAlert = document.getElementById(table.alertId);
-                            if (hasVisibleRows) {
-                                noDataAlert.style.display = 'none'; // Hide the alert if rows are visible
+                            // Show or hide the row based on filter matches
+                            if (projectMatch && departmentMatch && dateMatch) {
+                                $(this).show();
                             } else {
-                                noDataAlert.style.display = 'block'; // Show the alert if no rows are visible
+                                $(this).hide();
                             }
                         });
 
-                        // Redirect to the first page of both tables if no rows are visible after filtering
-                        if (!anyRowsVisible) {
-                            const queryParams = new URLSearchParams();
+                        // Show/hide "No data" alerts
+                        const pendingTasksVisible = $('#pending-tasks tbody tr:visible').length > 0;
+                        const completedTasksVisible = $('#remaining-tasks tbody tr:visible').length > 0;
 
-                            // Add filter parameters to the URL
-                            if (selectedProjects && selectedProjects.length > 0) {
-                                queryParams.set('project', selectedProjects.join(','));
-                            }
-                            if (selectedDepartments && selectedDepartments.length > 0) {
-                                queryParams.set('department', selectedDepartments.join(','));
-                            }
-                            if (startDate) {
-                                queryParams.set('start_date', startDate);
-                            }
-                            if (endDate) {
-                                queryParams.set('end_date', endDate);
-                            }
-
-                            // Reset pagination to the first page for both tables
-                            queryParams.set('page', 1);
-
-                            // Redirect to the new URL with filters and pagination
-                            window.location.href = `?${queryParams.toString()}`;
-                        }
+                        $('#no-data-alert-pending').toggle(!pendingTasksVisible);
+                        $('#no-data-alert-completed').toggle(!completedTasksVisible);
                     }
+
+                    // Attach filter change events
+                    $('#project-filter, #department-filter, #start-date, #end-date').on('change', applyFilters);
+
                     // Reset filters
                     function resetFilters() {
-                        // Clear the filter inputs
                         $('#project-filter').val(null).trigger('change');
                         $('#department-filter').val(null).trigger('change');
-                        document.getElementById('start-date').value = '';
-                        document.getElementById('end-date').value = '';
-
-                        // Redirect to the page without any filter parameters
-                        window.location.href = window.location.pathname; // Reload the page without query string
+                        $('#start-date').val('');
+                        $('#end-date').val('');
+                        applyFilters();
                     }
 
-                    // Attach event listener for reset button
-                    document.querySelector('.btn-primary[onclick="resetFilters()"]').onclick = resetFilters;
+                    // Attach reset button event
+                    $('.btn-primary[onclick="resetFilters()"]').on('click', resetFilters);
 
-                    // Reload the page when a filter is deselected
-                    $('#project-filter, #department-filter, #start-date, #end-date').on('change', function () {
-                        applyAllFilters();
+                    // Populate project filter options dynamically
+                    const projects = [...new Set($('table tbody tr').map(function () {
+                        return $(this).find('td:nth-child(2)').text().trim();
+                    }).get())];
+
+                    $('#project-filter').empty().append('<option value="All">All</option>');
+                    projects.forEach(project => {
+                        $('#project-filter').append(`<option value="${project}">${project}</option>`);
+                    });
+
+                    // Populate department filter options dynamically
+                    const departments = [...new Set($('table tbody tr').map(function () {
+                        return $(this).find('td:nth-child(10)').text().trim().match(/\(([^)]+)\)/)?.[1]?.split(', ') || [];
+                    }).get().flat())];
+
+                    $('#department-filter').empty().append('<option value="All">All</option>');
+                    departments.forEach(department => {
+                        $('#department-filter').append(`<option value="${department}">${department}</option>`);
                     });
                 });
             </script>
