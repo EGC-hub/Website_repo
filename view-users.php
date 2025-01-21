@@ -517,8 +517,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php unset($_SESSION['deletionMsg']); ?>
                     <?php endif; ?>
 
-                    <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createUserModal"
-                        style="margin-bottom: 20px;">
+                    <!-- Replace the "Back to Dashboard" button with the "Create User" button -->
+                    <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createUserModal">
                         Create User
                     </a>
 
@@ -593,8 +593,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <p>No users found.</p>
                         <?php endif; ?>
                     <?php endif; ?>
-
-                    <a href="welcome.php" class="back-button">Back to Dashboard</a>
                 </div>
             </div>
         </div>
