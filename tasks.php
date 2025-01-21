@@ -943,7 +943,7 @@ function getWeekdays($start, $end)
                             </thead>
                             <tbody>
                                 <?php
-                                $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
+                                $taskCountStart = 1;
                                 foreach ($pendingStartedTasksPage as $row): ?>
                                     <tr class="align-middle">
                                         <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
@@ -1085,7 +1085,7 @@ function getWeekdays($start, $end)
                             </thead>
                             <tbody>
                                 <?php
-                                $taskCountStart = ($currentPage - 1) * $tasksPerPage + 1;
+                                $taskCountStart = 1;
                                 foreach ($completedTasksPage as $row): ?>
                                     <?php
                                     $delayInfo = '';
