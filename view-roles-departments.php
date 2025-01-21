@@ -335,6 +335,16 @@ try {
                 font-size: 0.9rem;
             }
         }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
@@ -390,7 +400,8 @@ try {
                         <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
                             Add Role
                         </a>
-                        <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createDepartmentModal">
+                        <a type="button" class="back-button" data-bs-toggle="modal"
+                            data-bs-target="#createDepartmentModal">
                             Add Department
                         </a>
                     </div>
@@ -418,9 +429,11 @@ try {
                                         <td><?= $rcount++ ?></td>
                                         <td><?= htmlspecialchars($role['name']) ?></td>
                                         <td>
-                                            <a href="edit-role.php?id=<?= urlencode($role['id']) ?>" class="edit-button">Edit</a>
+                                            <a href="edit-role.php?id=<?= urlencode($role['id']) ?>"
+                                                class="edit-button">Edit</a>
                                             <form action="delete-role.php" method="POST" style="display:inline;">
-                                                <input type="hidden" name="role_id" value="<?= htmlspecialchars($role['id']) ?>">
+                                                <input type="hidden" name="role_id"
+                                                    value="<?= htmlspecialchars($role['id']) ?>">
                                                 <button type="submit" class="delete-button"
                                                     onclick="return confirm('Are you sure you want to delete this role?')">Delete</button>
                                             </form>
