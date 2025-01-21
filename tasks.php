@@ -965,7 +965,7 @@ function getWeekdays($start, $end)
                         </div>
 
                         <!-- Pending & Started Tasks Table -->
-                        <h3>Assigned & In Progress Tasks</h3>
+                        <h3>Tasks In Progress</h3>
                         <table class="table table-striped table-hover align-middle text-center" id="pending-tasks">
                             <thead>
                                 <tr class="align-middle">
