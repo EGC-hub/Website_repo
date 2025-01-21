@@ -35,6 +35,9 @@ $user_role = $_SESSION['role'] ?? null;
 $user_id = $_SESSION['user_id'] ?? null;
 $task_id = $_POST['task_id'] ?? null;
 $new_status = $_POST['status'] ?? null;
+$completion_description = $_POST['completion_description'] ?? null;
+$delayed_reason = $_POST['delayed_reason'] ?? null;
+$actual_completion_date = $_POST['actual_completion_date'] ?? null;
 
 if ($task_id === null || $new_status === null) {
     die(json_encode(['success' => false, 'message' => 'Invalid request.']));
@@ -80,9 +83,24 @@ try {
         die(json_encode(['success' => false, 'message' => 'Unauthorized access.']));
     }
 
-    // Update the task status in the database
-    $stmt = $pdo->prepare("UPDATE tasks SET status = ? WHERE task_id = ?");
-    $stmt->execute([$new_status, $task_id]);
+    // Prepare the SQL query to update the task
+    $sql = "UPDATE tasks 
+            SET status = ?, 
+                completion_description = ?, 
+                delayed_reason = ?, 
+                actual_completion_date = ? 
+            WHERE task_id = ?";
+
+    $stmt = $pdo->prepare($sql);
+
+    // Bind parameters
+    $stmt->execute([
+        $new_status,
+        $completion_description,
+        $delayed_reason,
+        $actual_completion_date,
+        $task_id
+    ]);
 
     echo json_encode(['success' => true, 'message' => 'Status updated successfully.', 'task_name' => 'Task Name']); // Replace 'Task Name' with the actual task name
 } catch (PDOException $e) {
