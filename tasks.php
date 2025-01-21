@@ -731,6 +731,25 @@ function getWeekdays($start, $end)
         .back-btn:hover {
             background-color: #004080;
         }
+
+        .status-filter-container {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-filter-container label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0;
+            /* Remove default margin */
+        }
+
+        #status-filter {
+            width: 300px;
+            /* Adjust width as needed */
+        }
     </style>
 </head>
 
@@ -915,6 +934,18 @@ function getWeekdays($start, $end)
 
                         <!-- Pending & Started Tasks Table -->
                         <h3>Tasks In Progress</h3>
+                        <div class="status-filter-container">
+                            <label for="status-filter">Filter by Status:</label>
+                            <select id="status-filter" multiple="multiple">
+                                <option value="All">All</option>
+                                <option value="Assigned" selected>Assigned</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Hold">Hold</option>
+                                <option value="Reinstated">Reinstated</option>
+                                <option value="Reassigned">Reassigned</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
                         <table class="table table-striped table-hover align-middle text-center" id="pending-tasks">
                             <thead>
                                 <tr class="align-middle">
@@ -1645,18 +1676,23 @@ function getWeekdays($start, $end)
                         const rows = $(`${tableId} tbody tr`);
                         let visibleRows = [];
 
+                        // Get selected statuses only for the Tasks in Progress table
+                        const selectedStatuses = tableId === '#pending-tasks' ? $('#status-filter').val() || [] : [];
+
                         rows.each(function () {
                             const projectName = $(this).find('td:nth-child(2)').text().trim();
                             const departmentName = $(this).find('td:nth-child(10)').text().trim().match(/\(([^)]+)\)/)?.[1] || '';
                             const taskStartDate = new Date($(this).find('td:nth-child(5)').text().trim());
                             const taskEndDate = new Date($(this).find('td:nth-child(6)').text().trim());
+                            const taskStatus = $(this).find('td:nth-child(7) select').val() || $(this).find('td:nth-child(7)').text().trim();
 
                             // Check if the row matches the selected filters
                             const projectMatch = selectedProjects.length === 0 || selectedProjects.includes('All') || selectedProjects.includes(projectName);
                             const departmentMatch = selectedDepartments.length === 0 || selectedDepartments.includes('All') || departmentName.split(', ').some(dept => selectedDepartments.includes(dept));
                             const dateMatch = (!startDate || taskStartDate >= new Date(startDate)) && (!endDate || taskEndDate <= new Date(endDate));
+                            const statusMatch = tableId !== '#pending-tasks' || selectedStatuses.length === 0 || selectedStatuses.includes('All') || selectedStatuses.includes(taskStatus);
 
-                            if (projectMatch && departmentMatch && dateMatch) {
+                            if (projectMatch && departmentMatch && dateMatch && statusMatch) {
                                 visibleRows.push(this);
                             }
                         });
@@ -1696,6 +1732,11 @@ function getWeekdays($start, $end)
                             $(this).find('td:first-child').text(index + 1); // Reset task numbering
                         });
                     }
+
+                    $('#status-filter').on('change', function () {
+                        currentPage = 1; // Reset to the first page when filters change
+                        applyFilters();
+                    });
 
                     function updatePagination(pendingVisibleRows, completedVisibleRows) {
                         // Calculate total pages based on the larger of the two tables
@@ -1739,7 +1780,8 @@ function getWeekdays($start, $end)
                         $('#department-filter').val(null).trigger('change');
                         $('#start-date').val('');
                         $('#end-date').val('');
-                        currentPage = 1; // Reset to the first page
+                        $('#status-filter').val(['Assigned']).trigger('change');
+                        currentPage = 1;
 
                         // Reset task numbering for both tables
                         resetTaskNumbering('#pending-tasks');
