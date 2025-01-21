@@ -310,16 +310,6 @@ $pendingStartedTasks = array_filter($allTasks, function ($task) {
 $completedTasks = array_filter($allTasks, function ($task) {
     return in_array($task['status'], ['Completed on Time', 'Delayed Completion', 'Closed']);
 });
-
-// Calculate total pages for each table separately
-$totalPendingStartedTasks = count($pendingStartedTasks);
-$totalCompletedTasks = count($completedTasks);
-
-// Calculate total pages for the entire page based on the larger of the two sets
-$totalPages = max(
-    ceil($totalPendingStartedTasks / $tasksPerPage),
-    ceil($totalCompletedTasks / $tasksPerPage)
-);
 ?>
 
 <!-- Delay logic -->
