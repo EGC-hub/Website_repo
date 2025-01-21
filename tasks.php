@@ -804,18 +804,12 @@ function getWeekdays($start, $end)
         </div>
     </div>
     <?php
-    // Initialize variables to hold unique project names and all task rows
-    $projects = [];
-    $rows = [];
-
-    // Process the query result to populate $projects and $rows
-    while ($row = $result->fetch_assoc()) {
-        $rows[] = $row; // Store each row for rendering
-    
-        // Add project name to $projects if not already included
-        if (!in_array($row['project_name'], $projects)) {
-            $projects[] = $row['project_name'];
-        }
+    // Fetch all unique project names from the tasks table
+    $projectQuery = $conn->query("SELECT DISTINCT project_name FROM tasks");
+    if ($projectQuery) {
+        $projects = $projectQuery->fetch_all(MYSQLI_ASSOC);
+    } else {
+        die("Error fetching projects: " . $conn->error);
     }
     ?>
 
@@ -881,8 +875,9 @@ function getWeekdays($start, $end)
                                     <select id="project-filter" multiple="multiple">
                                         <option value="All">All</option>
                                         <?php foreach ($projects as $project): ?>
-                                            <option value="<?= htmlspecialchars($project) ?>" <?= (isset($_GET['project']) && in_array($project, explode(',', $_GET['project']))) ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars($project) ?>
+                                            <option value="<?= htmlspecialchars($project['project_name']) ?>"
+                                                <?= (isset($_GET['project']) && in_array($project['project_name'], explode(',', $_GET['project']))) ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($project['project_name']) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
@@ -1646,7 +1641,6 @@ function getWeekdays($start, $end)
                         updatePagination();
                     }
 
-                    // Function to filter and paginate a table
                     function filterAndPaginateTable(tableId, selectedProjects, selectedDepartments, startDate, endDate, currentPage) {
                         const rows = $(`${tableId} tbody tr`);
                         let visibleRows = [];
@@ -1680,7 +1674,6 @@ function getWeekdays($start, $end)
                         noDataAlert.toggle(visibleRows.length === 0);
                     }
 
-                    // Function to update pagination controls
                     function updatePagination() {
                         const pendingVisibleRows = $('#pending-tasks tbody tr:visible').length;
                         const completedVisibleRows = $('#remaining-tasks tbody tr:visible').length;
@@ -1783,4 +1776,4 @@ function getWeekdays($start, $end)
     </body>
 
 </html>
-<?php $conn->close(); ?>c
+<?php $conn->close(); ?>
