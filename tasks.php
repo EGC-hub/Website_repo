@@ -293,15 +293,6 @@ $taskQuery = $user_role === 'Admin'
                 recorded_timestamp DESC
         ");
 
-// Number of tasks per table per page
-$tasksPerPage = 10;
-
-// Get current page from query string, default to 1
-$currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-
-// Calculate offset for the query
-$offset = ($currentPage - 1) * $tasksPerPage;
-
 // Fetch all tasks based on user role
 $stmt = $conn->prepare($taskQuery);
 if ($user_role === 'Manager' || $user_role === 'User') {
@@ -329,14 +320,6 @@ $totalPages = max(
     ceil($totalPendingStartedTasks / $tasksPerPage),
     ceil($totalCompletedTasks / $tasksPerPage)
 );
-
-// Slice the arrays to get tasks for the current page
-$pendingStartedTasksPage = array_slice($pendingStartedTasks, $offset, $tasksPerPage);
-$completedTasksPage = array_slice($completedTasks, $offset, $tasksPerPage);
-
-// Check if there are no tasks for Pending & Started Tasks on the current page
-$showPendingAlert = empty($pendingStartedTasksPage) ? 'block' : 'none';
-$showCompletedAlert = empty($completedTasksPage) ? 'block' : 'none';
 ?>
 
 <!-- Delay logic -->
@@ -1760,26 +1743,6 @@ function getWeekdays($start, $end)
 
                     // Attach reset button event
                     $('.btn-primary[onclick="resetFilters()"]').on('click', resetFilters);
-
-                    // Populate project filter options dynamically
-                    const projects = [...new Set($('table tbody tr').map(function () {
-                        return $(this).find('td:nth-child(2)').text().trim();
-                    }).get())];
-
-                    $('#project-filter').empty().append('<option value="All">All</option>');
-                    projects.forEach(project => {
-                        $('#project-filter').append(`<option value="${project}">${project}</option>`);
-                    });
-
-                    // Populate department filter options dynamically
-                    const departments = [...new Set($('table tbody tr').map(function () {
-                        return $(this).find('td:nth-child(10)').text().trim().match(/\(([^)]+)\)/)?.[1]?.split(', ') || [];
-                    }).get().flat())];
-
-                    $('#department-filter').empty().append('<option value="All">All</option>');
-                    departments.forEach(department => {
-                        $('#department-filter').append(`<option value="${department}">${department}</option>`);
-                    });
 
                     // Initialize pagination
                     applyFilters();
