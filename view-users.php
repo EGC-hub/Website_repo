@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            padding: 20px;
+            padding: 0;
         }
 
         /* Apply box-sizing to all elements */
@@ -185,31 +185,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flex-direction: column;
             align-items: center;
             text-align: center;
-        }
-
-        .user-info {
-            text-align: center;
-            width: 90%;
-            max-width: 1200px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .user-info p {
-            margin: 5px 0;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .user-info .session-warning {
-            color: grey;
-            font-weight: bold;
-            font-size: 14px;
-            margin-top: 10px;
         }
 
         .container {
@@ -402,6 +377,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: 2px !important;
             border-radius: 4px !important;
         }
+
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
             position: relative !important;
             left: auto !important;
@@ -422,111 +398,212 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .select2-container--open {
             z-index: 9999 !important;
         }
+
+        /* Sidebar and Navbar Styles */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #002c5f;
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #004080;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            margin-right: 20px;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            background-color: #002c5f;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: #004080;
+        }
     </style>
 </head>
 
 <body>
-    <div class="main-container">
-        <div class="user-info">
-            <p>Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong></p>
-            <p>Departments:
-                <strong>
-                    <?= !empty($user_departments) ? htmlspecialchars(implode(', ', $user_departments)) : 'None' ?>
-                </strong>
-            </p>
-            <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.</p>
-        </div>
-        <div class="container">
-            <h1>Users</h1>
-
-            <?php if (isset($_SESSION['successMsg'])): ?>
-                <div class="success-message">
-                    <?= htmlspecialchars($_SESSION['successMsg']) ?>
-                </div>
-                <?php unset($_SESSION['successMsg']); ?>
+    <!-- Sidebar and Navbar -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>Menu</h3>
+            <a href="tasks.php">Tasks</a>
+            <?php if ($user_role === 'Admin' || $user_role === 'Manager'): ?>
+                <a href="view-users.php">View Users</a>
             <?php endif; ?>
-
-            <?php if (isset($_SESSION['deletionMsg'])): ?>
-                <div class="deletion-message">
-                    <?= htmlspecialchars($_SESSION['deletionMsg']) ?>
-                </div>
-                <?php unset($_SESSION['deletionMsg']); ?>
-            <?php endif; ?>
-
-            <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createUserModal"
-                style="margin-bottom: 20px;">
-                Create User
-            </a>
-
             <?php if ($user_role === 'Admin'): ?>
-                <p>Viewing all users</p>
-                <?php if (!empty($users)): ?>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Departments</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $count = 1 ?>
-                            <?php foreach ($users as $user): ?>
-                                <tr>
-                                    <td><?= $count++ ?></td>
-                                    <td><?= htmlspecialchars($user['username']) ?></td>
-                                    <td><?= htmlspecialchars($user['email']) ?></td>
-                                    <td><?= htmlspecialchars($user['role_name']) ?></td>
-                                    <td><?= !empty($user['departments']) ? htmlspecialchars($user['departments']) : 'None' ?></td>
-                                    <td>
-                                        <a href='edit-user.php?id=<?= urlencode($user['id']) ?>' class='edit-button'>Edit</a>
-                                        <form action='delete-user.php' method='POST' style='display:inline;'>
-                                            <input type='hidden' name='user_id' value='<?= htmlspecialchars($user['id']) ?>'>
-                                            <button type='submit' class='delete-button'
-                                                onclick='return confirm("Are you sure you want to delete this user?")'>Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>No users found.</p>
-                <?php endif; ?>
-            <?php elseif ($user_role === 'Manager'): ?>
-                <p>Viewing users in your department(s):
-                    <strong><?= htmlspecialchars(implode(', ', $user_departments)) ?></strong>
-                </p>
-                <?php if (!empty($users)): ?>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Departments</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($users as $user): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($user['username']) ?></td>
-                                    <td><?= htmlspecialchars($user['email']) ?></td>
-                                    <td><?= htmlspecialchars($user['role_name']) ?></td>
-                                    <td><?= !empty($user['departments']) ? htmlspecialchars($user['departments']) : 'None' ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>No users found.</p>
-                <?php endif; ?>
+                <a href="view-roles-departments.php">View Role or Department</a>
             <?php endif; ?>
+        </div>
 
-            <a href="welcome.php" class="back-button">Back to Dashboard</a>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Navbar -->
+            <div class="navbar">
+                <!-- Logo Container -->
+                <div class="d-flex align-items-center me-3">
+                    <img src="images/logo/logo.webp" alt="Logo" class="logo" style="width: auto; height: 80px;">
+                </div>
+
+                <!-- User Info -->
+                <div class="user-info me-3 ms-auto">
+                    <p class="mb-0">Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong></p>
+                    <p class="mb-0">Departments:
+                        <strong><?= !empty($user_departments) ? htmlspecialchars(implode(', ', $user_departments)) : 'None' ?></strong>
+                    </p>
+                </div>
+
+                <!-- Back Button -->
+                <button class="back-btn" onclick="window.location.href='welcome.php'">Back</button>
+            </div>
+            <div class="main-container">
+                <div class="user-info">
+                    <p>Logged in as: <strong><?= htmlspecialchars($user_username) ?></strong></p>
+                    <p>Departments:
+                        <strong>
+                            <?= !empty($user_departments) ? htmlspecialchars(implode(', ', $user_departments)) : 'None' ?>
+                        </strong>
+                    </p>
+                    <p class="session-warning">Information: Your session will timeout after 20 minutes of inactivity.
+                    </p>
+                </div>
+                <div class="container">
+                    <h1>Users</h1>
+
+                    <?php if (isset($_SESSION['successMsg'])): ?>
+                        <div class="success-message">
+                            <?= htmlspecialchars($_SESSION['successMsg']) ?>
+                        </div>
+                        <?php unset($_SESSION['successMsg']); ?>
+                    <?php endif; ?>
+
+                    <?php if (isset($_SESSION['deletionMsg'])): ?>
+                        <div class="deletion-message">
+                            <?= htmlspecialchars($_SESSION['deletionMsg']) ?>
+                        </div>
+                        <?php unset($_SESSION['deletionMsg']); ?>
+                    <?php endif; ?>
+
+                    <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createUserModal"
+                        style="margin-bottom: 20px;">
+                        Create User
+                    </a>
+
+                    <?php if ($user_role === 'Admin'): ?>
+                        <p>Viewing all users</p>
+                        <?php if (!empty($users)): ?>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Departments</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $count = 1 ?>
+                                    <?php foreach ($users as $user): ?>
+                                        <tr>
+                                            <td><?= $count++ ?></td>
+                                            <td><?= htmlspecialchars($user['username']) ?></td>
+                                            <td><?= htmlspecialchars($user['email']) ?></td>
+                                            <td><?= htmlspecialchars($user['role_name']) ?></td>
+                                            <td><?= !empty($user['departments']) ? htmlspecialchars($user['departments']) : 'None' ?>
+                                            </td>
+                                            <td>
+                                                <a href='edit-user.php?id=<?= urlencode($user['id']) ?>'
+                                                    class='edit-button'>Edit</a>
+                                                <form action='delete-user.php' method='POST' style='display:inline;'>
+                                                    <input type='hidden' name='user_id'
+                                                        value='<?= htmlspecialchars($user['id']) ?>'>
+                                                    <button type='submit' class='delete-button'
+                                                        onclick='return confirm("Are you sure you want to delete this user?")'>Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php else: ?>
+                            <p>No users found.</p>
+                        <?php endif; ?>
+                    <?php elseif ($user_role === 'Manager'): ?>
+                        <p>Viewing users in your department(s):
+                            <strong><?= htmlspecialchars(implode(', ', $user_departments)) ?></strong>
+                        </p>
+                        <?php if (!empty($users)): ?>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Departments</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($users as $user): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($user['username']) ?></td>
+                                            <td><?= htmlspecialchars($user['email']) ?></td>
+                                            <td><?= htmlspecialchars($user['role_name']) ?></td>
+                                            <td><?= !empty($user['departments']) ? htmlspecialchars($user['departments']) : 'None' ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php else: ?>
+                            <p>No users found.</p>
+                        <?php endif; ?>
+                    <?php endif; ?>
+
+                    <a href="welcome.php" class="back-button">Back to Dashboard</a>
+                </div>
+            </div>
         </div>
     </div>
 
