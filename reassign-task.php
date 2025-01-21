@@ -6,6 +6,13 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 require '../config.php';
+
+// Database connection
+$dbHost = 'localhost';
+$dbUsername = $config['dbUsername'];
+$dbPassword = $config['dbPassword'];
+$dbName = 'euro_login_system';
+
 $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 
 if ($conn->connect_error) {
@@ -26,7 +33,7 @@ $stmt->bind_param("ii", $reassign_user_id, $task_id);
 if ($stmt->execute()) {
     echo json_encode([
         'success' => true,
-        'task_name' => 'Task Name', 
+        'task_name' => 'Task Name',
         'message' => 'Task reassigned successfully.'
     ]);
 } else {
