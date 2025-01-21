@@ -1655,6 +1655,12 @@ function getWeekdays($start, $end)
                         width: '300px'
                     });
 
+                    $('#status-filter').select2({
+                        placeholder: "Select statuses to filter",
+                        allowClear: true,
+                        width: '300px'
+                    });
+
                     // Function to apply filters and update pagination
                     function applyFilters() {
                         const selectedProjects = $('#project-filter').val() || [];
