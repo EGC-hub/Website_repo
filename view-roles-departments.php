@@ -202,14 +202,9 @@ try {
             background-color: #ff1a1a;
         }
 
-        .dashboard-content {
-            padding: 20px;
-        }
-
-        /* Existing styles for tables and containers */
         .container {
-            width: 90%;
-            max-width: 1200px;
+            width: 100%;
+            max-width: 1400px;
             margin: 20px auto;
             padding: 20px;
             background-color: #fff;
