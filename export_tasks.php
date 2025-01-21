@@ -74,7 +74,8 @@ $output = fopen('php://output', 'w');
 // Write CSV headers
 $headers = [
     'Project Name', 'Task Name', 'Task Description', 'Start Date', 'End Date', 'Status', 
-    'Project Type', 'Assigned By', 'Assigned To', 'Department', 'Created On'
+    'Project Type', 'Assigned By', 'Assigned To', 'Department', 'Created On', 'Completion Description', 
+    'Delayed Reason', 'Actual Completion Date'
 ];
 
 // Write Pending Tasks Section
@@ -94,7 +95,10 @@ while ($row = $result->fetch_assoc()) {
             $row['assigned_by'],
             $row['assigned_to'] ?? '', // Handle cases where assigned_to is not available
             $row['department'] ?? '',  // Handle cases where department is not available
-            date("d M Y, h:i A", strtotime($row['recorded_timestamp']))
+            date("d M Y, h:i A", strtotime($row['recorded_timestamp'])),
+            $row['completion_description'] ?? '', // Handle cases where completion_description is not available
+            $row['delayed_reason'] ?? '', // Handle cases where delayed_reason is not available
+            $row['actual_completion_date'] ? date("d M Y, h:i A", strtotime($row['actual_completion_date'])) : '' // Handle cases where actual_completion_date is not available
         ];
         fputcsv($output, $rowData);
     }
@@ -123,7 +127,10 @@ while ($row = $result->fetch_assoc()) {
             $row['assigned_by'],
             $row['assigned_to'] ?? '', // Handle cases where assigned_to is not available
             $row['department'] ?? '',  // Handle cases where department is not available
-            date("d M Y, h:i A", strtotime($row['recorded_timestamp']))
+            date("d M Y, h:i A", strtotime($row['recorded_timestamp'])),
+            $row['completion_description'] ?? '', // Handle cases where completion_description is not available
+            $row['delayed_reason'] ?? '', // Handle cases where delayed_reason is not available
+            $row['actual_completion_date'] ? date("d M Y, h:i A", strtotime($row['actual_completion_date'])) : '' // Handle cases where actual_completion_date is not available
         ];
         fputcsv($output, $rowData);
     }
