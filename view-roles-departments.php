@@ -487,16 +487,17 @@ try {
                     <?php else: ?>
                         <p>No departments found.</p>
                     <?php endif; ?>
-                </div>
 
-                <!-- Centered modal buttons -->
-                <div class="modal-buttons" style="position: fixed; bottom: 20px; right: 20px;">
-                    <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
-                        Add Role
-                    </a>
-                    <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createDepartmentModal">
-                        Add Department
-                    </a>
+                    <!-- Centered modal buttons -->
+                    <div class="modal-buttons" style="text-align: right; margin-top: 20px;">
+                        <a type="button" class="back-button" data-bs-toggle="modal" data-bs-target="#createRoleModal">
+                            Add Role
+                        </a>
+                        <a type="button" class="back-button" data-bs-toggle="modal"
+                            data-bs-target="#createDepartmentModal">
+                            Add Department
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
