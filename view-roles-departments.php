@@ -388,9 +388,9 @@ try {
 
                 <!-- User Info -->
                 <div class="user-info me-3 ms-auto">
-                    <p class="mb-0">Logged in as: <strong><?= htmlspecialchars($loggedInUsername) ?></strong></p>
+                    <p class="mb-0">Logged in as: <strong><?= htmlspecialchars($_SESSION('username')) ?></strong></p>
                     <p class="mb-0">Departments:
-                        <strong><?= htmlspecialchars($loggedInDepartment ?? 'Unknown') ?></strong>
+                        <strong><?= !empty($user_departments) ? htmlspecialchars(implode(', ', $user_departments)) : 'None' ?></strong>
                     </p>
                 </div>
 
