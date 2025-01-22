@@ -95,7 +95,7 @@ try {
 
         // Fetch average task duration
         $stmt = $pdo->prepare(
-            "SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, expected_finish_date)) as avg_duration FROM tasks WHERE status = 'Completed on Time'"
+            "SELECT AVG(TIMESTAMPDIFF(DAY, planned_start_date, planned_finish_date)) as avg_duration FROM tasks WHERE status = 'Completed on Time'"
         );
         $stmt->execute();
         $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
@@ -137,12 +137,12 @@ try {
         // Fetch task completion over time (grouped by month)
         $stmt = $pdo->prepare("
         SELECT 
-        DATE_FORMAT(expected_finish_date, '%b') as month,
+        DATE_FORMAT(planned_finish_date, '%b') as month,
         COUNT(*) as tasks_completed
         FROM tasks
         WHERE status = 'Completed on Time'
-        GROUP BY DATE_FORMAT(expected_finish_date, '%Y-%m')
-        ORDER BY expected_finish_date;
+        GROUP BY DATE_FORMAT(planned_finish_date, '%Y-%m')
+        ORDER BY planned_finish_date;
         ");
         $stmt->execute();
         $taskCompletionOverTime = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -274,7 +274,7 @@ try {
         // Fetch task completion over time for manager's departments
         $stmt = $pdo->prepare("
             SELECT 
-                DATE_FORMAT(expected_finish_date, '%b') as month,
+                DATE_FORMAT(planned_finish_date, '%b') as month,
                 COUNT(*) as tasks_completed
             FROM tasks t
             JOIN user_departments ud ON t.user_id = ud.user_id
@@ -283,8 +283,8 @@ try {
                 FROM user_departments 
                 WHERE user_id = :user_id
             )
-            GROUP BY DATE_FORMAT(expected_finish_date, '%Y-%m')
-            ORDER BY expected_finish_date;
+            GROUP BY DATE_FORMAT(planned_finish_date, '%Y-%m')
+            ORDER BY planned_finish_date;
         ");
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
@@ -315,7 +315,7 @@ try {
 
         // Fetch average task duration for manager's departments
         $stmt = $pdo->prepare("
-            SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, expected_finish_date)) as avg_duration 
+            SELECT AVG(TIMESTAMPDIFF(DAY, planned_start_date, planned_finish_date)) as avg_duration 
             FROM tasks t
             JOIN user_departments ud ON t.user_id = ud.user_id
             WHERE t.status = 'Completed on Time' 
@@ -380,12 +380,12 @@ try {
         // Fetch task completion over time for the user
         $stmt = $pdo->prepare("
         SELECT 
-            DATE_FORMAT(expected_finish_date, '%b') as month,
+            DATE_FORMAT(planned_finish_date, '%b') as month,
             COUNT(*) as tasks_completed
         FROM tasks
         WHERE status = 'Completed on Time' AND user_id = :user_id
-        GROUP BY DATE_FORMAT(expected_finish_date, '%Y-%m')
-        ORDER BY expected_finish_date;
+        GROUP BY DATE_FORMAT(planned_finish_date, '%Y-%m')
+        ORDER BY planned_finish_date;
     ");
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
@@ -393,7 +393,7 @@ try {
 
         // Fetch average task duration for the user
         $stmt = $pdo->prepare("
-        SELECT AVG(TIMESTAMPDIFF(DAY, expected_start_date, expected_finish_date)) as avg_duration 
+        SELECT AVG(TIMESTAMPDIFF(DAY, planned_start_date, planned_finish_date)) as avg_duration 
         FROM tasks 
         WHERE status = 'Completed on Time' AND user_id = :user_id
     ");
@@ -1214,7 +1214,7 @@ try {
                 <td>${task.task_name}</td>
                 <td>${task.assigned_to}</td>
                 <td>${task.department}</td>
-                <td>${task.completion_date || task.start_date || task.expected_finish_date}</td>
+                <td>${task.completion_date || task.start_date || task.planned_finish_date}</td>
             `;
                         tableBody.appendChild(row);
                     });
