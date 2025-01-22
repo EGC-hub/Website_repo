@@ -82,10 +82,15 @@ if ($userResult->num_rows > 0) {
     $loggedInUsername = $userDetails['username'];
     $loggedInDepartment = $userDetails['departments']; // Change 'department' to 'departments'
     $loggedInRole = $userDetails['role'];
+
+     // Check if the user has more than one department
+     $departmentsArray = explode(', ', $loggedInDepartment);
+     $hasMultipleDepartments = count($departmentsArray) > 1;
 } else {
     $loggedInUsername = "Unknown";
     $loggedInDepartment = "Unknown";
     $loggedInRole = "Unknown";
+    $hasMultipleDepartments = false;
 }
 
 // Fetch users for task assignment (admin and manager roles)
@@ -902,6 +907,7 @@ function getWeekdays($start, $end)
                                     </select>
                                 </div>
 
+                                <?php if($user_role === 'Admin' || $hasMultipleDepartments ) ?>
                                 <!-- Multi-select dropdown for filtering by department -->
                                 <div class="filter-dropdown">
                                     <label for="department-filter">Filter by Department of Assigned User:</label>
