@@ -758,6 +758,36 @@ function getWeekdays($start, $end)
             width: 300px;
             /* Adjust width as needed */
         }
+
+        /* stylings for splitting the date columns */
+        .diagonal-split {
+            position: relative;
+            border: 1px solid #000;
+        }
+
+        .diagonal-split::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-bottom: 1px solid #000;
+            transform: rotate(-45deg);
+            transform-origin: bottom left;
+        }
+
+        .diagonal-split .top-left {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+        }
+
+        .diagonal-split .bottom-right {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+        }
     </style>
 </head>
 
