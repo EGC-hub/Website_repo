@@ -88,6 +88,8 @@ if ($userResult->num_rows > 0) {
     // Check if the user has more than one department
     $departmentsArray = explode(', ', $loggedInDepartment);
     $hasMultipleDepartments = count($departmentsArray) > 1;
+
+    echo "Has Multiple Departments: " . ($hasMultipleDepartments ? 'Yes' : 'No') . "<br>";
 } else {
     $loggedInUsername = "Unknown";
     $loggedInDepartment = "Unknown";
