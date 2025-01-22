@@ -83,9 +83,9 @@ if ($userResult->num_rows > 0) {
     $loggedInDepartment = $userDetails['departments'];
     $loggedInRole = $userDetails['role'];
 
-     // Check if the user has more than one department
-     $departmentsArray = explode(', ', $loggedInDepartment);
-     $hasMultipleDepartments = count($departmentsArray) > 1;
+    // Check if the user has more than one department
+    $departmentsArray = explode(', ', $loggedInDepartment);
+    $hasMultipleDepartments = count($departmentsArray) > 1;
 } else {
     $loggedInUsername = "Unknown";
     $loggedInDepartment = "Unknown";
@@ -759,7 +759,6 @@ function getWeekdays($start, $end)
 </head>
 
 <body>
-    <?= $hasMultipleDepartments ?>
     <!-- Task Management Modal -->
     <div class="modal fade" id="taskManagementModal" tabindex="-1" aria-labelledby="taskManagementModalLabel"
         aria-hidden="true">
@@ -840,6 +839,7 @@ function getWeekdays($start, $end)
 
 
     <body>
+        <?= $hasMultipleDepartments ?>
         <!-- Sidebar and Navbar -->
         <div class="dashboard-container">
             <!-- Sidebar -->
@@ -908,7 +908,7 @@ function getWeekdays($start, $end)
                                     </select>
                                 </div>
 
-                                <?php if($user_role === 'Admin' || $hasMultipleDepartments ) ?>
+                                <?php if ($user_role === 'Admin' || $hasMultipleDepartments) ?>
                                 <!-- Multi-select dropdown for filtering by department -->
                                 <div class="filter-dropdown">
                                     <label for="department-filter">Filter by Department of Assigned User:</label>
