@@ -839,7 +839,7 @@ function getWeekdays($start, $end)
 
 
     <body>
-        <?= $hasMultipleDepartments ?>
+        <?php echo ($hasMultipleDepartments) ?>
         <!-- Sidebar and Navbar -->
         <div class="dashboard-container">
             <!-- Sidebar -->
