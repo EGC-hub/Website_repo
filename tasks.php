@@ -1821,6 +1821,9 @@ function getWeekdays($start, $end)
 
                         // Return the number of visible rows for pagination
                         return visibleRows.length;
+
+                        console.log("Rows:", rows);
+                        console.log("Visible Rows:", visibleRows);
                     }
 
                     function resetTaskNumbering(tableId) {
