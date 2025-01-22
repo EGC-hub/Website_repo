@@ -245,15 +245,15 @@ $taskQuery = $user_role === 'Admin'
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
-            task_transaction.delayed_reason,
-            task_transaction.actual_finish_date,
+            task_transactions.delayed_reason,
+            task_transactions.actual_finish_date,
             tasks.completion_description,
             assigned_to_user.username AS assigned_to, 
             GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
             assigned_by_user.username AS assigned_by,
             GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
         FROM tasks 
-        LEFT JOIN task_transaction ON tasks.task_id = task_transaction.task_id
+        LEFT JOIN task_transactions ON tasks.task_id = task_transactions.task_id
         JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
         JOIN user_departments AS assigned_to_ud ON assigned_to_user.id = assigned_to_ud.user_id
         JOIN departments AS assigned_to_department ON assigned_to_ud.department_id = assigned_to_department.id
@@ -264,7 +264,7 @@ $taskQuery = $user_role === 'Admin'
         ORDER BY 
             CASE 
                 WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
-                WHEN tasks.status = 'Delayed Completion' THEN task_transaction.actual_finish_date 
+                WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
                 WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
             END DESC, 
             tasks.recorded_timestamp DESC
@@ -283,15 +283,15 @@ $taskQuery = $user_role === 'Admin'
                 tasks.recorded_timestamp,
                 tasks.assigned_by_id,
                 tasks.user_id,
-                task_transaction.delayed_reason,
-                task_transaction.actual_finish_date,
+                task_transactions.delayed_reason,
+                task_transactions.actual_finish_date,
                 tasks.completion_description,
                 assigned_to_user.username AS assigned_to, 
                 GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
                 assigned_by_user.username AS assigned_by,
                 GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
             FROM tasks 
-            LEFT JOIN task_transaction ON tasks.task_id = task_transaction.task_id
+            LEFT JOIN task_transactions ON tasks.task_id = task_transactions.task_id
             JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
             JOIN user_departments AS assigned_to_ud ON assigned_to_user.id = assigned_to_ud.user_id
             JOIN departments AS assigned_to_department ON assigned_to_ud.department_id = assigned_to_department.id
@@ -303,7 +303,7 @@ $taskQuery = $user_role === 'Admin'
             ORDER BY 
                 CASE 
                     WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
-                    WHEN tasks.status = 'Delayed Completion' THEN task_transaction.actual_finish_date 
+                    WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
                     WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
                 END DESC, 
                 tasks.recorded_timestamp DESC
@@ -321,13 +321,13 @@ $taskQuery = $user_role === 'Admin'
                 tasks.recorded_timestamp,
                 tasks.assigned_by_id,
                 tasks.user_id,
-                task_transaction.delayed_reason,
-                task_transaction.actual_finish_date,
+                task_transactions.delayed_reason,
+                task_transactions.actual_finish_date,
                 tasks.completion_description,
                 assigned_by_user.username AS assigned_by,
                 GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
             FROM tasks 
-            LEFT JOIN task_transaction ON tasks.task_id = task_transaction.task_id
+            LEFT JOIN task_transactions ON tasks.task_id = task_transactions.task_id
             JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
             JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
             JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
@@ -336,7 +336,7 @@ $taskQuery = $user_role === 'Admin'
             ORDER BY 
                 CASE 
                     WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
-                    WHEN tasks.status = 'Delayed Completion' THEN task_transaction.actual_finish_date 
+                    WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
                     WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
                 END DESC, 
                 tasks.recorded_timestamp DESC
