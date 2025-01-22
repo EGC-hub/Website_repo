@@ -80,7 +80,7 @@ $userResult = $userQuery->get_result();
 if ($userResult->num_rows > 0) {
     $userDetails = $userResult->fetch_assoc();
     $loggedInUsername = $userDetails['username'];
-    $loggedInDepartment = $userDetails['departments']; // Change 'department' to 'departments'
+    $loggedInDepartment = $userDetails['departments'];
     $loggedInRole = $userDetails['role'];
 
      // Check if the user has more than one department
@@ -759,6 +759,7 @@ function getWeekdays($start, $end)
 </head>
 
 <body>
+    <?= $hasMultipleDepartments ?>
     <!-- Task Management Modal -->
     <div class="modal fade" id="taskManagementModal" tabindex="-1" aria-labelledby="taskManagementModalLabel"
         aria-hidden="true">
