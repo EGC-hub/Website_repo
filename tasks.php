@@ -963,8 +963,8 @@ function getWeekdays($start, $end)
                                     <th>Project Name</th>
                                     <th>Task Name</th>
                                     <th>Task Description</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
+                                    <th>Planned Start Date</th>
+                                    <th>Planned End Date</th>
                                     <th>Status</th>
                                     <th>Project Type</th>
                                     <th>Assigned By</th>
@@ -1108,8 +1108,8 @@ function getWeekdays($start, $end)
                                     <th>Project Name</th>
                                     <th>Task Name</th>
                                     <th>Task Description</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
+                                    <th>Planned Start Date</th>
+                                    <th>planned End Date</th>
                                     <th>Status</th>
                                     <th>Project Type</th>
                                     <th>Assigned By</th>
