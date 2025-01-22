@@ -1760,12 +1760,12 @@ function getWeekdays($start, $end)
 
                         rows.each(function () {
                             const projectName = $(this).find('td:nth-child(2)').text().trim();
-                            const departmentName = $(this).find('td:nth-child(10)').text().trim().match(/\(([^)]+)\)/)?.[1] || '';
+                            const departmentName = $(this).find('td:nth-child(11)').text().trim().match(/\(([^)]+)\)/)?.[1] || '';
                             const plannedStartDate = new Date($(this).find('td:nth-child(5)').text().trim());
                             const plannedFinishDate = new Date($(this).find('td:nth-child(6)').text().trim());
-                            const actualStartDate = new Date($(this).find('td:nth-child(11)').text().trim()); // Adjust the column index if needed
-                            const actualFinishDate = new Date($(this).find('td:nth-child(12)').text().trim()); // Adjust the column index if needed
-                            const taskStatus = $(this).find('td:nth-child(7) select').val() || $(this).find('td:nth-child(7)').text().trim();
+                            const actualStartDate = new Date($(this).find('td:nth-child(7)').text().trim()); // Adjust the column index if needed
+                            const actualFinishDate = new Date($(this).find('td:nth-child(8)').text().trim()); // Adjust the column index if needed
+                            const taskStatus = $(this).find('td:nth-child(9) select').val() || $(this).find('td:nth-child(7)').text().trim();
 
                             // Check if the row matches the selected filters
                             const projectMatch = selectedProjects.length === 0 || selectedProjects.includes('All') || selectedProjects.includes(projectName);
