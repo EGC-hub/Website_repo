@@ -240,6 +240,8 @@ $taskQuery = $user_role === 'Admin'
             tasks.task_description,
             tasks.planned_start_date,
             tasks.planned_finish_date,
+            tasks.actual_start_date,
+            tasks.actual_finish_date,
             tasks.status,
             tasks.project_type,
             tasks.recorded_timestamp,
@@ -279,6 +281,8 @@ $taskQuery = $user_role === 'Admin'
                 tasks.task_description,
                 tasks.planned_start_date,
                 tasks.planned_finish_date,
+                tasks.actual_start_date,
+                tasks.actual_finish_date,
                 tasks.status,
                 tasks.project_type,
                 tasks.recorded_timestamp,
@@ -318,6 +322,8 @@ $taskQuery = $user_role === 'Admin'
                 tasks.task_description,
                 tasks.planned_start_date,
                 tasks.planned_finish_date,
+                tasks.actual_start_date,
+                tasks.actual_finish_date,
                 tasks.status,
                 tasks.project_type,
                 tasks.recorded_timestamp,
@@ -988,6 +994,7 @@ function getWeekdays($start, $end)
 
                         <!-- Pending & Started Tasks Table -->
                         <h3>Tasks In Progress</h3>
+                        <!-- Filtering ny status for this table only -->
                         <div class="status-filter-container">
                             <label for="status-filter">Filter by Status:</label>
                             <select id="status-filter" multiple="multiple">
@@ -1009,6 +1016,8 @@ function getWeekdays($start, $end)
                                     <th>Task Description</th>
                                     <th>Planned Start Date</th>
                                     <th>Planned End Date</th>
+                                    <th>Actual Start Date</th>
+                                    <th>Actual End Date</th>
                                     <th>Status</th>
                                     <th>Project Type</th>
                                     <th>Assigned By</th>
@@ -1062,6 +1071,12 @@ function getWeekdays($start, $end)
                                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
                                         </td>
                                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
+                                        </td>
+                                        <td>
+                                            <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'null' ?>
+                                        </td>
+                                        <td>
+                                            <?= $row['actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'null' ?>
                                         </td>
                                         <td>
                                             <form method="POST" action="update-status.php">
