@@ -70,6 +70,8 @@ try {
             // Allow the status change
         } elseif (in_array($current_status, ['Completed on Time', 'Delayed Completion']) && $new_status === 'Closed') {
             // Allow changing to "Closed" in the bottom table
+        } elseif ($new_status === 'Reassigned') {
+            // Allow changing to "Reassigned" when the task is reassigned
         } else {
             die(json_encode(['success' => false, 'message' => 'Invalid status change.']));
         }
