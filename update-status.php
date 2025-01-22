@@ -85,23 +85,45 @@ try {
     }
 
     // Prepare the SQL query to update the task
-    $sql = "UPDATE tasks 
-            SET status = ?, 
-                completion_description = ?, 
-                delayed_reason = ?, 
-                actual_completion_date = ? 
-            WHERE task_id = ?";
-
-    $stmt = $pdo->prepare($sql);
-
-    // Bind parameters
-    $stmt->execute([
-        $new_status,
-        $completion_description,
-        $delayed_reason,
-        $actual_completion_date,
-        $task_id
-    ]);
+    if ($new_status === 'Completed on Time') {
+        // Only update status and completion_description for "Completed on Time"
+        $sql = "UPDATE tasks 
+                SET status = ?, 
+                    completion_description = ? 
+                WHERE task_id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            $new_status,
+            $completion_description,
+            $task_id
+        ]);
+    } elseif ($new_status === 'Delayed Completion') {
+        // Update status, completion_description, delayed_reason, and actual_completion_date for "Delayed Completion"
+        $sql = "UPDATE tasks 
+                SET status = ?, 
+                    completion_description = ?, 
+                    delayed_reason = ?, 
+                    actual_completion_date = ? 
+                WHERE task_id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            $new_status,
+            $completion_description,
+            $delayed_reason,
+            $actual_completion_date,
+            $task_id
+        ]);
+    } else {
+        // For other statuses, only update the status
+        $sql = "UPDATE tasks 
+                SET status = ? 
+                WHERE task_id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            $new_status,
+            $task_id
+        ]);
+    }
 
     echo json_encode(['success' => true, 'message' => 'Status updated successfully.', 'task_name' => $task_name]);
 } catch (PDOException $e) {
