@@ -83,6 +83,8 @@ if ($userResult->num_rows > 0) {
     $loggedInDepartment = $userDetails['departments'];
     $loggedInRole = $userDetails['role'];
 
+    echo "Logged In Departments: " . $loggedInDepartment . "<br>";
+
     // Check if the user has more than one department
     $departmentsArray = explode(', ', $loggedInDepartment);
     $hasMultipleDepartments = count($departmentsArray) > 1;
@@ -876,7 +878,6 @@ function getWeekdays($start, $end)
 
                 <div class="task-container">
                     <h2>Tasks</h2>
-                    <?php echo ($hasMultipleDepartments) ?>
                     <div class="container mt-4">
                         <!-- Filter Buttons -->
                         <!-- Filter Container -->
