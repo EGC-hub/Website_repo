@@ -1455,7 +1455,7 @@ function getWeekdays($start, $end)
                                 <!-- Hidden input for Task ID -->
                                 <input type="hidden" id="reassign-task-id" name="task_id">
                                 <!-- Hidden input for Status (will be set to "Assigned") -->
-                                <input type="hidden" id="reassign-status" name="status" value="Assigned">
+                                <input type="hidden" id="reassign-status" name="status" value="Reassigned">
 
                                 <!-- Dropdown for selecting the user to reassign to -->
                                 <div class="mb-3">
@@ -1594,6 +1594,9 @@ function getWeekdays($start, $end)
 
                     const form = event.target;
                     const formData = new FormData(form);
+
+                    // Explicitly set the status to "Reassigned"
+                    formData.set('status', 'Reassigned');
 
                     fetch('reassign-task.php', {
                         method: 'POST',
