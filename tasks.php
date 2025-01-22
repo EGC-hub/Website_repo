@@ -231,16 +231,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     }
 }
 
-// Fetch all tasks based on user role
 $taskQuery = $user_role === 'Admin'
     ? "
         SELECT 
-            tasks.*, 
+            tasks.task_id,
+            tasks.project_name,
+            tasks.task_name,
+            tasks.task_description,
+            tasks.planned_start_date,
+            tasks.planned_finish_date,
+            tasks.status,
+            tasks.project_type,
+            tasks.recorded_timestamp,
+            tasks.assigned_by_id,
+            tasks.user_id,
+            task_transaction.delayed_reason,
+            task_transaction.actual_finish_date,
+            tasks.completion_description,
             assigned_to_user.username AS assigned_to, 
             GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
             assigned_by_user.username AS assigned_by,
             GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
         FROM tasks 
+        LEFT JOIN task_transaction ON tasks.task_id = task_transaction.task_id
         JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
         JOIN user_departments AS assigned_to_ud ON assigned_to_user.id = assigned_to_ud.user_id
         JOIN departments AS assigned_to_department ON assigned_to_ud.department_id = assigned_to_department.id
@@ -251,20 +264,34 @@ $taskQuery = $user_role === 'Admin'
         ORDER BY 
             CASE 
                 WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
-                WHEN tasks.status = 'Delayed Completion' THEN tasks.delayed_completion_date 
+                WHEN tasks.status = 'Delayed Completion' THEN task_transaction.actual_finish_date 
                 WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
             END DESC, 
-            recorded_timestamp DESC
+            tasks.recorded_timestamp DESC
     "
     : ($user_role === 'Manager'
         ? "
             SELECT 
-                tasks.*, 
+                tasks.task_id,
+                tasks.project_name,
+                tasks.task_name,
+                tasks.task_description,
+                tasks.planned_start_date,
+                tasks.planned_finish_date,
+                tasks.status,
+                tasks.project_type,
+                tasks.recorded_timestamp,
+                tasks.assigned_by_id,
+                tasks.user_id,
+                task_transaction.delayed_reason,
+                task_transaction.actual_finish_date,
+                tasks.completion_description,
                 assigned_to_user.username AS assigned_to, 
                 GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
                 assigned_by_user.username AS assigned_by,
                 GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
             FROM tasks 
+            LEFT JOIN task_transaction ON tasks.task_id = task_transaction.task_id
             JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
             JOIN user_departments AS assigned_to_ud ON assigned_to_user.id = assigned_to_ud.user_id
             JOIN departments AS assigned_to_department ON assigned_to_ud.department_id = assigned_to_department.id
@@ -276,17 +303,31 @@ $taskQuery = $user_role === 'Admin'
             ORDER BY 
                 CASE 
                     WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
-                    WHEN tasks.status = 'Delayed Completion' THEN tasks.delayed_completion_date
-                    WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date  
+                    WHEN tasks.status = 'Delayed Completion' THEN task_transaction.actual_finish_date 
+                    WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
                 END DESC, 
-                recorded_timestamp DESC
+                tasks.recorded_timestamp DESC
         "
         : "
             SELECT 
-                tasks.*, 
+                tasks.task_id,
+                tasks.project_name,
+                tasks.task_name,
+                tasks.task_description,
+                tasks.planned_start_date,
+                tasks.planned_finish_date,
+                tasks.status,
+                tasks.project_type,
+                tasks.recorded_timestamp,
+                tasks.assigned_by_id,
+                tasks.user_id,
+                task_transaction.delayed_reason,
+                task_transaction.actual_finish_date,
+                tasks.completion_description,
                 assigned_by_user.username AS assigned_by,
                 GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
             FROM tasks 
+            LEFT JOIN task_transaction ON tasks.task_id = task_transaction.task_id
             JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
             JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
             JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
@@ -295,10 +336,10 @@ $taskQuery = $user_role === 'Admin'
             ORDER BY 
                 CASE 
                     WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
-                    WHEN tasks.status = 'Delayed Completion' THEN tasks.delayed_completion_date 
+                    WHEN tasks.status = 'Delayed Completion' THEN task_transaction.actual_finish_date 
                     WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
                 END DESC, 
-                recorded_timestamp DESC
+                tasks.recorded_timestamp DESC
         ");
 
 // Fetch all tasks based on user role
@@ -1155,7 +1196,7 @@ function getWeekdays($start, $end)
                                             <?php elseif ($row['status'] === 'Delayed Completion'): ?>
                                                 <!-- Link to Delayed Completion Modal -->
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['delayed_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
+                                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_finish_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
                                                     <?php echo htmlspecialchars($row['task_name']); ?>
                                                 </a>
                                             <?php else: ?>
