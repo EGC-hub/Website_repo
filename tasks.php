@@ -1534,6 +1534,7 @@ function getWeekdays($start, $end)
                     }
                 }
 
+                // Handle Reassignment Form Submission
                 function handleReassignmentForm(event) {
                     event.preventDefault(); // Prevent the default form submission
 

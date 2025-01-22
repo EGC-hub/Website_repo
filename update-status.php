@@ -45,7 +45,7 @@ if ($task_id === null || $new_status === null) {
 
 // Fetch the current task status and assigned_by_id from the database
 try {
-    $stmt = $pdo->prepare("SELECT status, assigned_by_id FROM tasks WHERE task_id = ?");
+    $stmt = $pdo->prepare("SELECT status, assigned_by_id, task_name FROM tasks WHERE task_id = ?");
     $stmt->execute([$task_id]);
     $task = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -55,6 +55,7 @@ try {
 
     $current_status = $task['status'];
     $assigned_by_id = $task['assigned_by_id'];
+    $task_name = $task['task_name'];
 
     // Define valid statuses for the top table (Pending & Started Tasks)
     $top_table_statuses = ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned', 'Completed on Time', 'Delayed Completion'];
@@ -102,7 +103,7 @@ try {
         $task_id
     ]);
 
-    echo json_encode(['success' => true, 'message' => 'Status updated successfully.', 'task_name' => 'Task Name']); // Replace 'Task Name' with the actual task name
+    echo json_encode(['success' => true, 'message' => 'Status updated successfully.', 'task_name' => $task_name]);
 } catch (PDOException $e) {
     die(json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]));
 }
