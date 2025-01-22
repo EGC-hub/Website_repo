@@ -179,18 +179,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     $task_name = trim($_POST['task_name']);
     $task_description = trim($_POST['task_description']);
     $project_type = trim($_POST['project_type']);
-    $expected_start_date = trim($_POST['expected_start_date']);
-    $expected_finish_date = trim($_POST['expected_finish_date']);
+    $planned_start_date = trim($_POST['planned_start_date']);
+    $planned_finish_date = trim($_POST['planned_finish_date']);
     $status = 'assigned';
     $assigned_user_id = isset($_POST['assigned_user_id']) ? (int) $_POST['assigned_user_id'] : null;
     $recorded_timestamp = date("Y-m-d H:i:s");
     $assigned_by_id = $_SESSION['user_id'];
 
-    if (empty($project_name) || empty($task_name) || empty($task_description) || empty($project_type) || empty($expected_start_date) || empty($expected_finish_date) || !$assigned_user_id) {
+    if (empty($project_name) || empty($task_name) || empty($task_description) || empty($project_type) || empty($planned_start_date) || empty($planned_finish_date) || !$assigned_user_id) {
         echo '<script>alert("Please fill in all required fields.");</script>';
     } else {
         $stmt = $conn->prepare(
-            "INSERT INTO tasks (user_id, project_name, task_name, task_description, project_type, expected_start_date, expected_finish_date, status, recorded_timestamp, assigned_by_id) 
+            "INSERT INTO tasks (user_id, project_name, task_name, task_description, project_type, planned_start_date, planned_finish_date, status, recorded_timestamp, assigned_by_id) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->bind_param(
@@ -200,8 +200,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
             $task_name,
             $task_description,
             $project_type,
-            $expected_start_date,
-            $expected_finish_date,
+            $planned_start_date,
+            $planned_finish_date,
             $status,
             $recorded_timestamp,
             $assigned_by_id
@@ -222,7 +222,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
                 $username = $user['username'];
 
                 // Send email notification
-                sendTaskNotification($email, $username, $project_name, $task_name, $task_description, $project_type, $expected_start_date, $expected_finish_date);
+                sendTaskNotification($email, $username, $project_name, $task_name, $task_description, $project_type, $planned_start_date, $planned_finish_date);
             }
         } else {
             echo '<script>alert("Failed to add task.");</script>';
@@ -250,9 +250,9 @@ $taskQuery = $user_role === 'Admin'
         GROUP BY tasks.task_id
         ORDER BY 
             CASE 
-                WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
+                WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
                 WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date 
-                WHEN tasks.status = 'Closed' THEN tasks.expected_finish_date 
+                WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
             END DESC, 
             recorded_timestamp DESC
     "
@@ -275,9 +275,9 @@ $taskQuery = $user_role === 'Admin'
             GROUP BY tasks.task_id
             ORDER BY 
                 CASE 
-                    WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
+                    WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
                     WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date
-                    WHEN tasks.status = 'Closed' THEN tasks.expected_finish_date  
+                    WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date  
                 END DESC, 
                 recorded_timestamp DESC
         "
@@ -294,9 +294,9 @@ $taskQuery = $user_role === 'Admin'
             GROUP BY tasks.task_id
             ORDER BY 
                 CASE 
-                    WHEN tasks.status = 'Completed on Time' THEN tasks.expected_finish_date 
+                    WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
                     WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date 
-                    WHEN tasks.status = 'Closed' THEN tasks.expected_finish_date 
+                    WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
                 END DESC, 
                 recorded_timestamp DESC
         ");
@@ -798,13 +798,13 @@ function getWeekdays($start, $end)
                         </div>
 
                         <div class="form-group">
-                            <label for="expected_start_date">Expected Start Date & Time</label>
-                            <input type="datetime-local" id="expected_start_date" name="expected_start_date" required>
+                            <label for="planned_start_date">Expected Start Date & Time</label>
+                            <input type="datetime-local" id="planned_start_date" name="planned_start_date" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="expected_finish_date">Expected End Date & Time</label>
-                            <input type="datetime-local" id="expected_finish_date" name="expected_finish_date" required>
+                            <label for="planned_finish_date">Expected End Date & Time</label>
+                            <input type="datetime-local" id="planned_finish_date" name="planned_finish_date" required>
                         </div>
 
                         <div class="form-group">
@@ -1015,9 +1015,9 @@ function getWeekdays($start, $end)
                                                 </a>
                                             </div>
                                         </td>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?>
+                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
                                         </td>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?>
+                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
                                         </td>
                                         <td>
                                             <form method="POST" action="update-status.php">
@@ -1126,7 +1126,7 @@ function getWeekdays($start, $end)
                                     <?php
                                     $delayInfo = '';
                                     if ($row['status'] === 'Delayed Completion') {
-                                        $expectedFinishDate = strtotime($row['expected_finish_date']);
+                                        $expectedFinishDate = strtotime($row['planned_finish_date']);
                                         $actualCompletionDate = strtotime($row['actual_completion_date']);
 
                                         if ($actualCompletionDate && $expectedFinishDate) {
@@ -1176,13 +1176,13 @@ function getWeekdays($start, $end)
                                                 </a>
                                             </div>
                                         </td>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_start_date']))) ?>
+                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
                                         </td>
                                         <td>
-                                            <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['expected_finish_date']))) ?>
+                                            <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
                                             <?php if ($row['status'] === 'Delayed Completion'): ?>
                                                 <?php
-                                                $expectedFinishDate = strtotime($row['expected_finish_date']);
+                                                $expectedFinishDate = strtotime($row['planned_finish_date']);
                                                 $actualCompletionDate = strtotime($row['actual_completion_date']);
                                                 if ($actualCompletionDate && $expectedFinishDate) {
                                                     // Calculate the number of weekdays between the expected finish date and actual completion date
