@@ -965,8 +965,6 @@ function getWeekdays($start, $end)
                                     <th>Task Description</th>
                                     <th>Planned Start Date</th>
                                     <th>Planned End Date</th>
-                                    <th>Actual Start Date</th>
-                                    <th>Actual End Date</th>
                                     <th>Status</th>
                                     <th>Project Type</th>
                                     <th>Assigned By</th>
@@ -1021,8 +1019,6 @@ function getWeekdays($start, $end)
                                         </td>
                                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
                                         </td>
-                                        <td>0</td>
-                                        <td>0</td>
                                         <td>
                                             <form method="POST" action="update-status.php">
                                                 <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
@@ -1114,8 +1110,6 @@ function getWeekdays($start, $end)
                                     <th>Task Description</th>
                                     <th>Planned Start Date</th>
                                     <th>planned End Date</th>
-                                    <th>Actual Start Date</th>
-                                    <th>Actual End Date</th>
                                     <th>Status</th>
                                     <th>Project Type</th>
                                     <th>Assigned By</th>
@@ -1203,8 +1197,6 @@ function getWeekdays($start, $end)
                                                 ?>
                                             <?php endif; ?>
                                         </td>
-                                        <td>0</td>
-                                        <td>0</td>
                                         <td>
                                             <form method="POST" action="update-status.php">
                                                 <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
