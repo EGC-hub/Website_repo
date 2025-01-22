@@ -234,11 +234,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
 // Fetch all tasks based on user role
 $taskQuery = $user_role === 'Admin'
     ? "
-        SELECT tasks.*, 
-               assigned_to_user.username AS assigned_to, 
-               GROUP_CONCAT(assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
-               assigned_by_user.username AS assigned_by,
-               GROUP_CONCAT(assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
+        SELECT 
+            tasks.*, 
+            assigned_to_user.username AS assigned_to, 
+            GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
+            assigned_by_user.username AS assigned_by,
+            GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
         FROM tasks 
         JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
         JOIN user_departments AS assigned_to_ud ON assigned_to_user.id = assigned_to_ud.user_id
@@ -257,11 +258,12 @@ $taskQuery = $user_role === 'Admin'
     "
     : ($user_role === 'Manager'
         ? "
-            SELECT tasks.*, 
-                   assigned_to_user.username AS assigned_to, 
-                   GROUP_CONCAT(assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
-                   assigned_by_user.username AS assigned_by,
-                   GROUP_CONCAT(assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
+            SELECT 
+                tasks.*, 
+                assigned_to_user.username AS assigned_to, 
+                GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
+                assigned_by_user.username AS assigned_by,
+                GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
             FROM tasks 
             JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
             JOIN user_departments AS assigned_to_ud ON assigned_to_user.id = assigned_to_ud.user_id
@@ -280,9 +282,10 @@ $taskQuery = $user_role === 'Admin'
                 recorded_timestamp DESC
         "
         : "
-            SELECT tasks.*, 
-                   assigned_by_user.username AS assigned_by,
-                   GROUP_CONCAT(assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
+            SELECT 
+                tasks.*, 
+                assigned_by_user.username AS assigned_by,
+                GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
             FROM tasks 
             JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
             JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
