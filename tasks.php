@@ -1761,17 +1761,35 @@ function getWeekdays($start, $end)
                         rows.each(function () {
                             const projectName = $(this).find('td:nth-child(2)').text().trim();
                             const departmentName = $(this).find('td:nth-child(10)').text().trim().match(/\(([^)]+)\)/)?.[1] || '';
-                            const taskStartDate = new Date($(this).find('td:nth-child(5)').text().trim());
-                            const taskEndDate = new Date($(this).find('td:nth-child(6)').text().trim());
+                            const plannedStartDate = new Date($(this).find('td:nth-child(5)').text().trim());
+                            const plannedFinishDate = new Date($(this).find('td:nth-child(6)').text().trim());
+                            const actualStartDate = new Date($(this).find('td:nth-child(11)').text().trim()); // Adjust the column index if needed
+                            const actualFinishDate = new Date($(this).find('td:nth-child(12)').text().trim()); // Adjust the column index if needed
                             const taskStatus = $(this).find('td:nth-child(7) select').val() || $(this).find('td:nth-child(7)').text().trim();
 
                             // Check if the row matches the selected filters
                             const projectMatch = selectedProjects.length === 0 || selectedProjects.includes('All') || selectedProjects.includes(projectName);
                             const departmentMatch = selectedDepartments.length === 0 || selectedDepartments.includes('All') || departmentName.split(', ').some(dept => selectedDepartments.includes(dept));
-                            const dateMatch = (!startDate || taskStartDate >= new Date(startDate)) && (!endDate || taskEndDate <= new Date(endDate));
                             const statusMatch = tableId !== '#pending-tasks' || selectedStatuses.length === 0 || selectedStatuses.includes('All') || selectedStatuses.includes(taskStatus);
 
-                            if (projectMatch && departmentMatch && dateMatch && statusMatch) {
+                            // Date filtering logic
+                            let dateMatch = true; // Assume the row matches the date filter by default
+
+                            if (startDate || endDate) {
+                                // Use actual dates if available, otherwise fall back to planned dates
+                                const startDateToCompare = actualStartDate || plannedStartDate;
+                                const finishDateToCompare = actualFinishDate || plannedFinishDate;
+
+                                // Check if the task's dates fall within the selected date range
+                                if (startDate && startDateToCompare < new Date(startDate)) {
+                                    dateMatch = false;
+                                }
+                                if (endDate && finishDateToCompare > new Date(endDate)) {
+                                    dateMatch = false;
+                                }
+                            }
+
+                            if (projectMatch && departmentMatch && statusMatch && dateMatch) {
                                 visibleRows.push(this);
                             }
                         });
