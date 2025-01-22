@@ -1711,6 +1711,8 @@ function getWeekdays($start, $end)
             <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
             <script>
+                console.log("Rows:", rows);
+                console.log("Visible Rows:", visibleRows);
                 $(document).ready(function () {
                     const tasksPerPage = 10; // Number of tasks per table per page
                     let currentPage = 1; // Current page for both tables
@@ -1821,9 +1823,6 @@ function getWeekdays($start, $end)
 
                         // Return the number of visible rows for pagination
                         return visibleRows.length;
-
-                        console.log("Rows:", rows);
-                        console.log("Visible Rows:", visibleRows);
                     }
 
                     function resetTaskNumbering(tableId) {
