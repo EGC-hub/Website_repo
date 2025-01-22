@@ -251,7 +251,7 @@ $taskQuery = $user_role === 'Admin'
         ORDER BY 
             CASE 
                 WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
-                WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date 
+                WHEN tasks.status = 'Delayed Completion' THEN tasks.delayed_completion_date 
                 WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
             END DESC, 
             recorded_timestamp DESC
@@ -276,7 +276,7 @@ $taskQuery = $user_role === 'Admin'
             ORDER BY 
                 CASE 
                     WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
-                    WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date
+                    WHEN tasks.status = 'Delayed Completion' THEN tasks.delayed_completion_date
                     WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date  
                 END DESC, 
                 recorded_timestamp DESC
@@ -295,7 +295,7 @@ $taskQuery = $user_role === 'Admin'
             ORDER BY 
                 CASE 
                     WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
-                    WHEN tasks.status = 'Delayed Completion' THEN tasks.actual_completion_date 
+                    WHEN tasks.status = 'Delayed Completion' THEN tasks.delayed_completion_date 
                     WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
                 END DESC, 
                 recorded_timestamp DESC
@@ -994,7 +994,7 @@ function getWeekdays($start, $end)
                                             <?php elseif ($row['status'] === 'Delayed Completion'): ?>
                                                 <!-- Link to Delayed Completion Modal -->
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
+                                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['delayed_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
                                                     <?php echo htmlspecialchars($row['task_name']); ?>
                                                 </a>
                                             <?php else: ?>
@@ -1127,7 +1127,7 @@ function getWeekdays($start, $end)
                                     $delayInfo = '';
                                     if ($row['status'] === 'Delayed Completion') {
                                         $expectedFinishDate = strtotime($row['planned_finish_date']);
-                                        $actualCompletionDate = strtotime($row['actual_completion_date']);
+                                        $actualCompletionDate = strtotime($row['delayed_completion_date']);
 
                                         if ($actualCompletionDate && $expectedFinishDate) {
                                             // Calculate the number of weekdays between the expected finish date and actual completion date
@@ -1155,7 +1155,7 @@ function getWeekdays($start, $end)
                                             <?php elseif ($row['status'] === 'Delayed Completion'): ?>
                                                 <!-- Link to Delayed Completion Modal -->
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
+                                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['delayed_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
                                                     <?php echo htmlspecialchars($row['task_name']); ?>
                                                 </a>
                                             <?php else: ?>
@@ -1183,7 +1183,7 @@ function getWeekdays($start, $end)
                                             <?php if ($row['status'] === 'Delayed Completion'): ?>
                                                 <?php
                                                 $expectedFinishDate = strtotime($row['planned_finish_date']);
-                                                $actualCompletionDate = strtotime($row['actual_completion_date']);
+                                                $actualCompletionDate = strtotime($row['delayed_completion_date']);
                                                 if ($actualCompletionDate && $expectedFinishDate) {
                                                     // Calculate the number of weekdays between the expected finish date and actual completion date
                                                     $weekdays = getWeekdays($expectedFinishDate, $actualCompletionDate);
@@ -1303,7 +1303,7 @@ function getWeekdays($start, $end)
                                     <label for="actual-completion-date" class="form-label">Actual Completion
                                         Date</label>
                                     <input type="datetime-local" class="form-control" id="actual-completion-date"
-                                        name="actual_completion_date">
+                                        name="delayed_completion_date">
                                 </div>
                             </div>
                             <div class="modal-footer">
