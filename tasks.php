@@ -763,25 +763,16 @@ function getWeekdays($start, $end)
         .diagonal-split {
             position: relative;
             border: 1px solid #000;
-            min-width: 200px;
-            /* Ensure the column has enough width */
-            min-height: 80px;
-            /* Ensure the column has enough height */
         }
 
         .diagonal-split::before {
             content: '';
             position: absolute;
-            top: -1px;
-            /* Adjust to align with the top border */
-            left: -1px;
-            /* Adjust to align with the left border */
-            width: calc(100% + 2px);
-            /* Adjust width to cover the entire cell */
-            height: calc(100% + 2px);
-            /* Adjust height to cover the entire cell */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             border-bottom: 1px solid #000;
-            /* Diagonal line */
             transform: rotate(-45deg);
             transform-origin: bottom left;
         }
@@ -789,27 +780,18 @@ function getWeekdays($start, $end)
         .diagonal-split .top-left {
             position: absolute;
             top: 5px;
-            /* Adjust top spacing */
             left: 5px;
-            /* Adjust left spacing */
-            font-size: 12px;
-            /* Adjust font size */
-            width: 45%;
-            /* Limit width to avoid overlapping */
         }
 
         .diagonal-split .bottom-right {
             position: absolute;
             bottom: 5px;
-            /* Adjust bottom spacing */
             right: 5px;
-            /* Adjust right spacing */
-            font-size: 12px;
-            /* Adjust font size */
-            width: 45%;
-            /* Limit width to avoid overlapping */
-            text-align: right;
-            /* Align text to the right */
+        }
+
+        th.diagonal-split,
+        td.diagonal-split {
+            width: 200px;
         }
     </style>
 </head>
