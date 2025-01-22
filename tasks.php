@@ -839,7 +839,6 @@ function getWeekdays($start, $end)
 
 
     <body>
-        <?php echo ($hasMultipleDepartments) ?>
         <!-- Sidebar and Navbar -->
         <div class="dashboard-container">
             <!-- Sidebar -->
@@ -877,6 +876,7 @@ function getWeekdays($start, $end)
 
                 <div class="task-container">
                     <h2>Tasks</h2>
+                    <?php echo ($hasMultipleDepartments) ?>
                     <div class="container mt-4">
                         <!-- Filter Buttons -->
                         <!-- Filter Container -->
