@@ -788,6 +788,11 @@ function getWeekdays($start, $end)
             bottom: 5px;
             right: 5px;
         }
+
+        th.diagonal-split,
+        td.diagonal-split {
+            width: 200px;
+        }
     </style>
 </head>
 
