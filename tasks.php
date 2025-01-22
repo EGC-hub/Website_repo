@@ -963,8 +963,14 @@ function getWeekdays($start, $end)
                                     <th>Project Name</th>
                                     <th>Task Name</th>
                                     <th>Task Description</th>
-                                    <th>Planned Start Date</th>
-                                    <th>Planned End Date</th>
+                                    <th class="diagonal-split">
+                                        <div class="top-left">Planned Start Date</div>
+                                        <div class="bottom-right">Actual Start Date</div>
+                                    </th>
+                                    <th class="diagonal-split">
+                                        <div class="top-left">Planned Start Date</div>
+                                        <div class="bottom-right">Actual Start Date</div>
+                                    </th>
                                     <th>Status</th>
                                     <th>Project Type</th>
                                     <th>Assigned By</th>
@@ -1015,9 +1021,21 @@ function getWeekdays($start, $end)
                                                 </a>
                                             </div>
                                         </td>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
+                                        <td class="diagonal-split">
+                                            <div class="top-left">
+                                                <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
+                                            </div>
+                                            <div class="bottom-right">
+                                                0
+                                            </div>
                                         </td>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
+                                        <td class="diagonal-split">
+                                            <div class="top-left">
+                                                <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
+                                            </div>
+                                            <div class="bottom-right">
+                                                0
+                                            </div>
                                         </td>
                                         <td>
                                             <form method="POST" action="update-status.php">
@@ -1108,8 +1126,14 @@ function getWeekdays($start, $end)
                                     <th>Project Name</th>
                                     <th>Task Name</th>
                                     <th>Task Description</th>
-                                    <th>Planned Start Date</th>
-                                    <th>planned End Date</th>
+                                    <th class="diagonal-split">
+                                        <div class="top-left">Planned Start Date</div>
+                                        <div class="bottom-right">Actual Start Date</div>
+                                    </th>
+                                    <th class="diagonal-split">
+                                        <div class="top-left">Planned Start Date</div>
+                                        <div class="bottom-right">Actual Start Date</div>
+                                    </th>
                                     <th>Status</th>
                                     <th>Project Type</th>
                                     <th>Assigned By</th>
@@ -1176,26 +1200,37 @@ function getWeekdays($start, $end)
                                                 </a>
                                             </div>
                                         </td>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
+                                        <td class="diagonal-split">
+                                            <div class="top-left">
+                                                <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
+                                            </div>
+                                            <div class="bottom-right">
+                                                0
+                                            </div>
                                         </td>
-                                        <td>
-                                            <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
-                                            <?php if ($row['status'] === 'Delayed Completion'): ?>
-                                                <?php
-                                                $expectedFinishDate = strtotime($row['planned_finish_date']);
-                                                $actualCompletionDate = strtotime($row['delayed_completion_date']);
-                                                if ($actualCompletionDate && $expectedFinishDate) {
-                                                    // Calculate the number of weekdays between the expected finish date and actual completion date
-                                                    $weekdays = getWeekdays($expectedFinishDate, $actualCompletionDate);
+                                        <td class="diagonal-split">
+                                            <div class="top-left">
+                                                <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
+                                                <?php if ($row['status'] === 'Delayed Completion'): ?>
+                                                    <?php
+                                                    $expectedFinishDate = strtotime($row['planned_finish_date']);
+                                                    $actualCompletionDate = strtotime($row['delayed_completion_date']);
+                                                    if ($actualCompletionDate && $expectedFinishDate) {
+                                                        // Calculate the number of weekdays between the expected finish date and actual completion date
+                                                        $weekdays = getWeekdays($expectedFinishDate, $actualCompletionDate);
 
-                                                    // Convert the delay into days and hours, excluding weekends
-                                                    $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
-                                                    $delayHours = floor(($actualCompletionDate - $expectedFinishDate) % (60 * 60 * 24) / (60 * 60)); // Remaining hours
-                                                    echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
-                                                    echo "<br><small class='text-muted'>Completed on: " . date("d M Y, h:i A", $actualCompletionDate) . "</small>";
-                                                }
-                                                ?>
-                                            <?php endif; ?>
+                                                        // Convert the delay into days and hours, excluding weekends
+                                                        $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
+                                                        $delayHours = floor(($actualCompletionDate - $expectedFinishDate) % (60 * 60 * 24) / (60 * 60)); // Remaining hours
+                                                        echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
+                                                        echo "<br><small class='text-muted'>Completed on: " . date("d M Y, h:i A", $actualCompletionDate) . "</small>";
+                                                    }
+                                                    ?>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="bottom-right">
+                                                0
+                                            </div>
                                         </td>
                                         <td>
                                             <form method="POST" action="update-status.php">
