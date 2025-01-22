@@ -907,20 +907,21 @@ function getWeekdays($start, $end)
                                     </select>
                                 </div>
 
-                                <?php if ($user_role === 'Admin' || $hasMultipleDepartments) ?>
-                                <!-- Multi-select dropdown for filtering by department -->
-                                <div class="filter-dropdown">
-                                    <label for="department-filter">Filter by Department of Assigned User:</label>
-                                    <select id="department-filter" multiple="multiple">
-                                        <option value="All">All</option>
-                                        <?php foreach ($departments as $department): ?>
-                                            <option value="<?= htmlspecialchars($department['name']) ?>"
-                                                <?= (isset($_GET['department']) && in_array($department['name'], explode(',', $_GET['department']))) ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars($department['name']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
+                                <?php if ($user_role === 'Admin' || $hasMultipleDepartments): ?>
+                                    <!-- Multi-select dropdown for filtering by department -->
+                                    <div class="filter-dropdown">
+                                        <label for="department-filter">Filter by Department of Assigned User:</label>
+                                        <select id="department-filter" multiple="multiple">
+                                            <option value="All">All</option>
+                                            <?php foreach ($departments as $department): ?>
+                                                <option value="<?= htmlspecialchars($department['name']) ?>"
+                                                    <?= (isset($_GET['department']) && in_array($department['name'], explode(',', $_GET['department']))) ? 'selected' : '' ?>>
+                                                    <?= htmlspecialchars($department['name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                <?php endif ?>
 
                                 <!-- Date Range Inputs -->
                                 <div class="filter-date">
