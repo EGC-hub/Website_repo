@@ -1760,7 +1760,7 @@ function getWeekdays($start, $end)
 
                         rows.each(function () {
                             const projectName = $(this).find('td:nth-child(2)').text().trim();
-                            const departmentName = $(this).find('td:nth-child(11)').text().trim().match(/\(([^)]+)\)/)?.[1] || '';
+                            const departmentName = $(this).find('td:nth-child(12)').text().trim().match(/\(([^)]+)\)/)?.[1] || '';
                             const plannedStartDate = new Date($(this).find('td:nth-child(5)').text().trim());
                             const plannedFinishDate = new Date($(this).find('td:nth-child(6)').text().trim());
                             const actualStartDate = new Date($(this).find('td:nth-child(7)').text().trim()); // Adjust the column index if needed
