@@ -70,7 +70,7 @@ try {
     }
 
     // Update the task's assigned user and set the status to "Assigned"
-    $stmt = $pdo->prepare("UPDATE tasks SET user_id = ?, status = 'Assigned' WHERE task_id = ?");
+    $stmt = $pdo->prepare("UPDATE tasks SET user_id = ?, status = 'Reassigned' WHERE task_id = ?");
     $stmt->execute([$reassign_user_id, $task_id]);
 
     // Fetch the task name for the response (optional)
