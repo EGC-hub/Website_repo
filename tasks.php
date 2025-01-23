@@ -364,27 +364,19 @@ foreach ($allTasks as &$task) {
     // Calculate planned duration (excluding weekends)
     $plannedStartDate = strtotime($task['planned_start_date']);
     $plannedEndDate = strtotime($task['planned_finish_date']);
-
-    // Debug: Display planned start and end dates
-    echo "<pre>";
-    echo "Task ID: " . $task['task_id'] . "\n";
-    echo "Planned Start Date: " . $task['planned_start_date'] . " (Timestamp: $plannedStartDate)\n";
-    echo "Planned End Date: " . $task['planned_finish_date'] . " (Timestamp: $plannedEndDate)\n";
-
     $plannedDurationHours = getWeekdayHours($plannedStartDate, $plannedEndDate);
-    echo "Planned Duration Hours: $plannedDurationHours\n";
+
+    // Store planned duration in the task array
+    $task['planned_duration_hours'] = $plannedDurationHours;
 
     // Calculate actual duration (from actual start date to current date)
     if (!empty($task['actual_start_date'])) {
         $actualStartDate = strtotime($task['actual_start_date']);
         $currentDate = time(); // Current date and time
-
-        // Debug: Display actual start date and current date
-        echo "Actual Start Date: " . $task['actual_start_date'] . " (Timestamp: $actualStartDate)\n";
-        echo "Current Date: " . date("Y-m-d H:i:s", $currentDate) . " (Timestamp: $currentDate)\n";
-
         $actualDurationHours = getWeekdayHours($actualStartDate, $currentDate);
-        echo "Actual Duration Hours: $actualDurationHours\n";
+
+        // Store actual duration in the task array
+        $task['actual_duration_hours'] = $actualDurationHours;
 
         // Determine available statuses based on the comparison
         if ($actualDurationHours > $plannedDurationHours) {
@@ -395,11 +387,8 @@ foreach ($allTasks as &$task) {
     } else {
         // If actual start date is not set, no status change is allowed
         $task['available_statuses'] = [];
-        echo "Actual Start Date: Not set\n";
+        $task['actual_duration_hours'] = null; // Set actual duration to null
     }
-
-    echo "-----------------------------\n";
-    echo "</pre>";
 }
 
 // Split tasks into Pending/Started and Completed
