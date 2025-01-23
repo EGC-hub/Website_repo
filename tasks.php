@@ -400,6 +400,7 @@ $completedTasks = array_filter($allTasks, function ($task) {
     return in_array($task['status'], ['Completed on Time', 'Delayed Completion', 'Closed']);
 });
 
+$currentTimestamp = time();
 echo "Current Timestamp: $currentTimestamp\n";
 ?>
 
