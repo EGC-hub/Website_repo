@@ -401,7 +401,14 @@ $completedTasks = array_filter($allTasks, function ($task) {
 });
 
 
-$actualStartDate = strtotime(datetime: $task['actual_start_date']);
+$task99 = $conn->prepare("
+SELECT * FROM tasks WHERE task_id = 99;
+");
+$task99->execute();
+$task99Result = $task99->get_result();
+$task991 = $task99Result->fetch_assoc();
+
+$actualStartDate = strtotime(datetime: $task991['actual_start_date']);
 $currentTimestamp = time();
 echo "Current Timestamp: $currentTimestamp\n";
 echo "Actual start date: $actualStartDate";
