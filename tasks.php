@@ -364,24 +364,28 @@ foreach ($allTasks as &$task) {
     // Calculate planned duration (excluding weekends)
     $plannedStartDate = strtotime($task['planned_start_date']);
     $plannedEndDate = strtotime($task['planned_finish_date']);
+    error_log("Planned Start Date: " . date("Y-m-d H:i:s", $plannedStartDate));
+    error_log("Planned End Date: " . date("Y-m-d H:i:s", $plannedEndDate));
+
     $plannedDurationHours = getWeekdayHours($plannedStartDate, $plannedEndDate);
+    error_log("Planned Duration Hours: " . $plannedDurationHours);
 
     // Calculate actual duration (from actual start date to current date)
     if (!empty($task['actual_start_date'])) {
         $actualStartDate = strtotime($task['actual_start_date']);
         $currentDate = time(); // Current date and time
-        $actualDurationHours = getWeekdayHours($actualStartDate, $currentDate);
+        error_log("Actual Start Date: " . date("Y-m-d H:i:s", $actualStartDate));
+        error_log("Current Date: " . date("Y-m-d H:i:s", $currentDate));
 
-        // Determine available statuses based on the comparison
-        if ($actualDurationHours > $plannedDurationHours) {
-            $task['available_statuses'] = ['Delayed Completion'];
-        } else {
-            $task['available_statuses'] = ['Completed on Time'];
-        }
+        $actualDurationHours = getWeekdayHours($actualStartDate, $currentDate);
+        error_log("Actual Duration Hours: " . $actualDurationHours);
     } else {
-        // If actual start date is not set, no status change is allowed
-        $task['available_statuses'] = [];
+        $actualDurationHours = null; // No actual duration if start date is not set
     }
+
+    // Add the calculated values to the task array for display
+    $task['planned_duration_hours'] = $plannedDurationHours;
+    $task['actual_duration_hours'] = $actualDurationHours;
 }
 
 // Split tasks into Pending/Started and Completed
@@ -928,7 +932,7 @@ function getWeekdayHours($start, $end)
 
 
     <body>
-        
+
         <!-- Sidebar and Navbar -->
         <div class="dashboard-container">
             <!-- Sidebar -->
@@ -1107,14 +1111,16 @@ function getWeekdayHours($start, $end)
                                         </td>
                                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
                                         </td>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?> <br>
-                                        <?= $plannedDurationHours ?>
+                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
+                                            <br>
+                                            <?= $plannedDurationHours ?>
                                         </td>
                                         <td>
                                             <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
-                                            <?= $row['actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?> <br>
+                                            <?= $row['actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?>
+                                            <br>
                                             <?= $actualDurationHours ?>
                                         </td>
                                         <td>
