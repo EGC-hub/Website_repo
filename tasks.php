@@ -1102,7 +1102,7 @@ function getWeekdays($start, $end)
                                                     // Regular user can only change status if they are the assigned user
                                                     if ($currentStatus === 'Assigned') {
                                                         // If the task is "Assigned", the next viable options are "Completed on Time" or "Delayed Completion"
-                                                        $statuses = ['Completed on Time', 'Delayed Completion', 'In Progress'];
+                                                        $statuses = ['In Progress', 'Completed on Time', 'Delayed Completion'];
                                                     } elseif ($currentStatus === 'In Progress') {
                                                         // If the task is "In Progress", the next viable options are "Completed on Time" or "Delayed Completion"
                                                         $statuses = ['Completed on Time', 'Delayed Completion'];
