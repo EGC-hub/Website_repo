@@ -1088,37 +1088,34 @@ function getWeekdays($start, $end)
                                                 // Fetch the assigned_by_id for the task
                                                 $assigned_by_id = $row['assigned_by_id'];
 
+                                                // Fetch the user_id of the assigned user
+                                                $assigned_user_id = $row['user_id'];
+
                                                 // Define the available statuses based on the user role and current status
                                                 $statuses = [];
                                                 if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
-                                                    // Admin or the user who assigned the task can change status to anything in the first table
+                                                    // Admin or the user who assigned the task can change status to anything except "In Progress", "Completed on Time", and "Delayed Completion"
                                                     if (in_array($currentStatus, ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'])) {
-                                                        $statuses = ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned', 'Completed on Time', 'Delayed Completion'];
-                                                    } elseif (in_array($currentStatus, ['Completed on Time', 'Delayed Completion'])) {
-                                                        // In the second table, only allow changing to "Closed"
-                                                        $statuses = ['Closed'];
+                                                        $statuses = ['Assigned', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'];
                                                     }
-                                                } elseif ($user_role === 'User') {
-                                                    // Regular user can only change status from "Assigned" to "Completed on Time" or "Delayed Completion"
+                                                } elseif ($user_role === 'User' && $user_id == $assigned_user_id) {
+                                                    // Regular user can only change status if they are the assigned user
                                                     if ($currentStatus === 'Assigned') {
-                                                        $statuses = ['Assigned', 'Completed on Time', 'Delayed Completion'];
+                                                        $statuses = ['Assigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
                                                     }
                                                 }
 
-                                                // Generate the status dropdown
+                                                // Generate the status dropdown or display the status as text
                                                 if (!empty($statuses)) {
-                                                    echo '<select id="status" name="status" onchange="handleStatusChange(event, ' . $row['task_id'] . ')"';
-                                                    if (in_array($currentStatus, ['Completed on Time', 'Delayed Completion', 'Closed'])) {
-                                                        echo ' disabled';
-                                                    }
-                                                    echo '>';
+                                                    echo '<select id="status" name="status" onchange="handleStatusChange(event, ' . $row['task_id'] . ')">';
                                                     foreach ($statuses as $statusValue) {
                                                         $selected = ($currentStatus === $statusValue) ? 'selected' : '';
                                                         echo "<option value='$statusValue' $selected>$statusValue</option>";
                                                     }
                                                     echo '</select>';
                                                 } else {
-                                                    echo $currentStatus; // Display the status as text if no changes are allowed
+                                                    // Display the status as plain text if the user is not allowed to change it
+                                                    echo $currentStatus;
                                                 }
                                                 ?>
                                             </form>
@@ -1277,31 +1274,23 @@ function getWeekdays($start, $end)
                                                 // Define the available statuses based on the user role and current status
                                                 $statuses = [];
                                                 if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
-                                                    // Admin or the user who assigned the task can change status to "Closed" if the task is "Completed on Time" or "Delayed Completion"
+                                                    // Admin or the user who assigned the task can change status to "Closed"
                                                     if (in_array($currentStatus, ['Completed on Time', 'Delayed Completion'])) {
-                                                        $statuses = [$currentStatus, 'Closed']; // Show the current status and "Closed"
-                                                    } elseif ($currentStatus === 'Closed') {
-                                                        $statuses = ['Closed']; // Only show "Closed" if the status is already "Closed"
+                                                        $statuses = ['Closed'];
                                                     }
-                                                } elseif ($user_role === 'User') {
-                                                    // Regular user cannot change status in the second table
-                                                    $statuses = [];
                                                 }
 
-                                                // Generate the status dropdown
+                                                // Generate the status dropdown or display the status as text
                                                 if (!empty($statuses)) {
-                                                    echo '<select id="status" name="status" onchange="handleStatusChange(event, ' . $row['task_id'] . ')"';
-                                                    if ($currentStatus === 'Closed') {
-                                                        echo ' disabled'; // Lock the dropdown if the status is "Closed"
-                                                    }
-                                                    echo '>';
+                                                    echo '<select id="status" name="status" onchange="handleStatusChange(event, ' . $row['task_id'] . ')">';
                                                     foreach ($statuses as $statusValue) {
                                                         $selected = ($currentStatus === $statusValue) ? 'selected' : '';
                                                         echo "<option value='$statusValue' $selected>$statusValue</option>";
                                                     }
                                                     echo '</select>';
                                                 } else {
-                                                    echo $currentStatus; // Display the status as text if no changes are allowed
+                                                    // Display the status as plain text if the user is not allowed to change it
+                                                    echo $currentStatus;
                                                 }
                                                 ?>
                                             </form>
