@@ -400,8 +400,11 @@ $completedTasks = array_filter($allTasks, function ($task) {
     return in_array($task['status'], ['Completed on Time', 'Delayed Completion', 'Closed']);
 });
 
+
+$actualStartDate = strtotime(datetime: $task['actual_start_date']);
 $currentTimestamp = time();
 echo "Current Timestamp: $currentTimestamp\n";
+echo "Actual start date: $actualStartDate";
 ?>
 
 <!-- Delay logic -->
