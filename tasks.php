@@ -360,6 +360,38 @@ $stmt->execute();
 $result = $stmt->get_result();
 $allTasks = $result->fetch_all(MYSQLI_ASSOC);
 
+foreach ($allTasks as &$task) {
+    $plannedStartDate = strtotime($task['planned_start_date']);
+    $plannedEndDate = strtotime($task['planned_finish_date']);
+
+    // Calculate the number of weekdays (excluding weekends)
+    $weekdays = getWeekdays($plannedStartDate, $plannedEndDate);
+
+    // Calculate the total hours 
+    $task['planned_duration_days'] = $weekdays;
+    $task['planned_duration_hours'] = $weekdays * 8;
+}
+
+// Calculate the actual duration and determine available statuses
+$currentDate = time();
+foreach ($allTasks as &$task) {
+    if (!empty($task['actual_start_date'])) {
+        $actualStartDate = strtotime($task['actual_start_date']);
+        $actualWeekdays = getWeekdays($actualStartDate, $currentDate);
+        $actualDurationHours = $actualWeekdays * 8; // 8 hours per day
+
+        // Determine available statuses based on the comparison
+        if ($actualDurationHours > $task['planned_duration_hours']) {
+            $task['available_statuses'] = ['Delayed Completion'];
+        } else {
+            $task['available_statuses'] = ['Completed on Time'];
+        }
+    } else {
+        // If actual start date is not set, no status change is allowed
+        $task['available_statuses'] = [];
+    }
+}
+
 // Split tasks into Pending/Started and Completed
 $pendingStartedTasks = array_filter($allTasks, function ($task) {
     return in_array($task['status'], ['Assigned', 'In Progress', 'Hold', 'Reinstated', 'Reassigned', 'Cancelled']);
@@ -1093,16 +1125,41 @@ function getWeekdays($start, $end)
 
                                                 // Define the available statuses based on the user role and current status
                                                 $statuses = [];
+
+                                                // Logic for Admin or the user who assigned the task
                                                 if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
                                                     // Admin or the user who assigned the task can change status to anything except "In Progress", "Completed on Time", and "Delayed Completion"
                                                     if (in_array($currentStatus, ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'])) {
                                                         $statuses = ['Assigned', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'];
                                                     }
-                                                } elseif ($user_role === 'User' && $user_id == $assigned_user_id || $user_id === $assigned_user_id) {
+                                                }
+                                                // Logic for Regular User (assigned user)
+                                                elseif ($user_role === 'User' && $user_id == $assigned_user_id) {
                                                     // Regular user can only change status if they are the assigned user
                                                     if ($currentStatus === 'Assigned') {
-                                                        // If the task is "Assigned", the next viable options are "Completed on Time" or "Delayed Completion"
-                                                        $statuses = ['In Progress', 'Completed on Time', 'Delayed Completion'];
+                                                        // If the task is "Assigned", the next viable options are "In Progress", "Completed on Time", or "Delayed Completion"
+                                                        $statuses = ['In Progress'];
+
+                                                        // Check if the task has an actual start date
+                                                        if (!empty($row['actual_start_date'])) {
+                                                            // Calculate planned and actual durations
+                                                            $plannedStartDate = strtotime($row['planned_start_date']);
+                                                            $plannedEndDate = strtotime($row['planned_finish_date']);
+                                                            $plannedWeekdays = getWeekdays($plannedStartDate, $plannedEndDate);
+                                                            $plannedDurationHours = $plannedWeekdays * 8; // 8 hours per day
+                                            
+                                                            $actualStartDate = strtotime($row['actual_start_date']);
+                                                            $currentDate = time();
+                                                            $actualWeekdays = getWeekdays($actualStartDate, $currentDate);
+                                                            $actualDurationHours = $actualWeekdays * 8; // 8 hours per day
+                                            
+                                                            // Determine available statuses based on the comparison
+                                                            if ($actualDurationHours > $plannedDurationHours) {
+                                                                $statuses[] = 'Delayed Completion';
+                                                            } else {
+                                                                $statuses[] = 'Completed on Time';
+                                                            }
+                                                        }
                                                     } elseif ($currentStatus === 'In Progress') {
                                                         // If the task is "In Progress", the next viable options are "Completed on Time" or "Delayed Completion"
                                                         $statuses = ['Completed on Time', 'Delayed Completion'];
