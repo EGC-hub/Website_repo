@@ -406,45 +406,34 @@ $completedTasks = array_filter($allTasks, function ($task) {
 // Define the getWeekdayHours function once at the top of the script
 function getWeekdayHours($start, $end)
 {
-    echo "<pre>";
-    echo "Calculating Weekday Hours...\n";
-    echo "Start Timestamp: " . date("Y-m-d H:i:s", $start) . " ($start)\n";
-    echo "End Timestamp: " . date("Y-m-d H:i:s", $end) . " ($end)\n";
-
     $weekdayHours = 0;
     $current = $start;
 
+    // Loop through each day between start and end
     while ($current <= $end) {
         $dayOfWeek = date('N', $current); // 1 (Monday) to 7 (Sunday)
-        echo "Current Date: " . date("Y-m-d H:i:s", $current) . " (Day of Week: $dayOfWeek)\n";
 
-        if ($dayOfWeek <= 5) { // Exclude Saturday (6) and Sunday (7)
-            // Calculate the hours for the current day
-            $startOfDay = strtotime('today', $current); // Start of the day
-            $endOfDay = strtotime('tomorrow', $current) - 1; // End of the day
+        // Exclude weekends
+        if ($dayOfWeek <= 5) {
+            // Calculate the start and end of the current day
+            $startOfDay = strtotime('today', $current); // Start of the day (00:00:00)
+            $endOfDay = strtotime('tomorrow', $current) - 1; // End of the day (23:59:59)
 
-            // Adjust the start and end times to be within the current day
+            // Adjust the start and end times to fit within the current day
             $startTime = max($start, $startOfDay);
             $endTime = min($end, $endOfDay);
 
-            echo "Start of Day: " . date("Y-m-d H:i:s", $startOfDay) . "\n";
-            echo "End of Day: " . date("Y-m-d H:i:s", $endOfDay) . "\n";
-            echo "Adjusted Start Time: " . date("Y-m-d H:i:s", $startTime) . "\n";
-            echo "Adjusted End Time: " . date("Y-m-d H:i:s", $endTime) . "\n";
-
-            // Calculate the hours difference for the current day
+            // Calculate the hours for the current day
             $hours = ($endTime - $startTime) / 3600; // Convert seconds to hours
-            echo "Hours for Current Day: $hours\n";
 
+            // Add the hours to the total
             $weekdayHours += $hours;
-            echo "Total Weekday Hours So Far: $weekdayHours\n";
         }
 
-        $current = strtotime('+1 day', $current); // Move to the next day
+        // Move to the next day
+        $current = strtotime('+1 day', $current);
     }
 
-    echo "Final Weekday Hours: $weekdayHours\n";
-    echo "</pre>";
     return $weekdayHours;
 }
 ?>
