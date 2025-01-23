@@ -78,10 +78,12 @@ try {
         }
     } elseif ($user_role === 'User' && $user_id == $assigned_user_id || $user_id === $assigned_user_id) {
         // Regular user or the assigned user can only change status if they are the assigned user
-        if ($current_status === 'Assigned' && in_array($new_status, ['In Progress', 'Completed on Time', 'Delayed Completion'])) {
-            // Allow the status change
-        } else {
-            die(json_encode(['success' => false, 'message' => 'Unauthorized status change.']));
+        if ($current_status === 'Assigned' || $current_status === 'Reassigned') {
+            if (in_array($new_status, ['In Progress', 'Completed on Time', 'Delayed Completion'])) {
+                // Allow the status change
+            } else {
+                die(json_encode(['success' => false, 'message' => 'Unauthorized status change.']));
+            }
         }
     } else {
         die(json_encode(['success' => false, 'message' => 'Unauthorized access.']));
