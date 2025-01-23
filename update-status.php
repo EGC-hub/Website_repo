@@ -43,9 +43,9 @@ if ($task_id === null || $new_status === null) {
     die(json_encode(['success' => false, 'message' => 'Invalid request.']));
 }
 
-// Fetch the current task status and assigned_by_id from the database
+// Fetch the current task status, assigned_by_id, and user_id (assigned user) from the database
 try {
-    $stmt = $pdo->prepare("SELECT status, assigned_by_id, task_name FROM tasks WHERE task_id = ?");
+    $stmt = $pdo->prepare("SELECT status, assigned_by_id, user_id, task_name FROM tasks WHERE task_id = ?");
     $stmt->execute([$task_id]);
     $task = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -55,6 +55,7 @@ try {
 
     $current_status = $task['status'];
     $assigned_by_id = $task['assigned_by_id'];
+    $assigned_user_id = $task['user_id']; // User assigned to the task
     $task_name = $task['task_name'];
 
     // Define valid statuses for the top table (Pending & Started Tasks)
@@ -65,8 +66,8 @@ try {
 
     // Validate the status change based on the user's role and assigned_by_id
     if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
-        // Admin or the user who assigned the task can change status to any status except "Closed" in the top table
-        if (in_array($current_status, $top_table_statuses) && $new_status !== 'Closed') {
+        // Admin or the user who assigned the task can change status to any status except "In Progress", "Completed on Time", and "Delayed Completion"
+        if (in_array($current_status, $top_table_statuses) && !in_array($new_status, ['In Progress', 'Completed on Time', 'Delayed Completion'])) {
             // Allow the status change
         } elseif (in_array($current_status, ['Completed on Time', 'Delayed Completion']) && $new_status === 'Closed') {
             // Allow changing to "Closed" in the bottom table
@@ -75,9 +76,9 @@ try {
         } else {
             die(json_encode(['success' => false, 'message' => 'Invalid status change.']));
         }
-    } elseif ($user_role === 'User') {
-        // Regular user can only change status from "Assigned" to "Completed on Time" or "Delayed Completion" in the top table
-        if ($current_status === 'Assigned' && in_array($new_status, ['Completed on Time', 'Delayed Completion'])) {
+    } elseif ($user_role === 'User' && $user_id == $assigned_user_id || $user_id === $assigned_user_id) {
+        // Regular user or the assigned user can only change status if they are the assigned user
+        if ($current_status === 'Assigned' && in_array($new_status, ['In Progress', 'Completed on Time', 'Delayed Completion'])) {
             // Allow the status change
         } else {
             die(json_encode(['success' => false, 'message' => 'Unauthorized status change.']));
@@ -87,7 +88,18 @@ try {
     }
 
     // Prepare the SQL query to update the task
-    if ($new_status === 'Completed on Time') {
+    if ($new_status === 'In Progress') {
+        // Update status and set actual_start_date to the current timestamp
+        $sql = "UPDATE tasks 
+                SET status = ?, 
+                    actual_start_date = NOW() 
+                WHERE task_id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            $new_status,
+            $task_id
+        ]);
+    } elseif ($new_status === 'Completed on Time') {
         // Only update status and completion_description for "Completed on Time"
         $sql = "UPDATE tasks 
                 SET status = ?, 
