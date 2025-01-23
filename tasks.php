@@ -1053,10 +1053,8 @@ function getWeekdayHours($start, $end)
                                     <th>Task Description</th>
                                     <th>Planned Start Date</th>
                                     <th>Planned End Date</th>
-                                    <th>Planned Duration</th>
                                     <th>Actual Start Date</th>
                                     <th>Actual End Date</th>
-                                    <th>Actual Duration</th>
                                     <th>Status</th>
                                     <th>Project Type</th>
                                     <th>Assigned By</th>
@@ -1111,14 +1109,12 @@ function getWeekdayHours($start, $end)
                                         </td>
                                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
                                         </td>
-                                        <td><?= $plannedDurationHours ?></td>
                                         <td>
                                             <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
                                             <?= $row['actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?>
                                         </td>
-                                        <td><?= $actualDurationHours ?></td>
                                         <td>
                                             <form method="POST" action="update-status.php">
                                                 <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
