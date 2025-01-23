@@ -412,6 +412,7 @@ $actualStartDate = strtotime(datetime: $task991['actual_start_date']);
 $currentTimestamp = time();
 echo "Current Timestamp: $currentTimestamp\n";
 echo "Actual start date: $actualStartDate";
+echo "Server Timezone: " . date_default_timezone_get();
 ?>
 
 <!-- Delay logic -->
