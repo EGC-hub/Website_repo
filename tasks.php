@@ -1137,10 +1137,10 @@ function getWeekdays($start, $end)
                                                 elseif ($user_role === 'User' && $user_id == $assigned_user_id) {
                                                     // Regular user can only change status if they are the assigned user
                                                     if ($currentStatus === 'Assigned') {
-                                                        // If the task is "Assigned", the next viable options are "In Progress", "Completed on Time", or "Delayed Completion"
+                                                        // If the task is "Assigned", the next viable options are "In Progress"
                                                         $statuses = ['In Progress'];
-
-                                                        // Check if the task has an actual start date
+                                                    } elseif ($currentStatus === 'In Progress') {
+                                                        // If the task is "In Progress", check the actual duration against the planned duration
                                                         if (!empty($row['actual_start_date'])) {
                                                             // Calculate planned and actual durations
                                                             $plannedStartDate = strtotime($row['planned_start_date']);
@@ -1155,14 +1155,11 @@ function getWeekdays($start, $end)
                                             
                                                             // Determine available statuses based on the comparison
                                                             if ($actualDurationHours > $plannedDurationHours) {
-                                                                $statuses[] = 'Delayed Completion';
+                                                                $statuses = ['Delayed Completion']; // Only allow "Delayed Completion"
                                                             } else {
-                                                                $statuses[] = 'Completed on Time';
+                                                                $statuses = ['Completed on Time']; // Only allow "Completed on Time"
                                                             }
                                                         }
-                                                    } elseif ($currentStatus === 'In Progress') {
-                                                        // If the task is "In Progress", the next viable options are "Completed on Time" or "Delayed Completion"
-                                                        $statuses = ['Completed on Time', 'Delayed Completion'];
                                                     } else {
                                                         // For other statuses, allow the default transitions
                                                         $allowedStatuses = ['Assigned', 'Reassigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
