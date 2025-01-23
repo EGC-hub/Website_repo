@@ -1100,9 +1100,15 @@ function getWeekdays($start, $end)
                                                     }
                                                 } elseif ($user_role === 'User' && $user_id == $assigned_user_id || $user_id === $assigned_user_id) {
                                                     // Regular user can only change status if they are the assigned user
-                                                    $allowedStatuses = ['Assigned', 'Reassigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
-                                                    if (in_array($currentStatus, $allowedStatuses)) {
-                                                        $statuses = $allowedStatuses;
+                                                    if ($currentStatus === 'In Progress') {
+                                                        // Once the task is "In Progress", it can only be changed to "Completed on Time" or "Delayed Completion"
+                                                        $statuses = ['Completed on Time', 'Delayed Completion'];
+                                                    } else {
+                                                        // For other statuses, allow the default transitions
+                                                        $allowedStatuses = ['Assigned', 'Reassigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
+                                                        if (in_array($currentStatus, $allowedStatuses)) {
+                                                            $statuses = $allowedStatuses;
+                                                        }
                                                     }
                                                 }
 
