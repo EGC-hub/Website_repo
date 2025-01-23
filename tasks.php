@@ -361,27 +361,19 @@ $result = $stmt->get_result();
 $allTasks = $result->fetch_all(MYSQLI_ASSOC);
 
 foreach ($allTasks as &$task) {
+    // Calculate planned duration (excluding weekends)
     $plannedStartDate = strtotime($task['planned_start_date']);
     $plannedEndDate = strtotime($task['planned_finish_date']);
+    $plannedDurationHours = getWeekdayHours($plannedStartDate, $plannedEndDate);
 
-    // Calculate the number of weekdays (excluding weekends)
-    $weekdays = getWeekdays($plannedStartDate, $plannedEndDate);
-
-    // Calculate the total hours 
-    $task['planned_duration_days'] = $weekdays;
-    $task['planned_duration_hours'] = $weekdays * 8;
-}
-
-// Calculate the actual duration and determine available statuses
-$currentDate = time();
-foreach ($allTasks as &$task) {
+    // Calculate actual duration (from actual start date to current date)
     if (!empty($task['actual_start_date'])) {
         $actualStartDate = strtotime($task['actual_start_date']);
-        $actualWeekdays = getWeekdays($actualStartDate, $currentDate);
-        $actualDurationHours = $actualWeekdays * 8; // 8 hours per day
+        $currentDate = time(); // Current date and time
+        $actualDurationHours = getWeekdayHours($actualStartDate, $currentDate);
 
         // Determine available statuses based on the comparison
-        if ($actualDurationHours > $task['planned_duration_hours']) {
+        if ($actualDurationHours > $plannedDurationHours) {
             $task['available_statuses'] = ['Delayed Completion'];
         } else {
             $task['available_statuses'] = ['Completed on Time'];
@@ -404,19 +396,31 @@ $completedTasks = array_filter($allTasks, function ($task) {
 
 <!-- Delay logic -->
 <?php
-// Define the getWeekdays function once at the top of the script
-function getWeekdays($start, $end)
+// Define the getWeekdayHours function once at the top of the script
+function getWeekdayHours($start, $end)
 {
-    $weekdays = 0;
+    $weekdayHours = 0;
     $current = $start;
+
     while ($current <= $end) {
         $dayOfWeek = date('N', $current); // 1 (Monday) to 7 (Sunday)
         if ($dayOfWeek <= 5) { // Exclude Saturday (6) and Sunday (7)
-            $weekdays++;
+            // Calculate the hours for the current day
+            $startOfDay = strtotime('today', $current); // Start of the day
+            $endOfDay = strtotime('tomorrow', $current) - 1; // End of the day
+
+            // Adjust the start and end times to be within the current day
+            $startTime = max($start, $startOfDay);
+            $endTime = min($end, $endOfDay);
+
+            // Calculate the hours difference for the current day
+            $hours = ($endTime - $startTime) / 3600; // Convert seconds to hours
+            $weekdayHours += $hours;
         }
-        $current = strtotime('+1 day', $current);
+        $current = strtotime('+1 day', $current); // Move to the next day
     }
-    return $weekdays;
+
+    return $weekdayHours;
 }
 ?>
 
@@ -1140,26 +1144,8 @@ function getWeekdays($start, $end)
                                                         // If the task is "Assigned", the next viable options are "In Progress"
                                                         $statuses = ['In Progress'];
                                                     } elseif ($currentStatus === 'In Progress') {
-                                                        // If the task is "In Progress", check the actual duration against the planned duration
-                                                        if (!empty($row['actual_start_date'])) {
-                                                            // Calculate planned and actual durations
-                                                            $plannedStartDate = strtotime($row['planned_start_date']);
-                                                            $plannedEndDate = strtotime($row['planned_finish_date']);
-                                                            $plannedWeekdays = getWeekdays($plannedStartDate, $plannedEndDate);
-                                                            $plannedDurationHours = $plannedWeekdays * 8; // 8 hours per day
-                                            
-                                                            $actualStartDate = strtotime($row['actual_start_date']);
-                                                            $currentDate = time();
-                                                            $actualWeekdays = getWeekdays($actualStartDate, $currentDate);
-                                                            $actualDurationHours = $actualWeekdays * 8; // 8 hours per day
-                                            
-                                                            // Determine available statuses based on the comparison
-                                                            if ($actualDurationHours > $plannedDurationHours) {
-                                                                $statuses = ['Delayed Completion']; // Only allow "Delayed Completion"
-                                                            } else {
-                                                                $statuses = ['Completed on Time']; // Only allow "Completed on Time"
-                                                            }
-                                                        }
+                                                        // If the task is "In Progress", use the available statuses calculated earlier
+                                                        $statuses = $row['available_statuses'];
                                                     } else {
                                                         // For other statuses, allow the default transitions
                                                         $allowedStatuses = ['Assigned', 'Reassigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
@@ -1258,7 +1244,7 @@ function getWeekdays($start, $end)
 
                                         if ($actualCompletionDate && $expectedFinishDate) {
                                             // Calculate the number of weekdays between the expected finish date and actual completion date
-                                            $weekdays = getWeekdays($expectedFinishDate, $actualCompletionDate);
+                                            $weekdays = getWeekdayHours($expectedFinishDate, $actualCompletionDate);
 
                                             // Convert the delay into days and hours, excluding weekends
                                             $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
@@ -1313,7 +1299,7 @@ function getWeekdays($start, $end)
                                                 $actualCompletionDate = strtotime($row['delayed_completion_date']);
                                                 if ($actualCompletionDate && $expectedFinishDate) {
                                                     // Calculate the number of weekdays between the expected finish date and actual completion date
-                                                    $weekdays = getWeekdays($expectedFinishDate, $actualCompletionDate);
+                                                    $weekdays = getWeekdayHours($expectedFinishDate, $actualCompletionDate);
 
                                                     // Convert the delay into days and hours, excluding weekends
                                                     $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
