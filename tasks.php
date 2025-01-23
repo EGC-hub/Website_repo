@@ -364,13 +364,27 @@ foreach ($allTasks as &$task) {
     // Calculate planned duration (excluding weekends)
     $plannedStartDate = strtotime($task['planned_start_date']);
     $plannedEndDate = strtotime($task['planned_finish_date']);
+
+    // Debug: Display planned start and end dates
+    echo "<pre>";
+    echo "Task ID: " . $task['task_id'] . "\n";
+    echo "Planned Start Date: " . $task['planned_start_date'] . " (Timestamp: $plannedStartDate)\n";
+    echo "Planned End Date: " . $task['planned_finish_date'] . " (Timestamp: $plannedEndDate)\n";
+
     $plannedDurationHours = getWeekdayHours($plannedStartDate, $plannedEndDate);
+    echo "Planned Duration Hours: $plannedDurationHours\n";
 
     // Calculate actual duration (from actual start date to current date)
     if (!empty($task['actual_start_date'])) {
         $actualStartDate = strtotime($task['actual_start_date']);
         $currentDate = time(); // Current date and time
+
+        // Debug: Display actual start date and current date
+        echo "Actual Start Date: " . $task['actual_start_date'] . " (Timestamp: $actualStartDate)\n";
+        echo "Current Date: " . date("Y-m-d H:i:s", $currentDate) . " (Timestamp: $currentDate)\n";
+
         $actualDurationHours = getWeekdayHours($actualStartDate, $currentDate);
+        echo "Actual Duration Hours: $actualDurationHours\n";
 
         // Determine available statuses based on the comparison
         if ($actualDurationHours > $plannedDurationHours) {
@@ -381,7 +395,11 @@ foreach ($allTasks as &$task) {
     } else {
         // If actual start date is not set, no status change is allowed
         $task['available_statuses'] = [];
+        echo "Actual Start Date: Not set\n";
     }
+
+    echo "-----------------------------\n";
+    echo "</pre>";
 }
 
 // Split tasks into Pending/Started and Completed
@@ -399,11 +417,18 @@ $completedTasks = array_filter($allTasks, function ($task) {
 // Define the getWeekdayHours function once at the top of the script
 function getWeekdayHours($start, $end)
 {
+    echo "<pre>";
+    echo "Calculating Weekday Hours...\n";
+    echo "Start Timestamp: " . date("Y-m-d H:i:s", $start) . " ($start)\n";
+    echo "End Timestamp: " . date("Y-m-d H:i:s", $end) . " ($end)\n";
+
     $weekdayHours = 0;
     $current = $start;
 
     while ($current <= $end) {
         $dayOfWeek = date('N', $current); // 1 (Monday) to 7 (Sunday)
+        echo "Current Date: " . date("Y-m-d H:i:s", $current) . " (Day of Week: $dayOfWeek)\n";
+
         if ($dayOfWeek <= 5) { // Exclude Saturday (6) and Sunday (7)
             // Calculate the hours for the current day
             $startOfDay = strtotime('today', $current); // Start of the day
@@ -413,13 +438,24 @@ function getWeekdayHours($start, $end)
             $startTime = max($start, $startOfDay);
             $endTime = min($end, $endOfDay);
 
+            echo "Start of Day: " . date("Y-m-d H:i:s", $startOfDay) . "\n";
+            echo "End of Day: " . date("Y-m-d H:i:s", $endOfDay) . "\n";
+            echo "Adjusted Start Time: " . date("Y-m-d H:i:s", $startTime) . "\n";
+            echo "Adjusted End Time: " . date("Y-m-d H:i:s", $endTime) . "\n";
+
             // Calculate the hours difference for the current day
             $hours = ($endTime - $startTime) / 3600; // Convert seconds to hours
+            echo "Hours for Current Day: $hours\n";
+
             $weekdayHours += $hours;
+            echo "Total Weekday Hours So Far: $weekdayHours\n";
         }
+
         $current = strtotime('+1 day', $current); // Move to the next day
     }
 
+    echo "Final Weekday Hours: $weekdayHours\n";
+    echo "</pre>";
     return $weekdayHours;
 }
 ?>
@@ -928,7 +964,7 @@ function getWeekdayHours($start, $end)
 
 
     <body>
-        
+
         <!-- Sidebar and Navbar -->
         <div class="dashboard-container">
             <!-- Sidebar -->
@@ -1107,14 +1143,16 @@ function getWeekdayHours($start, $end)
                                         </td>
                                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
                                         </td>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?> <br>
-                                        <?= $plannedDurationHours ?>
+                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
+                                            <br>
+                                            <?= $plannedDurationHours ?>
                                         </td>
                                         <td>
                                             <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
-                                            <?= $row['actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?> <br>
+                                            <?= $row['actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?>
+                                            <br>
                                             <?= $actualDurationHours ?>
                                         </td>
                                         <td>
