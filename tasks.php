@@ -1100,7 +1100,7 @@ function getWeekdays($start, $end)
                                                     }
                                                 } elseif ($user_role === 'User' && $user_id == $assigned_user_id || $user_id === $assigned_user_id) {
                                                     // Regular user can only change status if they are the assigned user
-                                                    if ($currentStatus === 'Assigned' || $current_status === 'Reassigned') {
+                                                    if ($currentStatus === 'Assigned') {
                                                         $statuses = ['Assigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
                                                     }
                                                 }
