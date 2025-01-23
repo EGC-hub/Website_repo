@@ -1073,10 +1073,10 @@ function getWeekdays($start, $end)
                                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
                                         </td>
                                         <td>
-                                            <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'null' ?>
+                                            <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
-                                            <?= $row['actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'null' ?>
+                                            <?= $row['actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
                                             <form method="POST" action="update-status.php">
@@ -1168,7 +1168,9 @@ function getWeekdays($start, $end)
                                     <th>Task Name</th>
                                     <th>Task Description</th>
                                     <th>Planned Start Date</th>
-                                    <th>planned End Date</th>
+                                    <th>Planned End Date</th>
+                                    <th>Actual Start Date</th>
+                                    <th>Actual End Date</th>
                                     <th>Status</th>
                                     <th>Project Type</th>
                                     <th>Assigned By</th>
@@ -1255,6 +1257,12 @@ function getWeekdays($start, $end)
                                                 }
                                                 ?>
                                             <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'N/A' ?>
+                                        </td>
+                                        <td>
+                                            <?= $row['actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
                                             <form method="POST" action="update-status.php">
