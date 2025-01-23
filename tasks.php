@@ -1298,6 +1298,9 @@ function getWeekdays($start, $end)
                                                 // Generate the status dropdown or display the status as text
                                                 if (!empty($statuses)) {
                                                     echo '<select id="status" name="status" onchange="handleStatusChange(event, ' . $row['task_id'] . ')">';
+                                                    if (!in_array($currentStatus, $statuses)) {
+                                                        echo "<option value='$currentStatus' selected>$currentStatus</option>";
+                                                    }
                                                     foreach ($statuses as $statusValue) {
                                                         $selected = ($currentStatus === $statusValue) ? 'selected' : '';
                                                         echo "<option value='$statusValue' $selected>$statusValue</option>";
