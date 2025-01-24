@@ -1191,7 +1191,7 @@ function getWeekdayHours($start, $end)
                                                 (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                             </td>
                                         <?php endif; ?>
-                                        <td data-utc="<?= htmlspecialchars($row['recorded_timestamp'] . 'Z') ?>">
+                                        <td data-utc="<?= htmlspecialchars($row['recorded_timestamp']) ?>">
                                             <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
                                         </td>
                                         <?php if (($user_role !== 'User' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'Admin'): ?>
@@ -2022,7 +2022,18 @@ function getWeekdayHours($start, $end)
                             const utcTimestamp = cell.getAttribute('data-utc'); // Get the UTC timestamp
                             console.log('UTC Timestamp:', utcTimestamp); // Debug: Log the UTC timestamp
 
-                            const localTime = new Date(utcTimestamp).toLocaleString(); // Convert to local time
+                            const options = {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true,
+                                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone // Use the user's timezone
+                            };
+
+                            const localTime = new Date(utcTimestamp).toLocaleString('en-US', options);
+
                             console.log('Local Time:', localTime); // Debug: Log the local time
 
                             // Update the cell content with the local time
