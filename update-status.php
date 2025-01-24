@@ -37,7 +37,7 @@ $task_id = $_POST['task_id'] ?? null;
 $new_status = $_POST['status'] ?? null;
 $completion_description = $_POST['completion_description'] ?? null;
 $delayed_reason = $_POST['delayed_reason'] ?? null;
-$actual_completion_date = $_POST['actual_completion_date'] ?? null;
+$actual_finish_date = $_POST['actual_finish_date'] ?? null; // New field for actual finish date
 
 if ($task_id === null || $new_status === null) {
     die(json_encode(['success' => false, 'message' => 'Invalid request.']));
@@ -102,31 +102,33 @@ try {
             $task_id
         ]);
     } elseif ($new_status === 'Completed on Time') {
-        // Only update status and completion_description for "Completed on Time"
+        // Update status, completion_description, and actual_finish_date for "Completed on Time"
         $sql = "UPDATE tasks 
                 SET status = ?, 
-                    completion_description = ? 
+                    completion_description = ?, 
+                    actual_finish_date = ? 
                 WHERE task_id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             $new_status,
             $completion_description,
+            $actual_finish_date, // Use the actual_finish_date from the form
             $task_id
         ]);
     } elseif ($new_status === 'Delayed Completion') {
-        // Update status, completion_description, delayed_reason, and actual_completion_date for "Delayed Completion"
+        // Update status, completion_description, delayed_reason, and actual_finish_date for "Delayed Completion"
         $sql = "UPDATE tasks 
                 SET status = ?, 
                     completion_description = ?, 
                     delayed_reason = ?, 
-                    actual_completion_date = ? 
+                    actual_finish_date = ? 
                 WHERE task_id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             $new_status,
             $completion_description,
             $delayed_reason,
-            $actual_completion_date,
+            $actual_finish_date, // Use the actual_finish_date from the form
             $task_id
         ]);
     } else {

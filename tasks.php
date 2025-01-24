@@ -1320,32 +1320,39 @@ function getWeekdayHours($start, $end)
                                                 </a>
                                             </div>
                                         </td>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
+                                        <td>
+                                            <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
                                         </td>
                                         <td>
                                             <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
-                                            <?php if ($row['status'] === 'Delayed Completion'): ?>
-                                                <?php
-                                                $expectedFinishDate = strtotime($row['planned_finish_date']);
-                                                $actualCompletionDate = strtotime($row['delayed_completion_date']);
-                                                if ($actualCompletionDate && $expectedFinishDate) {
-                                                    // Calculate the number of weekdays between the expected finish date and actual completion date
-                                                    $weekdays = getWeekdayHours($expectedFinishDate, $actualCompletionDate);
-
-                                                    // Convert the delay into days and hours, excluding weekends
-                                                    $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
-                                                    $delayHours = floor(($actualCompletionDate - $expectedFinishDate) % (60 * 60 * 24) / (60 * 60)); // Remaining hours
-                                                    echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
-                                                    echo "<br><small class='text-muted'>Completed on: " . date("d M Y, h:i A", $actualCompletionDate) . "</small>";
-                                                }
-                                                ?>
-                                            <?php endif; ?>
                                         </td>
                                         <td>
                                             <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
-                                            <?= $row['actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?>
+                                            <?php if ($row['actual_finish_date']): ?>
+                                                <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) ?>
+                                                <?php if ($row['status'] === 'Delayed Completion'): ?>
+                                                    <?php
+                                                    $expectedFinishDate = strtotime($row['planned_finish_date']);
+                                                    $actualEndDate = strtotime($row['actual_finish_date']);
+
+                                                    if ($actualEndDate && $expectedFinishDate) {
+                                                        // Calculate the number of weekdays between the expected finish date and actual end date
+                                                        $weekdays = getWeekdayHours($expectedFinishDate, $actualEndDate);
+
+                                                        // Convert the delay into days and hours, excluding weekends
+                                                        $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
+                                                        $delayHours = floor(($actualEndDate - $expectedFinishDate) % (60 * 60 * 24) / (60 * 60)); // Remaining hours
+                                        
+                                                        // Display the delay duration
+                                                        echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
+                                                    }
+                                                    ?>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                N/A
+                                            <?php endif; ?>
                                         </td>
                                         <td>
                                             <form method="POST" action="update-status.php">
@@ -1614,6 +1621,34 @@ function getWeekdayHours($start, $end)
 
             <!-- JS for the dropdown handling -->
             <script>
+                // function to calculate the duration of days and hours between the actual dates
+                function calculateWeekdayDuration(startDate, endDate) {
+                    let days = 0;
+                    let hours = 0;
+                    let currentDate = new Date(startDate);
+
+                    // Loop through each day between start and end dates
+                    while (currentDate <= endDate) {
+                        const dayOfWeek = currentDate.getDay(); // 0 (Sunday) to 6 (Saturday)
+
+                        // Exclude weekends
+                        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                            days++;
+                        }
+
+                        // Move to the next day
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
+
+                    // Calculate the remaining hours
+                    const startTime = startDate.getTime();
+                    const endTime = endDate.getTime();
+                    const totalHours = Math.floor((endTime - startTime) / (1000 * 60 * 60));
+                    hours = totalHours % 24;
+
+                    return { days, hours };
+                }
+
                 function handleStatusChange(event, taskId) {
                     event.preventDefault();
 
@@ -1626,6 +1661,16 @@ function getWeekdayHours($start, $end)
                         const reassignmentModal = new bootstrap.Modal(document.getElementById('reassignmentModal'));
                         reassignmentModal.show();
                     } else if (status === 'Delayed Completion' || status === 'Completed on Time') {
+                        // Capture the current time
+                        const currentTime = new Date().toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
+
+                        // Set the current time in the form data
+                        const actualFinishDateInput = document.createElement('input');
+                        actualFinishDateInput.type = 'hidden';
+                        actualFinishDateInput.name = 'actual_finish_date';
+                        actualFinishDateInput.value = currentTime;
+                        form.appendChild(actualFinishDateInput);
+
                         // Existing logic for completion modal
                         document.getElementById('task-id').value = taskId;
                         document.getElementById('modal-status').value = status;
@@ -1656,7 +1701,11 @@ function getWeekdayHours($start, $end)
                                     document.getElementById('success-message').innerText = data.message;
                                     const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                                     successModal.show();
-                                    event.target.disabled = true;
+
+                                    // Refresh the page after 2 seconds
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 2000);
                                 } else {
                                     alert(data.message);
                                 }
@@ -1678,6 +1727,11 @@ function getWeekdayHours($start, $end)
                                     document.getElementById('success-message').innerText = data.message;
                                     const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                                     successModal.show();
+
+                                    // Refresh the page after 2 seconds
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 2000);
                                 } else {
                                     alert(data.message);
                                 }
@@ -1716,10 +1770,10 @@ function getWeekdayHours($start, $end)
                                 const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                                 successModal.show();
 
-                                // Optionally, refresh the task list or update the UI
+                                // Refresh the page after 2 seconds
                                 setTimeout(() => {
-                                    window.location.reload(); // Reload the page to reflect the updated status
-                                }, 2000); // Reload after 2 seconds
+                                    window.location.reload();
+                                }, 2000);
                             } else {
                                 alert(data.message); // Show an error message if the update failed
                             }
@@ -1774,10 +1828,10 @@ function getWeekdayHours($start, $end)
                                 const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                                 successModal.show();
 
-                                // Optionally, refresh the task list or update the UI
+                                // Refresh the page after 2 seconds
                                 setTimeout(() => {
-                                    window.location.reload(); // Reload the page to reflect the updated status
-                                }, 2000); // Reload after 2 seconds
+                                    window.location.reload();
+                                }, 2000);
                             } else {
                                 alert(data.message); // Show an error message if the update failed
                             }
