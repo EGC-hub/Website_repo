@@ -1305,7 +1305,7 @@ function getWeekdayHours($start, $end)
                                                     // Convert dates to timestamps
                                                     $plannedStartDate = strtotime($row['planned_start_date']);
                                                     $plannedFinishDate = strtotime($row['planned_finish_date']);
-                                                    $actualStartDate = strtotime($row['task_actual_start_date']);
+                                                    $actualStartDate = strtotime($row['actual_start_date']);
                                                     $actualFinishDate = strtotime($row['task_actual_finish_date']);
 
                                                     if ($plannedStartDate && $plannedFinishDate && $actualStartDate && $actualFinishDate) {
