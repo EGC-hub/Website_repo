@@ -2003,14 +2003,19 @@ function getWeekdayHours($start, $end)
                 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 console.log('Detected Timezone:', userTimezone);
 
-                fetch('tasks.php', { // Update the URL to point to tasks.php
+                fetch('tasks.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ timezone: userTimezone }),
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok: ' + response.statusText);
+                        }
+                        return response.json(); // Parse the response as JSON
+                    })
                     .then(data => {
                         console.log('Timezone sent to server:', userTimezone);
                     })
