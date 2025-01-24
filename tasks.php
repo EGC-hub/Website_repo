@@ -32,8 +32,6 @@ if (isset($_GET['timezone'])) {
 // Default to UTC if the timezone is not set
 $userTimezone = $_SESSION['user_timezone'] ?? 'UTC';
 date_default_timezone_set($userTimezone);
-echo "Default Timezone: " . date_default_timezone_get(); // Should output the user's timezone (e.g., Asia/Calcutta)
-
 
 // Get user information from the session
 $user_id = $_SESSION['user_id'] ?? null;
