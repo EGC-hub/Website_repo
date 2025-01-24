@@ -18,22 +18,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-// Handle the timezone sent via AJAX
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['timezone'])) {
-    $timezone = $_POST['timezone'];
-    $_SESSION['user_timezone'] = $timezone;
-    error_log("Timezone received: " . $timezone);
-
-    // Set the Content-Type header to JSON
-    header('Content-Type: application/json');
-    echo json_encode(['success' => true]);
-    exit; // Stop further execution for the AJAX request
-}
-
-// Default to UTC if the timezone is not set
-$userTimezone = $_SESSION['user_timezone'] ?? 'UTC';
-echo $userTimezone;
-
 // Get user information from the session
 $user_id = $_SESSION['user_id'] ?? null;
 $user_role = $_SESSION['role'] ?? null;
@@ -1997,31 +1981,6 @@ function getWeekdayHours($start, $end)
                         modalBody.textContent = description; // Set the modal content
                     });
                 });
-            </script>
-
-            <script>
-                const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                console.log('Detected Timezone:', userTimezone);
-
-                fetch('tasks.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ timezone: userTimezone }),
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok: ' + response.statusText);
-                        }
-                        return response.json(); // Parse the response as JSON
-                    })
-                    .then(data => {
-                        console.log('Timezone sent to server:', userTimezone);
-                    })
-                    .catch(error => {
-                        console.error('Error sending timezone:', error);
-                    });
             </script>
 
             <!-- To check if task desc is more than 2 lines -->
