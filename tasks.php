@@ -1191,7 +1191,8 @@ function getWeekdayHours($start, $end)
                                                 (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                             </td>
                                         <?php endif; ?>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
+                                        <td data-utc="<?= htmlspecialchars($row['recorded_timestamp']) ?>">
+                                            <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
                                         </td>
                                         <?php if (($user_role !== 'User' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'Admin'): ?>
                                             <td>
@@ -1368,7 +1369,8 @@ function getWeekdayHours($start, $end)
                                                 (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                             </td>
                                         <?php endif; ?>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
+                                        <td data-utc="<?= htmlspecialchars($row['recorded_timestamp']) ?>">
+                                            <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -2012,15 +2014,23 @@ function getWeekdayHours($start, $end)
             </script>
 
             <script>
-                // Automatically detect the user's timezone
-                const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                console.log('Detected Timezone:', userTimezone);
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Function to convert UTC timestamp to local time
+                    function convertUTCTimeToLocal() {
+                        const timestampCells = document.querySelectorAll('td[data-utc]');
 
-                // Check if the timezone is already in the URL or session
-                if (!window.location.href.includes('timezone=') && !<?php echo isset($_SESSION['user_timezone']) ? 'true' : 'false'; ?>) {
-                    // Redirect to the same page with the timezone as a URL parameter
-                    window.location.href = window.location.pathname + '?timezone=' + encodeURIComponent(userTimezone);
-                }
+                        timestampCells.forEach(cell => {
+                            const utcTimestamp = cell.getAttribute('data-utc'); // Get the UTC timestamp
+                            const localTime = new Date(utcTimestamp).toLocaleString(); // Convert to local time
+
+                            // Update the cell content with the local time
+                            cell.textContent = localTime;
+                        });
+                    }
+
+                    // Run the conversion when the page loads
+                    convertUTCTimeToLocal();
+                });
             </script>
 
             <!-- To check if task desc is more than 2 lines -->
