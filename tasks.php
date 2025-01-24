@@ -18,6 +18,21 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
+// Check if the timezone is passed via URL parameter
+if (isset($_GET['timezone'])) {
+    $timezone = $_GET['timezone'];
+    $_SESSION['user_timezone'] = $timezone;
+    error_log("Timezone received: " . $timezone);
+
+    // Redirect back to the same page without the timezone parameter
+    header('Location: ' . strtok($_SERVER['REQUEST_URI'], '?'));
+    exit;
+}
+
+// Default to UTC if the timezone is not set
+$userTimezone = $_SESSION['user_timezone'] ?? 'UTC';
+echo $userTimezone;
+
 // Get user information from the session
 $user_id = $_SESSION['user_id'] ?? null;
 $user_role = $_SESSION['role'] ?? null;
@@ -1981,6 +1996,15 @@ function getWeekdayHours($start, $end)
                         modalBody.textContent = description; // Set the modal content
                     });
                 });
+            </script>
+
+            <script>
+                // Automatically detect the user's timezone
+                const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                console.log('Detected Timezone:', userTimezone);
+
+                // Redirect to the same page with the timezone as a URL parameter
+                window.location.href = window.location.pathname + '?timezone=' + encodeURIComponent(userTimezone);
             </script>
 
             <!-- To check if task desc is more than 2 lines -->
