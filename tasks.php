@@ -1980,12 +1980,25 @@ function getWeekdayHours($start, $end)
                     // Initialize pagination
                     applyFilters();
                 });
+            </script>
 
-                // Users timezone
-                // Automatically detect the user's timezone
+            <!-- JS for task description modal -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const taskDescriptionModal = document.getElementById('taskDescriptionModal');
+                    taskDescriptionModal.addEventListener('show.bs.modal', function (event) {
+                        const button = event.relatedTarget; // Button/link that triggered the modal
+                        const description = button.getAttribute('data-description'); // Extract description from data attribute
+                        const modalBody = taskDescriptionModal.querySelector('.modal-body p');
+                        modalBody.textContent = description; // Set the modal content
+                    });
+                });
+            </script>
+
+            <script>
                 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                console.log('Detected Timezone:', userTimezone); // Check this in the console
 
-                // Send the timezone to the server using an AJAX request
                 fetch('/set-timezone', {
                     method: 'POST',
                     headers: {
@@ -2000,19 +2013,6 @@ function getWeekdayHours($start, $end)
                     .catch(error => {
                         console.error('Error sending timezone:', error);
                     });
-            </script>
-
-            <!-- JS for task description modal -->
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const taskDescriptionModal = document.getElementById('taskDescriptionModal');
-                    taskDescriptionModal.addEventListener('show.bs.modal', function (event) {
-                        const button = event.relatedTarget; // Button/link that triggered the modal
-                        const description = button.getAttribute('data-description'); // Extract description from data attribute
-                        const modalBody = taskDescriptionModal.querySelector('.modal-body p');
-                        modalBody.textContent = description; // Set the modal content
-                    });
-                });
             </script>
 
             <!-- To check if task desc is more than 2 lines -->
