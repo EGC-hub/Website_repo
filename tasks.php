@@ -18,10 +18,11 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-// Check if the timezone is sent via POST request
+// Handle the timezone sent via AJAX
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['timezone'])) {
-    // Store the user's timezone in the session
-    $_SESSION['user_timezone'] = $_POST['timezone'];
+    $timezone = $_POST['timezone'];
+    $_SESSION['user_timezone'] = $timezone;
+    error_log("Timezone received: " . $timezone);
     echo json_encode(['success' => true]);
     exit; // Stop further execution for the AJAX request
 }
@@ -1997,9 +1998,9 @@ function getWeekdayHours($start, $end)
 
             <script>
                 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                console.log('Detected Timezone:', userTimezone); // Check this in the console
+                console.log('Detected Timezone:', userTimezone);
 
-                fetch('/set-timezone', {
+                fetch('tasks.php', { // Update the URL to point to tasks.php
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
