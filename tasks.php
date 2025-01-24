@@ -1191,7 +1191,7 @@ function getWeekdayHours($start, $end)
                                                 (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                             </td>
                                         <?php endif; ?>
-                                        <td data-utc="<?= htmlspecialchars($row['recorded_timestamp']) ?>">
+                                        <td data-utc="<?= htmlspecialchars($row['recorded_timestamp'] . 'Z') ?>">
                                             <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
                                         </td>
                                         <?php if (($user_role !== 'User' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'Admin'): ?>
@@ -2015,29 +2015,21 @@ function getWeekdayHours($start, $end)
 
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
-                    // Function to convert UTC timestamp to local time
                     function convertUTCTimeToLocal() {
                         const timestampCells = document.querySelectorAll('td[data-utc]');
 
                         timestampCells.forEach(cell => {
                             const utcTimestamp = cell.getAttribute('data-utc'); // Get the UTC timestamp
-                            const options = {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: true
-                            };
+                            console.log('UTC Timestamp:', utcTimestamp); // Debug: Log the UTC timestamp
 
-                            const localTime = new Date(utcTimestamp).toLocaleString('en-US', options); // Convert to local time
+                            const localTime = new Date(utcTimestamp).toLocaleString(); // Convert to local time
+                            console.log('Local Time:', localTime); // Debug: Log the local time
 
                             // Update the cell content with the local time
                             cell.textContent = localTime;
                         });
                     }
 
-                    // Run the conversion when the page loads
                     convertUTCTimeToLocal();
                 });
             </script>
