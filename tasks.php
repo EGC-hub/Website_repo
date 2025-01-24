@@ -2003,8 +2003,11 @@ function getWeekdayHours($start, $end)
                 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 console.log('Detected Timezone:', userTimezone);
 
-                // Redirect to the same page with the timezone as a URL parameter
-                window.location.href = window.location.pathname + '?timezone=' + encodeURIComponent(userTimezone);
+                // Check if the timezone is already in the URL or session
+                if (!window.location.href.includes('timezone=') && !<?php echo isset($_SESSION['user_timezone']) ? 'true' : 'false'; ?>) {
+                    // Redirect to the same page with the timezone as a URL parameter
+                    window.location.href = window.location.pathname + '?timezone=' + encodeURIComponent(userTimezone);
+                }
             </script>
 
             <!-- To check if task desc is more than 2 lines -->
