@@ -1302,16 +1302,25 @@ function getWeekdayHours($start, $end)
                                                 <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['task_actual_finish_date']))) ?>
                                                 <?php if ($row['status'] === 'Delayed Completion'): ?>
                                                     <?php
-                                                    $expectedFinishDate = strtotime($row['planned_finish_date']);
-                                                    $actualEndDate = strtotime($row['task_actual_finish_date']);
+                                                    // Convert dates to timestamps
+                                                    $plannedStartDate = strtotime($row['planned_start_date']);
+                                                    $plannedFinishDate = strtotime($row['planned_finish_date']);
+                                                    $actualStartDate = strtotime($row['task_actual_start_date']);
+                                                    $actualFinishDate = strtotime($row['task_actual_finish_date']);
 
-                                                    if ($actualEndDate && $expectedFinishDate) {
-                                                        // Calculate the number of weekdays between the expected finish date and actual end date
-                                                        $weekdays = getWeekdayHours($expectedFinishDate, $actualEndDate);
+                                                    if ($plannedStartDate && $plannedFinishDate && $actualStartDate && $actualFinishDate) {
+                                                        // Calculate planned duration (in seconds)
+                                                        $plannedDuration = $plannedFinishDate - $plannedStartDate;
 
-                                                        // Convert the delay into days and hours, excluding weekends
-                                                        $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
-                                                        $delayHours = floor(($actualEndDate - $expectedFinishDate) % (60 * 60 * 24) / (60 * 60)); // Remaining hours
+                                                        // Calculate actual duration (in seconds)
+                                                        $actualDuration = $actualFinishDate - $actualStartDate;
+
+                                                        // Calculate delay (in seconds)
+                                                        $delaySeconds = $actualDuration - $plannedDuration;
+
+                                                        // Convert delay into days and hours
+                                                        $delayDays = floor($delaySeconds / (60 * 60 * 24)); // Total days
+                                                        $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60)); // Remaining hours
                                         
                                                         // Display the delay duration
                                                         echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
