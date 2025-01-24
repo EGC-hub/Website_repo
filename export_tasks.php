@@ -44,7 +44,6 @@ $taskQuery = $user_role === 'Admin'
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
-            tasks.delayed_completion_date,
             task_transactions.delayed_reason,
             task_transactions.actual_finish_date AS transaction_actual_finish_date, -- Alias for task_transactions.actual_finish_date
             tasks.completion_description,
@@ -85,7 +84,6 @@ $taskQuery = $user_role === 'Admin'
                 tasks.recorded_timestamp,
                 tasks.assigned_by_id,
                 tasks.user_id,
-                tasks.delayed_completion_date,
                 task_transactions.delayed_reason,
                 task_transactions.actual_finish_date AS transaction_actual_finish_date, -- Alias for task_transactions.actual_finish_date
                 tasks.completion_description,
@@ -126,7 +124,6 @@ $taskQuery = $user_role === 'Admin'
                 tasks.recorded_timestamp,
                 tasks.assigned_by_id,
                 tasks.user_id,
-                tasks.delayed_completion_date,
                 task_transactions.delayed_reason,
                 task_transactions.actual_finish_date AS transaction_actual_finish_date, -- Alias for task_transactions.actual_finish_date
                 tasks.completion_description,
@@ -176,14 +173,16 @@ $headers = [
     'Project Type',
     'Assigned By',
     'Assigned By Department',
-    'Assigned To',
-    'Assigned To Department',
     'Created On',
     'Completion Description',
     'Delayed Reason',
-    'Delayed Completion Date',
     'Transaction Actual Finish Date'
 ];
+
+// Add "Assigned To" and "Assigned To Department" only for Admin and Manager roles
+if ($user_role === 'Admin' || $user_role === 'Manager') {
+    array_splice($headers, 11, 0, ['Assigned To', 'Assigned To Department']);
+}
 
 // Write Pending Tasks Section
 fputcsv($output, ['Pending & In Progress Tasks']);
@@ -203,14 +202,20 @@ while ($row = $result->fetch_assoc()) {
             $row['project_type'],
             $row['assigned_by'],
             $row['assigned_by_department'],
-            $row['assigned_to'] ?? '', // Handle cases where assigned_to is not available
-            $row['assigned_to_department'] ?? '',  // Handle cases where assigned_to_department is not available
             date("d M Y, h:i A", strtotime($row['recorded_timestamp'])),
             $row['completion_description'] ?? '', // Handle cases where completion_description is not available
             $row['delayed_reason'] ?? '', // Handle cases where delayed_reason is not available
-            $row['delayed_completion_date'] ? date("d M Y, h:i A", strtotime($row['delayed_completion_date'])) : '', // Handle cases where delayed_completion_date is not available
             $row['transaction_actual_finish_date'] ? date("d M Y, h:i A", strtotime($row['transaction_actual_finish_date'])) : '' // Handle cases where transaction_actual_finish_date is not available
         ];
+
+        // Add "Assigned To" and "Assigned To Department" only for Admin and Manager roles
+        if ($user_role === 'Admin' || $user_role === 'Manager') {
+            array_splice($rowData, 11, 0, [
+                $row['assigned_to'] ?? '', // Handle cases where assigned_to is not available
+                $row['assigned_to_department'] ?? ''  // Handle cases where assigned_to_department is not available
+            ]);
+        }
+
         fputcsv($output, $rowData);
     }
 }
@@ -239,14 +244,20 @@ while ($row = $result->fetch_assoc()) {
             $row['project_type'],
             $row['assigned_by'],
             $row['assigned_by_department'],
-            $row['assigned_to'] ?? '', // Handle cases where assigned_to is not available
-            $row['assigned_to_department'] ?? '',  // Handle cases where assigned_to_department is not available
             date("d M Y, h:i A", strtotime($row['recorded_timestamp'])),
             $row['completion_description'] ?? '', // Handle cases where completion_description is not available
             $row['delayed_reason'] ?? '', // Handle cases where delayed_reason is not available
-            $row['delayed_completion_date'] ? date("d M Y, h:i A", strtotime($row['delayed_completion_date'])) : '', // Handle cases where delayed_completion_date is not available
             $row['transaction_actual_finish_date'] ? date("d M Y, h:i A", strtotime($row['transaction_actual_finish_date'])) : '' // Handle cases where transaction_actual_finish_date is not available
         ];
+
+        // Add "Assigned To" and "Assigned To Department" only for Admin and Manager roles
+        if ($user_role === 'Admin' || $user_role === 'Manager') {
+            array_splice($rowData, 11, 0, [
+                $row['assigned_to'] ?? '', // Handle cases where assigned_to is not available
+                $row['assigned_to_department'] ?? ''  // Handle cases where assigned_to_department is not available
+            ]);
+        }
+
         fputcsv($output, $rowData);
     }
 }

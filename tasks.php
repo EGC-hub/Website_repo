@@ -247,7 +247,6 @@ $taskQuery = $user_role === 'Admin'
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
-            tasks.delayed_completion_date,
             task_transactions.delayed_reason,
             task_transactions.actual_finish_date AS transaction_actual_finish_date, -- Alias for task_transactions.actual_finish_date
             tasks.completion_description,
@@ -288,7 +287,6 @@ $taskQuery = $user_role === 'Admin'
                 tasks.recorded_timestamp,
                 tasks.assigned_by_id,
                 tasks.user_id,
-                tasks.delayed_completion_date,
                 task_transactions.delayed_reason,
                 task_transactions.actual_finish_date AS transaction_actual_finish_date, -- Alias for task_transactions.actual_finish_date
                 tasks.completion_description,
@@ -329,7 +327,6 @@ $taskQuery = $user_role === 'Admin'
                 tasks.recorded_timestamp,
                 tasks.assigned_by_id,
                 tasks.user_id,
-                tasks.delayed_completion_date,
                 task_transactions.delayed_reason,
                 task_transactions.actual_finish_date AS transaction_actual_finish_date, -- Alias for task_transactions.actual_finish_date
                 tasks.completion_description,
@@ -1094,12 +1091,6 @@ function getWeekdayHours($start, $end)
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
                                                     data-description="<?= htmlspecialchars($row['completion_description']); ?>">
                                                     <?= htmlspecialchars($row['task_name']); ?>
-                                                </a>
-                                            <?php elseif ($row['status'] === 'Delayed Completion'): ?>
-                                                <!-- Link to Delayed Completion Modal -->
-                                                <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['delayed_completion_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
-                                                    <?php echo htmlspecialchars($row['task_name']); ?>
                                                 </a>
                                             <?php else: ?>
                                                 <!-- Plain Text for Other Statuses -->
