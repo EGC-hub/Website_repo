@@ -1217,7 +1217,26 @@ function getWeekdayHours($start, $end)
                                                 (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                             </td>
                                         <?php endif; ?>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
+                                        <td>
+                                            <?php
+                                            // Fetch the timestamp from the database (assumed to be in UTC)
+                                            $recordedTimestamp = $row['recorded_timestamp'];
+
+                                            // Get the user's timezone from the session (default to UTC if not set)
+                                            $userTimezone = $_SESSION['user_timezone'] ?? 'UTC';
+
+                                            // Create a DateTime object with the timestamp (assume it's in UTC)
+                                            $date = new DateTime($recordedTimestamp, new DateTimeZone('UTC'));
+
+                                            // Convert the DateTime object to the user's timezone
+                                            $date->setTimezone(new DateTimeZone($userTimezone));
+
+                                            // Format the date and time for display
+                                            $formattedDate = $date->format('d M Y, h:i A');
+
+                                            // Output the formatted date and time
+                                            echo htmlspecialchars($formattedDate);
+                                            ?>
                                         </td>
                                         <?php if (($user_role !== 'User' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'Admin'): ?>
                                             <td>
@@ -1395,7 +1414,26 @@ function getWeekdayHours($start, $end)
                                                 (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                             </td>
                                         <?php endif; ?>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
+                                        <td>
+                                            <?php
+                                            // Fetch the timestamp from the database (assumed to be in UTC)
+                                            $recordedTimestamp = $row['recorded_timestamp'];
+
+                                            // Get the user's timezone from the session (default to UTC if not set)
+                                            $userTimezone = $_SESSION['user_timezone'] ?? 'UTC';
+
+                                            // Create a DateTime object with the timestamp (assume it's in UTC)
+                                            $date = new DateTime($recordedTimestamp, new DateTimeZone('UTC'));
+
+                                            // Convert the DateTime object to the user's timezone
+                                            $date->setTimezone(new DateTimeZone($userTimezone));
+
+                                            // Format the date and time for display
+                                            $formattedDate = $date->format('d M Y, h:i A');
+
+                                            // Output the formatted date and time
+                                            echo htmlspecialchars($formattedDate);
+                                            ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
