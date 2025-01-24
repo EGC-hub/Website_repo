@@ -23,6 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['timezone'])) {
     $timezone = $_POST['timezone'];
     $_SESSION['user_timezone'] = $timezone;
     error_log("Timezone received: " . $timezone);
+
+    // Set the Content-Type header to JSON
+    header('Content-Type: application/json');
     echo json_encode(['success' => true]);
     exit; // Stop further execution for the AJAX request
 }
