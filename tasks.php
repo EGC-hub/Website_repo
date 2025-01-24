@@ -1128,7 +1128,7 @@ function getWeekdayHours($start, $end)
                                             <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
-                                            <?= $row['tasks_actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?>
+                                            <?= $row['task_actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
                                             <form method="POST" action="update-status.php">
@@ -1298,12 +1298,12 @@ function getWeekdayHours($start, $end)
                                             <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
-                                            <?php if ($row['tasks_actual_finish_date']): ?>
-                                                <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['tasks_actual_finish_date']))) ?>
+                                            <?php if ($row['task_actual_finish_date']): ?>
+                                                <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['task_actual_finish_date']))) ?>
                                                 <?php if ($row['status'] === 'Delayed Completion'): ?>
                                                     <?php
                                                     $expectedFinishDate = strtotime($row['planned_finish_date']);
-                                                    $actualEndDate = strtotime($row['tasks_actual_finish_date']);
+                                                    $actualEndDate = strtotime($row['task_actual_finish_date']);
 
                                                     if ($actualEndDate && $expectedFinishDate) {
                                                         // Calculate the number of weekdays between the expected finish date and actual end date
