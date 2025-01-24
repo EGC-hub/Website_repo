@@ -241,7 +241,7 @@ $taskQuery = $user_role === 'Admin'
             tasks.planned_start_date,
             tasks.planned_finish_date,
             tasks.actual_start_date,
-            tasks.actual_finish_date,
+            tasks.actual_finish_date AS task_actual_finish_date, -- Alias for tasks.actual_finish_date
             tasks.status,
             tasks.project_type,
             tasks.recorded_timestamp,
@@ -249,7 +249,7 @@ $taskQuery = $user_role === 'Admin'
             tasks.user_id,
             tasks.delayed_completion_date,
             task_transactions.delayed_reason,
-            task_transactions.actual_finish_date,
+            task_transactions.actual_finish_date AS transaction_actual_finish_date, -- Alias for task_transactions.actual_finish_date
             tasks.completion_description,
             assigned_to_user.username AS assigned_to, 
             GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
@@ -282,7 +282,7 @@ $taskQuery = $user_role === 'Admin'
                 tasks.planned_start_date,
                 tasks.planned_finish_date,
                 tasks.actual_start_date,
-                tasks.actual_finish_date,
+                tasks.actual_finish_date AS task_actual_finish_date, -- Alias for tasks.actual_finish_date
                 tasks.status,
                 tasks.project_type,
                 tasks.recorded_timestamp,
@@ -290,7 +290,7 @@ $taskQuery = $user_role === 'Admin'
                 tasks.user_id,
                 tasks.delayed_completion_date,
                 task_transactions.delayed_reason,
-                task_transactions.actual_finish_date,
+                task_transactions.actual_finish_date AS transaction_actual_finish_date, -- Alias for task_transactions.actual_finish_date
                 tasks.completion_description,
                 assigned_to_user.username AS assigned_to, 
                 GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
@@ -323,7 +323,7 @@ $taskQuery = $user_role === 'Admin'
                 tasks.planned_start_date,
                 tasks.planned_finish_date,
                 tasks.actual_start_date,
-                tasks.actual_finish_date,
+                tasks.actual_finish_date AS task_actual_finish_date, -- Alias for tasks.actual_finish_date
                 tasks.status,
                 tasks.project_type,
                 tasks.recorded_timestamp,
@@ -331,7 +331,7 @@ $taskQuery = $user_role === 'Admin'
                 tasks.user_id,
                 tasks.delayed_completion_date,
                 task_transactions.delayed_reason,
-                task_transactions.actual_finish_date,
+                task_transactions.actual_finish_date AS transaction_actual_finish_date, -- Alias for task_transactions.actual_finish_date
                 tasks.completion_description,
                 assigned_by_user.username AS assigned_by,
                 GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
@@ -1128,7 +1128,7 @@ function getWeekdayHours($start, $end)
                                             <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
-                                            <?= $row['actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?>
+                                            <?= $row['tasks_actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
                                             <form method="POST" action="update-status.php">
@@ -1267,7 +1267,7 @@ function getWeekdayHours($start, $end)
                                             <?php elseif ($row['status'] === 'Delayed Completion'): ?>
                                                 <!-- Link to Delayed Completion Modal -->
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['actual_finish_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
+                                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['transactions_actual_finish_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
                                                     <?php echo htmlspecialchars($row['task_name']); ?>
                                                 </a>
                                             <?php else: ?>
@@ -1298,12 +1298,12 @@ function getWeekdayHours($start, $end)
                                             <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
-                                            <?php if ($row['actual_finish_date']): ?>
-                                                <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) ?>
+                                            <?php if ($row['tasks_actual_finish_date']): ?>
+                                                <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['tasks_actual_finish_date']))) ?>
                                                 <?php if ($row['status'] === 'Delayed Completion'): ?>
                                                     <?php
                                                     $expectedFinishDate = strtotime($row['planned_finish_date']);
-                                                    $actualEndDate = strtotime($row['actual_finish_date']);
+                                                    $actualEndDate = strtotime($row['tasks_actual_finish_date']);
 
                                                     if ($actualEndDate && $expectedFinishDate) {
                                                         // Calculate the number of weekdays between the expected finish date and actual end date
