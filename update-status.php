@@ -37,7 +37,7 @@ $task_id = $_POST['task_id'] ?? null;
 $new_status = $_POST['status'] ?? null;
 $completion_description = $_POST['completion_description'] ?? null;
 $delayed_reason = $_POST['delayed_reason'] ?? null;
-$actual_finish_date = $_POST['actual_finish_date'] ?? null; // New field for actual finish date
+$actual_finish_date = $_POST['actual_finish_date'] ?? null; // This is now set dynamically in JavaScript
 
 if ($task_id === null || $new_status === null) {
     die(json_encode(['success' => false, 'message' => 'Invalid request.']));
@@ -112,7 +112,7 @@ try {
         $stmt->execute([
             $new_status,
             $completion_description,
-            $actual_finish_date, // Use the actual_finish_date from the form
+            $actual_finish_date, // Use the dynamically set actual_finish_date
             $task_id
         ]);
     } elseif ($new_status === 'Delayed Completion') {
@@ -128,7 +128,7 @@ try {
             $new_status,
             $completion_description,
             $delayed_reason,
-            $actual_finish_date, // Use the actual_finish_date from the form
+            $actual_finish_date, // Use the dynamically set actual_finish_date
             $task_id
         ]);
     } else {

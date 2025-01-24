@@ -1419,7 +1419,7 @@ function getWeekdayHours($start, $end)
                 </div>
             </div>
 
-            <!-- Modal for Task Completion -->
+            <!-- Modal for Delayed Task Completion -->
             <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog">
@@ -1802,6 +1802,13 @@ function getWeekdayHours($start, $end)
             <script>
                 function handleCompletionForm(event) {
                     event.preventDefault(); // Prevent the default form submission
+
+                    // Get the current date and time in the correct format (YYYY-MM-DD HH:MM:SS)
+                    const now = new Date();
+                    const formattedDate = now.toISOString().slice(0, 19).replace('T', ' ');
+
+                    // Set the value of the hidden input field for the actual finish date
+                    document.getElementById('actual-completion-date').value = formattedDate;
 
                     const form = event.target;
                     const formData = new FormData(form);
