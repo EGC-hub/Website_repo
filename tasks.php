@@ -399,20 +399,6 @@ $pendingStartedTasks = array_filter($allTasks, function ($task) {
 $completedTasks = array_filter($allTasks, function ($task) {
     return in_array($task['status'], ['Completed on Time', 'Delayed Completion', 'Closed']);
 });
-
-
-$task99 = $conn->prepare("
-SELECT * FROM tasks WHERE task_id = 99;
-");
-$task99->execute();
-$task99Result = $task99->get_result();
-$task991 = $task99Result->fetch_assoc();
-
-$actualStartDate = strtotime(datetime: $task991['actual_start_date']);
-$currentTimestamp = time();
-echo "Current Timestamp: $currentTimestamp\n";
-echo "Actual start date: $actualStartDate";
-echo "Server Timezone: " . date_default_timezone_get();
 ?>
 
 <!-- Delay logic -->
@@ -1135,17 +1121,14 @@ function getWeekdayHours($start, $end)
                                         </td>
                                         <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
                                         </td>
-                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
-                                            <br>
-                                            <?= $plannedDurationHours ?>
+                                        <td>
+                                            <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
                                         </td>
                                         <td>
                                             <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'N/A' ?>
                                         </td>
                                         <td>
                                             <?= $row['actual_finish_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_finish_date']))) : 'N/A' ?>
-                                            <br>
-                                            <?= $actualDurationHours ?>
                                         </td>
                                         <td>
                                             <form method="POST" action="update-status.php">
