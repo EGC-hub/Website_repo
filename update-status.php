@@ -116,20 +116,28 @@ try {
             $task_id
         ]);
     } elseif ($new_status === 'Delayed Completion') {
-        // Update status, completion_description, delayed_reason, and actual_finish_date for "Delayed Completion"
+        // Update status, completion_description, and actual_finish_date in the tasks table
         $sql = "UPDATE tasks 
                 SET status = ?, 
                     completion_description = ?, 
-                    delayed_reason = ?, 
                     actual_finish_date = ? 
                 WHERE task_id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             $new_status,
             $completion_description,
-            $delayed_reason,
             $actual_finish_date, // Use the dynamically set actual_finish_date
             $task_id
+        ]);
+
+        // Insert delayed_reason and actual_finish_date into the task_transactions table
+        $sql = "INSERT INTO task_transactions (task_id, delayed_reason, actual_finish_date) 
+                VALUES (?, ?, ?)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            $task_id,
+            $delayed_reason,
+            $actual_finish_date
         ]);
     } else {
         // For other statuses, only update the status
