@@ -18,6 +18,18 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
+// Check if the timezone is sent via POST request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['timezone'])) {
+    // Store the user's timezone in the session
+    $_SESSION['user_timezone'] = $_POST['timezone'];
+    echo json_encode(['success' => true]);
+    exit; // Stop further execution for the AJAX request
+}
+
+// Default to UTC if the timezone is not set
+$userTimezone = $_SESSION['user_timezone'] ?? 'UTC';
+echo $userTimezone;
+
 // Get user information from the session
 $user_id = $_SESSION['user_id'] ?? null;
 $user_role = $_SESSION['role'] ?? null;
@@ -399,9 +411,6 @@ $pendingStartedTasks = array_filter($allTasks, function ($task) {
 $completedTasks = array_filter($allTasks, function ($task) {
     return in_array($task['status'], ['Completed on Time', 'Delayed Completion', 'Closed']);
 });
-
-$detectedTimezone = date_default_timezone_get();
-echo $detectedTimezone;
 ?>
 
 <!-- Delay logic -->
@@ -1971,6 +1980,26 @@ function getWeekdayHours($start, $end)
                     // Initialize pagination
                     applyFilters();
                 });
+
+                // Users timezone
+                // Automatically detect the user's timezone
+                const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+                // Send the timezone to the server using an AJAX request
+                fetch('/set-timezone', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ timezone: userTimezone }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Timezone sent to server:', userTimezone);
+                    })
+                    .catch(error => {
+                        console.error('Error sending timezone:', error);
+                    });
             </script>
 
             <!-- JS for task description modal -->
