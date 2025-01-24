@@ -1419,7 +1419,7 @@ function getWeekdayHours($start, $end)
                 </div>
             </div>
 
-            <!-- Modal for Delayed Task Completion -->
+            <!-- Modal for Task Completion -->
             <div class="modal fade" id="completionModal" tabindex="-1" aria-labelledby="completionModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog">
@@ -1650,25 +1650,26 @@ function getWeekdayHours($start, $end)
                     const form = event.target.form;
 
                     if (status === 'Reassigned') {
-                        // Show the reassignment modal
+                        // Existing logic: Show the reassignment modal
                         document.getElementById('reassign-task-id').value = taskId;
                         const reassignmentModal = new bootstrap.Modal(document.getElementById('reassignmentModal'));
                         reassignmentModal.show();
                     } else if (status === 'Delayed Completion' || status === 'Completed on Time') {
-                        // Capture the current time
+                        // Existing logic: Capture the current time
                         const currentTime = new Date().toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
 
-                        // Set the current time in the form data
+                        // Existing logic: Set the current time in the form data
                         const actualFinishDateInput = document.createElement('input');
                         actualFinishDateInput.type = 'hidden';
                         actualFinishDateInput.name = 'actual_finish_date';
                         actualFinishDateInput.value = currentTime;
                         form.appendChild(actualFinishDateInput);
 
-                        // Existing logic for completion modal
+                        // Existing logic: Set the task ID and status in the completion modal
                         document.getElementById('task-id').value = taskId;
                         document.getElementById('modal-status').value = status;
 
+                        // Existing logic: Show or hide the delayed reason and completion date containers
                         const delayedReasonContainer = document.getElementById('delayed-reason-container');
                         const completionDateContainer = document.getElementById('completion-date-container');
 
@@ -1680,10 +1681,11 @@ function getWeekdayHours($start, $end)
                             completionDateContainer.style.display = 'none';
                         }
 
-                        const modal = new bootstrap.Modal(document.getElementById('completionModal'));
-                        modal.show();
+                        // Fix: Show the completion modal
+                        const completionModal = new bootstrap.Modal(document.getElementById('completionModal'));
+                        completionModal.show();
                     } else if (status === 'Closed') {
-                        // Existing logic for 'Closed' status
+                        // Existing logic: Handle 'Closed' status
                         fetch('update-status.php', {
                             method: 'POST',
                             body: new FormData(form)
@@ -1709,7 +1711,7 @@ function getWeekdayHours($start, $end)
                                 alert('An error occurred while updating the status.');
                             });
                     } else {
-                        // Existing logic for other statuses
+                        // Existing logic: Handle other statuses
                         fetch('update-status.php', {
                             method: 'POST',
                             body: new FormData(form)
