@@ -1252,23 +1252,6 @@ function getWeekdayHours($start, $end)
                                 <?php
                                 $taskCountStart = 1;
                                 foreach ($completedTasks as $row): ?>
-                                    <?php
-                                    $delayInfo = '';
-                                    if ($row['status'] === 'Delayed Completion') {
-                                        $expectedFinishDate = strtotime($row['planned_finish_date']);
-                                        $actualCompletionDate = strtotime($row['delayed_completion_date']);
-
-                                        if ($actualCompletionDate && $expectedFinishDate) {
-                                            // Calculate the number of weekdays between the expected finish date and actual completion date
-                                            $weekdays = getWeekdayHours($expectedFinishDate, $actualCompletionDate);
-
-                                            // Convert the delay into days and hours, excluding weekends
-                                            $delayDays = $weekdays - 1; // Subtract 1 because the start day is included
-                                            $delayHours = floor(($actualCompletionDate - $expectedFinishDate) % (60 * 60 * 24) / (60 * 60)); // Remaining hours
-                                            $delayInfo = "{$delayDays} days, {$delayHours} hours delayed";
-                                        }
-                                    }
-                                    ?>
                                     <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
                                         data-status="<?= htmlspecialchars($row['status']) ?>" class="align-middle <?php if ($row['status'] === 'Delayed Completion')
                                               echo 'delayed-task'; ?>">
