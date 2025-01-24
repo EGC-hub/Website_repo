@@ -37,7 +37,6 @@ $task_id = $_POST['task_id'] ?? null;
 $new_status = $_POST['status'] ?? null;
 $completion_description = $_POST['completion_description'] ?? null;
 $delayed_reason = $_POST['delayed_reason'] ?? null;
-$actual_finish_date = $_POST['actual_finish_date'] ?? null; // This is now set dynamically in JavaScript
 
 if ($task_id === null || $new_status === null) {
     die(json_encode(['success' => false, 'message' => 'Invalid request.']));
@@ -106,13 +105,12 @@ try {
         $sql = "UPDATE tasks 
                 SET status = ?, 
                     completion_description = ?, 
-                    actual_finish_date = ? 
+                    actual_finish_date = NOW() 
                 WHERE task_id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             $new_status,
             $completion_description,
-            $actual_finish_date, // Use the dynamically set actual_finish_date
             $task_id
         ]);
     } elseif ($new_status === 'Delayed Completion') {
@@ -120,24 +118,22 @@ try {
         $sql = "UPDATE tasks 
                 SET status = ?, 
                     completion_description = ?, 
-                    actual_finish_date = ? 
+                    actual_finish_date = NOW() 
                 WHERE task_id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             $new_status,
             $completion_description,
-            $actual_finish_date, // Use the dynamically set actual_finish_date
             $task_id
         ]);
 
         // Insert delayed_reason and actual_finish_date into the task_transactions table
         $sql = "INSERT INTO task_transactions (task_id, delayed_reason, actual_finish_date) 
-                VALUES (?, ?, ?)";
+                VALUES (?, ?, NOW())";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             $task_id,
-            $delayed_reason,
-            $actual_finish_date
+            $delayed_reason
         ]);
     } else {
         // For other statuses, only update the status

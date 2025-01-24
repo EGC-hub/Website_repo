@@ -1623,16 +1623,6 @@ function getWeekdayHours($start, $end)
                         const reassignmentModal = new bootstrap.Modal(document.getElementById('reassignmentModal'));
                         reassignmentModal.show();
                     } else if (status === 'Delayed Completion' || status === 'Completed on Time') {
-                        // Capture the current time
-                        const currentTime = new Date().toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
-
-                        // Set the current time in the form data
-                        const actualFinishDateInput = document.createElement('input');
-                        actualFinishDateInput.type = 'hidden';
-                        actualFinishDateInput.name = 'actual_finish_date';
-                        actualFinishDateInput.value = currentTime;
-                        form.appendChild(actualFinishDateInput);
-
                         // Set the task ID and status in the completion modal
                         document.getElementById('task-id').value = taskId;
                         document.getElementById('modal-status').value = status;
