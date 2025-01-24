@@ -1267,7 +1267,7 @@ function getWeekdayHours($start, $end)
                                             <?php elseif ($row['status'] === 'Delayed Completion'): ?>
                                                 <!-- Link to Delayed Completion Modal -->
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['transactions_actual_finish_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
+                                                    onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['task_actual_finish_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
                                                     <?php echo htmlspecialchars($row['task_name']); ?>
                                                 </a>
                                             <?php else: ?>
