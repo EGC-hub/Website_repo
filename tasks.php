@@ -18,21 +18,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-// Check if the timezone is passed via URL parameter
-if (isset($_GET['timezone'])) {
-    $timezone = $_GET['timezone'];
-    $_SESSION['user_timezone'] = $timezone;
-    error_log("Timezone received: " . $timezone);
-
-    // Redirect back to the same page without the timezone parameter
-    header('Location: ' . strtok($_SERVER['REQUEST_URI'], '?'));
-    exit;
-}
-
-// Default to UTC if the timezone is not set
-$userTimezone = $_SESSION['user_timezone'] ?? 'UTC';
-date_default_timezone_set($userTimezone);
-
 // Get user information from the session
 $user_id = $_SESSION['user_id'] ?? null;
 $user_role = $_SESSION['role'] ?? null;
