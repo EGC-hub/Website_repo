@@ -399,6 +399,9 @@ $pendingStartedTasks = array_filter($allTasks, function ($task) {
 $completedTasks = array_filter($allTasks, function ($task) {
     return in_array($task['status'], ['Completed on Time', 'Delayed Completion', 'Closed']);
 });
+
+$detectedTimezone = date_default_timezone_get();
+echo $detectedTimezone;
 ?>
 
 <!-- Delay logic -->
