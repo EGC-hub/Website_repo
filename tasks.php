@@ -1435,6 +1435,8 @@ function getWeekdayHours($start, $end)
                                 <input type="hidden" id="task-id" name="task_id">
                                 <!-- Hidden input for Status -->
                                 <input type="hidden" id="modal-status" name="status">
+                                <!-- Hidden input for Actual Completion Date (automatically populated) -->
+                                <input type="hidden" id="actual-completion-date" name="actual_finish_date">
 
                                 <!-- Completion Description -->
                                 <div class="mb-3">
@@ -1448,14 +1450,6 @@ function getWeekdayHours($start, $end)
                                     <label for="delayed-reason" class="form-label">Why was it completed late?</label>
                                     <textarea class="form-control" id="delayed-reason" name="delayed_reason"
                                         rows="3"></textarea>
-                                </div>
-
-                                <!-- Actual Completion Date -->
-                                <div class="mb-3" id="completion-date-container" style="display: none;">
-                                    <label for="actual-completion-date" class="form-label">Actual Completion
-                                        Date</label>
-                                    <input type="datetime-local" class="form-control" id="actual-completion-date"
-                                        name="delayed_completion_date">
                                 </div>
                             </div>
                             <div class="modal-footer">
