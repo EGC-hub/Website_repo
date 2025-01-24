@@ -2021,7 +2021,16 @@ function getWeekdayHours($start, $end)
 
                         timestampCells.forEach(cell => {
                             const utcTimestamp = cell.getAttribute('data-utc'); // Get the UTC timestamp
-                            const localTime = new Date(utcTimestamp).toLocaleString(); // Convert to local time
+                            const options = {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true
+                            };
+
+                            const localTime = new Date(utcTimestamp).toLocaleString('en-US', options); // Convert to local time
 
                             // Update the cell content with the local time
                             cell.textContent = localTime;
