@@ -363,9 +363,6 @@ foreach ($allTasks as &$task) {
     $plannedEndDate = strtotime($task['planned_finish_date']);
     $plannedDurationHours = getWeekdayHours($plannedStartDate, $plannedEndDate);
 
-    // Round planned duration to 2 decimal places
-    $plannedDurationHours = round($plannedDurationHours, 2);
-
     // Store planned duration in the task array
     $task['planned_duration_hours'] = $plannedDurationHours;
 
@@ -375,14 +372,11 @@ foreach ($allTasks as &$task) {
         $currentDate = time(); // Current date and time
         $actualDurationHours = getWeekdayHours($actualStartDate, $currentDate);
 
-        // Round actual duration to 2 decimal places
-        $actualDurationHours = round($actualDurationHours, 2);
-
         // Store actual duration in the task array
         $task['actual_duration_hours'] = $actualDurationHours;
 
         // Determine available statuses based on the comparison
-        if ($actualDurationHours > $plannedDurationHours) {
+        if ($actualDurationHours >= $plannedDurationHours) {
             $task['available_statuses'] = ['Delayed Completion'];
         } else {
             $task['available_statuses'] = ['Completed on Time'];
