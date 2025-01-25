@@ -44,21 +44,21 @@ try {
         $taskName = trim($_POST['task_name']);
         $taskDescription = trim($_POST['task_description']);
         $projectType = trim($_POST['project_type']);
-        $expectedStartDate = trim($_POST['expected_start_date']);
-        $expectedFinishDate = trim($_POST['expected_finish_date']);
+        $expectedStartDate = trim($_POST['planned_start_date']);
+        $expectedFinishDate = trim($_POST['planned_finish_date']);
 
         // Validate inputs
         if (empty($taskName) || empty($projectName) || empty($taskDescription) || empty($projectType) || empty($expectedStartDate) || empty($expectedFinishDate)) {
             $error = "All fields are required.";
         } else {
             // Update the task in the database
-            $updateStmt = $pdo->prepare("UPDATE tasks SET project_name = :project_name, task_name = :task_name, task_description = :task_description, project_type = :project_type, expected_start_date = :expected_start_date, expected_finish_date = :expected_finish_date WHERE task_id = :task_id");
+            $updateStmt = $pdo->prepare("UPDATE tasks SET project_name = :project_name, task_name = :task_name, task_description = :task_description, project_type = :project_type, planned_start_date = :planned_start_date, planned_finish_date = :planned_finish_date WHERE task_id = :task_id");
             $updateStmt->bindParam(':project_name', $projectName);
             $updateStmt->bindParam(':task_name', $taskName);
             $updateStmt->bindParam(':task_description', $taskDescription);
             $updateStmt->bindParam(':project_type', $projectType);
-            $updateStmt->bindParam(':expected_start_date', $expectedStartDate);
-            $updateStmt->bindParam(':expected_finish_date', $expectedFinishDate);
+            $updateStmt->bindParam(':planned_start_date', $expectedStartDate);
+            $updateStmt->bindParam(':planned_finish_date', $expectedFinishDate);
             $updateStmt->bindParam(':task_id', $taskId);
 
             if ($updateStmt->execute()) {
@@ -68,8 +68,8 @@ try {
                 $task['task_name'] = $taskName;
                 $task['task_description'] = $taskDescription;
                 $task['project_type'] = $projectType;
-                $task['expected_start_date'] = $expectedStartDate;
-                $task['expected_finish_date'] = $expectedFinishDate;
+                $task['planned_start_date'] = $expectedStartDate;
+                $task['planned_finish_date'] = $expectedFinishDate;
             } else {
                 $error = "Failed to update task. Please try again.";
             }
@@ -222,14 +222,14 @@ try {
                 </select>
             </div>
             <div class="form-group">
-                <label for="expected_start_date">Planned Start Date</label>
-                <input type="datetime-local" id="expected_start_date" name="expected_start_date"
+                <label for="planned_start_date">Planned Start Date</label>
+                <input type="datetime-local" id="planned_start_date" name="planned_start_date"
                     value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($task['planned_start_date']))) ?>"
                     required>
             </div>
             <div class="form-group">
-                <label for="expected_finish_date">Planned Finish Date</label>
-                <input type="datetime-local" id="expected_finish_date" name="expected_finish_date"
+                <label for="planned_finish_date">Planned Finish Date</label>
+                <input type="datetime-local" id="planned_finish_date" name="planned_finish_date"
                     value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($task['planned_finish_date']))) ?>"
                     required>
             </div>
