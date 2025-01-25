@@ -358,109 +358,34 @@ $result = $stmt->get_result();
 $allTasks = $result->fetch_all(MYSQLI_ASSOC);
 
 foreach ($allTasks as &$task) {
-    // Only process tasks that are "In Progress"
-    if ($task['status'] === 'In Progress') {
-        // Calculate planned duration (excluding weekends)
-        $plannedStartDate = strtotime($task['planned_start_date']);
-        $plannedEndDate = strtotime($task['planned_finish_date']);
-        $plannedDurationSeconds = getWeekdaySeconds($plannedStartDate, $plannedEndDate);
+    // Calculate planned duration (excluding weekends)
+    $plannedStartDate = strtotime($task['planned_start_date']);
+    $plannedEndDate = strtotime($task['planned_finish_date']);
+    $plannedDurationHours = getWeekdayHours($plannedStartDate, $plannedEndDate);
 
-        // Convert planned duration to days, hours, and minutes
-        $plannedDuration = secondsToDaysHoursMinutes($plannedDurationSeconds);
+    // Store planned duration in the task array
+    $task['planned_duration_hours'] = $plannedDurationHours;
 
-        // Store planned duration in the task array
-        $task['planned_duration'] = $plannedDuration;
+    // Calculate actual duration (from actual start date to current date)
+    if (!empty($task['actual_start_date'])) {
+        $actualStartDate = strtotime($task['actual_start_date']);
+        $currentDate = time(); // Current date and time
+        $actualDurationHours = getWeekdayHours($actualStartDate, $currentDate);
 
-        // Calculate actual duration (from actual start date to current date)
-        if (!empty($task['actual_start_date'])) {
-            $actualStartDate = strtotime($task['actual_start_date']);
-            $currentDate = time(); // Current date and time
-            $actualDurationSeconds = getWeekdaySeconds($actualStartDate, $currentDate);
+        // Store actual duration in the task array
+        $task['actual_duration_hours'] = $actualDurationHours;
 
-            // Convert actual duration to days, hours, and minutes
-            $actualDuration = secondsToDaysHoursMinutes($actualDurationSeconds);
-
-            // Store actual duration in the task array
-            $task['actual_duration'] = $actualDuration;
-
-            // Debug output
-            echo "Task ID: " . $task['task_id'] . "\n";
-            echo "Planned Duration: " . json_encode($plannedDuration) . "\n";
-            echo "Actual Duration: " . json_encode($actualDuration) . "\n";
-            echo "Comparison: Actual (" . $actualDurationSeconds . " seconds) >= Planned (" . $plannedDurationSeconds . " seconds)?\n";
-
-            // Determine available statuses based on the comparison
-            if ($actualDurationSeconds >= $plannedDurationSeconds) {
-                $task['available_statuses'] = ['Delayed Completion'];
-                echo "Status: Delayed Completion\n";
-            } else {
-                $task['available_statuses'] = ['Completed on Time'];
-                echo "Status: Completed on Time\n";
-            }
+        // Determine available statuses based on the comparison
+        if ($actualDurationHours >= $plannedDurationHours) {
+            $task['available_statuses'] = ['Delayed Completion'];
         } else {
-            // If actual start date is not set, no status change is allowed
-            $task['available_statuses'] = [];
-            $task['actual_duration'] = null; // Set actual duration to null
-            echo "Status: No actual start date\n";
+            $task['available_statuses'] = ['Completed on Time'];
         }
     } else {
-        // Skip tasks that are not "In Progress"
-        echo "Task ID: " . $task['task_id'] . " - Skipped (Status: " . $task['status'] . ")\n";
+        // If actual start date is not set, no status change is allowed
+        $task['available_statuses'] = [];
+        $task['actual_duration_hours'] = null; // Set actual duration to null
     }
-}
-
-/**
- * Calculate the duration in seconds between two timestamps, excluding weekends.
- */
-function getWeekdaySeconds($start, $end)
-{
-    $weekdaySeconds = 0;
-    $current = $start;
-
-    // Loop through each day between start and end
-    while ($current <= $end) {
-        $dayOfWeek = date('N', $current); // 1 (Monday) to 7 (Sunday)
-
-        // Exclude weekends
-        if ($dayOfWeek <= 5) {
-            // Calculate the start and end of the current day
-            $startOfDay = strtotime('today', $current); // Start of the day (00:00:00)
-            $endOfDay = strtotime('tomorrow', $current) - 1; // End of the day (23:59:59)
-
-            // Adjust the start and end times to fit within the current day
-            $startTime = max($start, $startOfDay);
-            $endTime = min($end, $endOfDay);
-
-            // Calculate the seconds for the current day
-            $seconds = $endTime - $startTime;
-
-            // Add the seconds to the total
-            $weekdaySeconds += $seconds;
-        }
-
-        // Move to the next day
-        $current = strtotime('+1 day', $current);
-    }
-
-    return $weekdaySeconds;
-}
-
-/**
- * Convert seconds to days, hours, and minutes.
- */
-function secondsToDaysHoursMinutes($seconds)
-{
-    $days = floor($seconds / (24 * 3600));
-    $seconds %= (24 * 3600);
-    $hours = floor($seconds / 3600);
-    $seconds %= 3600;
-    $minutes = floor($seconds / 60);
-
-    return [
-        'days' => $days,
-        'hours' => $hours,
-        'minutes' => $minutes,
-    ];
 }
 
 // Split tasks into Pending/Started and Completed
