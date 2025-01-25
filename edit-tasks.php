@@ -99,6 +99,10 @@ try {
             margin: 0;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         .form-container {
             background-color: #ffffff;
             padding: 40px;
