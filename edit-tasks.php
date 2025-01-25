@@ -221,13 +221,13 @@ try {
             <div class="form-group">
                 <label for="expected_start_date">Expected Start Date</label>
                 <input type="datetime-local" id="expected_start_date" name="expected_start_date"
-                    value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($task['expected_start_date']))) ?>"
+                    value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($task['planned_start_date']))) ?>"
                     required>
             </div>
             <div class="form-group">
                 <label for="expected_finish_date">Expected Finish Date</label>
                 <input type="datetime-local" id="expected_finish_date" name="expected_finish_date"
-                    value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($task['expected_finish_date']))) ?>"
+                    value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($task['planned_finish_date']))) ?>"
                     required>
             </div>
             <button type="submit">Save Changes</button>
