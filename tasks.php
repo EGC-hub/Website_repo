@@ -358,39 +358,54 @@ $result = $stmt->get_result();
 $allTasks = $result->fetch_all(MYSQLI_ASSOC);
 
 foreach ($allTasks as &$task) {
-    // Calculate planned duration (excluding weekends)
-    $plannedStartDate = strtotime($task['planned_start_date']);
-    $plannedEndDate = strtotime($task['planned_finish_date']);
-    $plannedDurationSeconds = getWeekdaySeconds($plannedStartDate, $plannedEndDate);
+    // Only process tasks that are "In Progress"
+    if ($task['status'] === 'In Progress') {
+        // Calculate planned duration (excluding weekends)
+        $plannedStartDate = strtotime($task['planned_start_date']);
+        $plannedEndDate = strtotime($task['planned_finish_date']);
+        $plannedDurationSeconds = getWeekdaySeconds($plannedStartDate, $plannedEndDate);
 
-    // Convert planned duration to days, hours, and minutes
-    $plannedDuration = secondsToDaysHoursMinutes($plannedDurationSeconds);
+        // Convert planned duration to days, hours, and minutes
+        $plannedDuration = secondsToDaysHoursMinutes($plannedDurationSeconds);
 
-    // Store planned duration in the task array
-    $task['planned_duration'] = $plannedDuration;
+        // Store planned duration in the task array
+        $task['planned_duration'] = $plannedDuration;
 
-    // Calculate actual duration (from actual start date to current date)
-    if (!empty($task['actual_start_date'])) {
-        $actualStartDate = strtotime($task['actual_start_date']);
-        $currentDate = time(); // Current date and time
-        $actualDurationSeconds = getWeekdaySeconds($actualStartDate, $currentDate);
+        // Calculate actual duration (from actual start date to current date)
+        if (!empty($task['actual_start_date'])) {
+            $actualStartDate = strtotime($task['actual_start_date']);
+            $currentDate = time(); // Current date and time
+            $actualDurationSeconds = getWeekdaySeconds($actualStartDate, $currentDate);
 
-        // Convert actual duration to days, hours, and minutes
-        $actualDuration = secondsToDaysHoursMinutes($actualDurationSeconds);
+            // Convert actual duration to days, hours, and minutes
+            $actualDuration = secondsToDaysHoursMinutes($actualDurationSeconds);
 
-        // Store actual duration in the task array
-        $task['actual_duration'] = $actualDuration;
+            // Store actual duration in the task array
+            $task['actual_duration'] = $actualDuration;
 
-        // Determine available statuses based on the comparison
-        if ($actualDurationSeconds >= $plannedDurationSeconds) {
-            $task['available_statuses'] = ['Delayed Completion'];
+            // Debug output
+            echo "Task ID: " . $task['task_id'] . "\n";
+            echo "Planned Duration: " . json_encode($plannedDuration) . "\n";
+            echo "Actual Duration: " . json_encode($actualDuration) . "\n";
+            echo "Comparison: Actual (" . $actualDurationSeconds . " seconds) >= Planned (" . $plannedDurationSeconds . " seconds)?\n";
+
+            // Determine available statuses based on the comparison
+            if ($actualDurationSeconds >= $plannedDurationSeconds) {
+                $task['available_statuses'] = ['Delayed Completion'];
+                echo "Status: Delayed Completion\n";
+            } else {
+                $task['available_statuses'] = ['Completed on Time'];
+                echo "Status: Completed on Time\n";
+            }
         } else {
-            $task['available_statuses'] = ['Completed on Time'];
+            // If actual start date is not set, no status change is allowed
+            $task['available_statuses'] = [];
+            $task['actual_duration'] = null; // Set actual duration to null
+            echo "Status: No actual start date\n";
         }
     } else {
-        // If actual start date is not set, no status change is allowed
-        $task['available_statuses'] = [];
-        $task['actual_duration'] = null; // Set actual duration to null
+        // Skip tasks that are not "In Progress"
+        echo "Task ID: " . $task['task_id'] . " - Skipped (Status: " . $task['status'] . ")\n";
     }
 }
 
