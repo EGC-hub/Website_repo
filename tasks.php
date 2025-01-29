@@ -10,7 +10,18 @@ require 'PHPMailer-master/src/Exception.php';
 require 'PHPMailer-master/src/PHPMailer.php';
 require 'PHPMailer-master/src/SMTP.php';
 
+// Include the permissions file
+require 'permissions.php';
+
 session_start();
+
+if (isset($_COOKIE['user_timezone'])) {
+    $userTimeZone = $_COOKIE['user_timezone'];
+    date_default_timezone_set($userTimeZone);
+} else {
+    // Default timezone if not provided
+    date_default_timezone_set('UTC');
+}
 
 // Check if the user is not logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
@@ -93,11 +104,11 @@ if ($userResult->num_rows > 0) {
     $hasMultipleDepartments = false;
 }
 
-// Fetch users for task assignment (admin and manager roles)
+// Fetch users for task assignment (assign_tasks privilege & Tasks module)
 $users = [];
-if ($user_role === 'Admin' || $user_role === 'Manager') {
-    if ($user_role === 'Admin') {
-        // Admin can assign tasks to users and managers
+if (hasPermission('assign_tasks', 'Tasks')) {
+    if (hasPermission('assign_to_any_user_tasks', 'Tasks')) {
+        // assign_to_any_user_tasks privilege can assign tasks to users and managers
         $userQuery = "
             SELECT u.id, u.username, u.email, GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, r.name AS role 
             FROM users u
@@ -108,7 +119,7 @@ if ($user_role === 'Admin' || $user_role === 'Manager') {
             GROUP BY u.id
         ";
     } else {
-        // Manager can only assign tasks to users in their department
+        // others can only assign tasks to users in their department
         $userQuery = "
             SELECT u.id, u.username, u.email, GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, r.name AS role 
             FROM users u
@@ -122,7 +133,7 @@ if ($user_role === 'Admin' || $user_role === 'Manager') {
     }
 
     $stmt = $conn->prepare($userQuery);
-    if ($user_role === 'Manager') {
+    if (!hasPermission('assign_to_any_user_tasks', 'Tasks')) {
         $stmt->bind_param("i", $user_id);
     }
     $stmt->execute();
@@ -186,8 +197,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     $recorded_timestamp = date("Y-m-d H:i:s");
     $assigned_by_id = $_SESSION['user_id'];
 
+    $currentDate = new DateTime();
+
+    // Get the planned start and end dates
+    $datePlannedStartDate = new DateTime($planned_start_date);
+    $datePlannedEndDate = new DateTime($planned_finish_date);
+
+    // Calculate the 3-month boundary dates
+    $threeMonthsAgo = clone $currentDate;
+    $threeMonthsAgo->modify('-3 months');
+
+    $threeMonthsAhead = clone $currentDate;
+    $threeMonthsAhead->modify('+3 months');
+
+
+
     if (empty($project_name) || empty($task_name) || empty($task_description) || empty($project_type) || empty($planned_start_date) || empty($planned_finish_date) || !$assigned_user_id) {
         echo '<script>alert("Please fill in all required fields.");</script>';
+    } elseif ($datePlannedStartDate < $threeMonthsAgo || $datePlannedEndDate > $threeMonthsAhead) {
+        echo '<script>alert("Error: Planned start date is too far in the past or too far in the future.");</script>';
     } else {
         $stmt = $conn->prepare(
             "INSERT INTO tasks (user_id, project_name, task_name, task_description, project_type, planned_start_date, planned_finish_date, status, recorded_timestamp, assigned_by_id) 
@@ -231,8 +259,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     }
 }
 
-$taskQuery = $user_role === 'Admin'
-    ? "
+if (hasPermission('view_all_tasks', 'Tasks')) {
+    // Admin-like query: Fetch all tasks
+    $taskQuery = "
         SELECT 
             tasks.task_id,
             tasks.project_name,
@@ -241,14 +270,14 @@ $taskQuery = $user_role === 'Admin'
             tasks.planned_start_date,
             tasks.planned_finish_date,
             tasks.actual_start_date,
-            tasks.actual_finish_date AS task_actual_finish_date, -- Alias for tasks.actual_finish_date
+            tasks.actual_finish_date AS task_actual_finish_date,
             tasks.status,
             tasks.project_type,
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
             task_transactions.delayed_reason,
-            task_transactions.actual_finish_date AS transaction_actual_finish_date, -- Alias for task_transactions.actual_finish_date
+            task_transactions.actual_finish_date AS transaction_actual_finish_date,
             tasks.completion_description,
             assigned_to_user.username AS assigned_to, 
             GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
@@ -270,89 +299,99 @@ $taskQuery = $user_role === 'Admin'
                 WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
             END DESC, 
             tasks.recorded_timestamp DESC
-    "
-    : ($user_role === 'Manager'
-        ? "
-            SELECT 
-                tasks.task_id,
-                tasks.project_name,
-                tasks.task_name,
-                tasks.task_description,
-                tasks.planned_start_date,
-                tasks.planned_finish_date,
-                tasks.actual_start_date,
-                tasks.actual_finish_date AS task_actual_finish_date, -- Alias for tasks.actual_finish_date
-                tasks.status,
-                tasks.project_type,
-                tasks.recorded_timestamp,
-                tasks.assigned_by_id,
-                tasks.user_id,
-                task_transactions.delayed_reason,
-                task_transactions.actual_finish_date AS transaction_actual_finish_date, -- Alias for task_transactions.actual_finish_date
-                tasks.completion_description,
-                assigned_to_user.username AS assigned_to, 
-                GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
-                assigned_by_user.username AS assigned_by,
-                GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
-            FROM tasks 
-            LEFT JOIN task_transactions ON tasks.task_id = task_transactions.task_id
-            JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
-            JOIN user_departments AS assigned_to_ud ON assigned_to_user.id = assigned_to_ud.user_id
-            JOIN departments AS assigned_to_department ON assigned_to_ud.department_id = assigned_to_department.id
-            JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-            JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
-            JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
-            WHERE assigned_to_ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
-            GROUP BY tasks.task_id
-            ORDER BY 
-                CASE 
-                    WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
-                    WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
-                    WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
-                END DESC, 
-                tasks.recorded_timestamp DESC
-        "
-        : "
-            SELECT 
-                tasks.task_id,
-                tasks.project_name,
-                tasks.task_name,
-                tasks.task_description,
-                tasks.planned_start_date,
-                tasks.planned_finish_date,
-                tasks.actual_start_date,
-                tasks.actual_finish_date AS task_actual_finish_date, -- Alias for tasks.actual_finish_date
-                tasks.status,
-                tasks.project_type,
-                tasks.recorded_timestamp,
-                tasks.assigned_by_id,
-                tasks.user_id,
-                task_transactions.delayed_reason,
-                task_transactions.actual_finish_date AS transaction_actual_finish_date, -- Alias for task_transactions.actual_finish_date
-                tasks.completion_description,
-                assigned_by_user.username AS assigned_by,
-                GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
-            FROM tasks 
-            LEFT JOIN task_transactions ON tasks.task_id = task_transactions.task_id
-            JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
-            JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
-            JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
-            WHERE tasks.user_id = ? 
-            GROUP BY tasks.task_id
-            ORDER BY 
-                CASE 
-                    WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
-                    WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
-                    WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
-                END DESC, 
-                tasks.recorded_timestamp DESC
-        ");
+    ";
+} elseif (hasPermission('view_department_tasks', 'Tasks')) {
+    //Fetch tasks for users in the same department
+    $taskQuery = "
+        SELECT 
+            tasks.task_id,
+            tasks.project_name,
+            tasks.task_name,
+            tasks.task_description,
+            tasks.planned_start_date,
+            tasks.planned_finish_date,
+            tasks.actual_start_date,
+            tasks.actual_finish_date AS task_actual_finish_date,
+            tasks.status,
+            tasks.project_type,
+            tasks.recorded_timestamp,
+            tasks.assigned_by_id,
+            tasks.user_id,
+            task_transactions.delayed_reason,
+            task_transactions.actual_finish_date AS transaction_actual_finish_date,
+            tasks.completion_description,
+            assigned_to_user.username AS assigned_to, 
+            GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
+            assigned_by_user.username AS assigned_by,
+            GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
+        FROM tasks 
+        LEFT JOIN task_transactions ON tasks.task_id = task_transactions.task_id
+        JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
+        JOIN user_departments AS assigned_to_ud ON assigned_to_user.id = assigned_to_ud.user_id
+        JOIN departments AS assigned_to_department ON assigned_to_ud.department_id = assigned_to_department.id
+        JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+        JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
+        JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
+        WHERE assigned_to_ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
+        GROUP BY tasks.task_id
+        ORDER BY 
+            CASE 
+                WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
+                WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
+                WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
+            END DESC, 
+            tasks.recorded_timestamp DESC
+    ";
+} elseif (hasPermission('view_own_tasks', 'Tasks')) {
+    //Fetch only tasks assigned to the current user
+    $taskQuery = "
+        SELECT 
+            tasks.task_id,
+            tasks.project_name,
+            tasks.task_name,
+            tasks.task_description,
+            tasks.planned_start_date,
+            tasks.planned_finish_date,
+            tasks.actual_start_date,
+            tasks.actual_finish_date AS task_actual_finish_date,
+            tasks.status,
+            tasks.project_type,
+            tasks.recorded_timestamp,
+            tasks.assigned_by_id,
+            tasks.user_id,
+            task_transactions.delayed_reason,
+            task_transactions.actual_finish_date AS transaction_actual_finish_date,
+            tasks.completion_description,
+            assigned_by_user.username AS assigned_by,
+            GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
+        FROM tasks 
+        LEFT JOIN task_transactions ON tasks.task_id = task_transactions.task_id
+        JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
+        JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
+        JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
+        WHERE tasks.user_id = ? 
+        GROUP BY tasks.task_id
+        ORDER BY 
+            CASE 
+                WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
+                WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
+                WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
+            END DESC, 
+            tasks.recorded_timestamp DESC
+    ";
+} else {
+    // No permission: Fetch no tasks
+    $taskQuery = "SELECT NULL";
+}
 
-// Fetch all tasks based on user role
+// Fetch all tasks based on privilege
 $stmt = $conn->prepare($taskQuery);
-if ($user_role === 'Manager' || $user_role === 'User') {
+
+if (hasPermission('view_department_tasks', 'Tasks') || hasPermission('view_own_tasks', 'Tasks')) {
+    // Bind the user ID for Manager and User queries
     $stmt->bind_param("i", $user_id);
 }
+
 $stmt->execute();
 $result = $stmt->get_result();
 $allTasks = $result->fetch_all(MYSQLI_ASSOC);
@@ -400,7 +439,6 @@ $completedTasks = array_filter($allTasks, function ($task) {
 
 <!-- Delay logic -->
 <?php
-// Define the getWeekdayHours function once at the top of the script
 function getWeekdayHours($start, $end)
 {
     $weekdayHours = 0;
@@ -946,11 +984,14 @@ function getWeekdayHours($start, $end)
             <div class="sidebar">
                 <h3>Menu</h3>
                 <a href="tasks.php">Tasks</a>
-                <?php if ($user_role === 'Admin' || $user_role === 'Manager'): ?>
+                <?php if (hasPermission('read_users', 'Users')): ?>
                     <a href="view-users.php">View Users</a>
                 <?php endif; ?>
-                <?php if ($user_role === 'Admin'): ?>
+                <?php if (hasPermission('read_roles_&_departments', 'Roles & Departments')): ?>
                     <a href="view-roles-departments.php">View Role or Department</a>
+                <?php endif; ?>
+                <?php if (hasPermission('read_&_write_privileges', 'Privileges')): ?>
+                    <a href="assign-privilege.php">Assign & View Privileges</a>
                 <?php endif; ?>
             </div>
 
@@ -982,14 +1023,16 @@ function getWeekdayHours($start, $end)
                         <!-- Filter Container -->
                         <div class="filter-container">
                             <div class="filter-buttons">
-                                <?php if ($user_role === 'Admin' || $user_role === 'Manager'): ?>
+                                <?php if (hasPermission('create_tasks', 'Tasks')): ?>
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                         data-bs-target="#taskManagementModal">
                                         Create New Task
                                     </button>
                                 <?php endif; ?>
                                 <button onclick="resetFilters()" class="btn btn-primary">Reset</button>
-                                <a href="export_tasks.php" class="btn btn-success">Export to CSV</a>
+                                <?php if (hasPermission('export_tasks', 'Tasks')): ?>
+                                    <a href="export_tasks.php" class="btn btn-success">Export to CSV</a>
+                                <?php endif; ?>
                             </div>
 
                             <!-- Filter Dropdowns and Date Range -->
@@ -1008,7 +1051,7 @@ function getWeekdayHours($start, $end)
                                     </select>
                                 </div>
 
-                                <?php if ($user_role === 'Admin' || $hasMultipleDepartments): ?>
+                                <?php if (hasPermission('filter_tasks', 'Tasks') || $hasMultipleDepartments): ?>
                                     <!-- Multi-select dropdown for filtering by department -->
                                     <div class="filter-dropdown">
                                         <label for="department-filter">Filter by Department of Assigned User:</label>
@@ -1069,11 +1112,11 @@ function getWeekdayHours($start, $end)
                                     <th>Status</th>
                                     <th>Project Type</th>
                                     <th>Assigned By</th>
-                                    <?php if ($user_role !== 'User'): ?>
+                                    <?php if (hasPermission('assign_tasks', 'Tasks')): ?>
                                         <th>Assigned To</th>
                                     <?php endif; ?>
                                     <th>Created On</th>
-                                    <?php if ($user_role !== 'User'): ?>
+                                    <?php if (hasPermission('assign_tasks', 'Tasks')): ?>
                                         <th>Actions</th>
                                     <?php endif; ?>
                                 </tr>
@@ -1137,15 +1180,15 @@ function getWeekdayHours($start, $end)
                                                 // Define the available statuses based on the user role and current status
                                                 $statuses = [];
 
-                                                // Logic for Admin or the user who assigned the task
-                                                if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
-                                                    // Admin or the user who assigned the task can change status to anything except "In Progress", "Completed on Time", and "Delayed Completion"
+                                                // Logic for status_change_main privilege or the user who assigned the task
+                                                if (hasPermission('status_change_main', 'Tasks') || $assigned_by_id == $user_id) {
+                                                    // status_change_main privilege or the user who assigned the task can change status to anything except "In Progress", "Completed on Time", and "Delayed Completion"
                                                     if (in_array($currentStatus, ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'])) {
                                                         $statuses = ['Assigned', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'];
                                                     }
                                                 }
                                                 // Logic for Regular User (assigned user)
-                                                elseif ($user_role === 'User' && $user_id == $assigned_user_id) {
+                                                elseif (hasPermission('status_change_normal', 'Tasks') && $user_id == $assigned_user_id) {
                                                     // Regular user can only change status if they are the assigned user
                                                     if ($currentStatus === 'Assigned') {
                                                         // If the task is "Assigned", the next viable options are "In Progress"
@@ -1186,7 +1229,7 @@ function getWeekdayHours($start, $end)
                                         <td><?= htmlspecialchars($row['assigned_by']) ?>
                                             (<?= htmlspecialchars($row['assigned_by_department']) ?>)
                                         </td>
-                                        <?php if ($user_role !== 'User'): ?>
+                                        <?php if (hasPermission('assign_tasks', 'Tasks')): ?>
                                             <td><?= htmlspecialchars($row['assigned_to']) ?>
                                                 (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                             </td>
@@ -1194,14 +1237,46 @@ function getWeekdayHours($start, $end)
                                         <td data-utc="<?= htmlspecialchars($row['recorded_timestamp']) ?>">
                                             <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
                                         </td>
-                                        <?php if (($user_role !== 'User' && $row['assigned_by_id'] == $_SESSION['user_id']) || $user_role == 'Admin'): ?>
+                                        <?php if ((hasPermission('update_tasks', 'Tasks') && $row['assigned_by_id'] == $_SESSION['user_id']) || hasPermission('upate_tasks_all', 'Tasks')): ?>
                                             <td>
                                                 <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
-                                                <form method="POST" action="delete-task.php" style="display:inline;">
-                                                    <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
-                                                    <button type="submit" class="delete-button"
-                                                        onclick="return confirm('Are you sure?')">Delete</button>
-                                                </form>
+                                                <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal<?= $row['task_id'] ?>">
+                                                    Delete
+                                                </button>
+                                                <!-- Delete Modal -->
+                                                <div class="modal fade" id="deleteModal<?= $row['task_id'] ?>" tabindex="-1"
+                                                    aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="deleteModalLabel">Delete Task</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                    aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <form method="POST" action="delete-task.php">
+                                                                    <input type="hidden" name="task_id"
+                                                                        value="<?= $row['task_id'] ?>">
+                                                                    <input type="hidden" name="user_id"
+                                                                        value="<?= $_SESSION['user_id'] ?>">
+                                                                    <div class="mb-3">
+                                                                        <label for="reason" class="form-label">Reason for
+                                                                            deleting the task:</label>
+                                                                        <textarea class="form-control" id="reason" name="reason"
+                                                                            rows="3" required></textarea>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary"
+                                                                            data-bs-dismiss="modal">Cancel</button>
+                                                                        <button type="submit" class="btn btn-danger">Delete
+                                                                            Task</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </td>
                                         <?php else: ?>
 
@@ -1234,7 +1309,7 @@ function getWeekdayHours($start, $end)
                                     <th>Status</th>
                                     <th>Project Type</th>
                                     <th>Assigned By</th>
-                                    <?php if ($user_role !== 'User'): ?>
+                                    <?php if (hasPermission('assign_tasks', 'Tasks')): ?>
                                         <th>Assigned To</th>
                                     <?php endif; ?>
                                     <th>Created On</th>
@@ -1292,33 +1367,6 @@ function getWeekdayHours($start, $end)
                                         <td>
                                             <?php if ($row['task_actual_finish_date']): ?>
                                                 <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['task_actual_finish_date']))) ?>
-                                                <?php if ($row['status'] === 'Delayed Completion'): ?>
-                                                    <?php
-                                                    // Convert dates to timestamps
-                                                    $plannedStartDate = strtotime($row['planned_start_date']);
-                                                    $plannedFinishDate = strtotime($row['planned_finish_date']);
-                                                    $actualStartDate = strtotime($row['actual_start_date']);
-                                                    $actualFinishDate = strtotime($row['task_actual_finish_date']);
-
-                                                    if ($plannedStartDate && $plannedFinishDate && $actualStartDate && $actualFinishDate) {
-                                                        // Calculate planned duration (in seconds)
-                                                        $plannedDuration = $plannedFinishDate - $plannedStartDate;
-
-                                                        // Calculate actual duration (in seconds)
-                                                        $actualDuration = $actualFinishDate - $actualStartDate;
-
-                                                        // Calculate delay (in seconds)
-                                                        $delaySeconds = $actualDuration - $plannedDuration;
-
-                                                        // Convert delay into days and hours
-                                                        $delayDays = floor($delaySeconds / (60 * 60 * 24)); // Total days
-                                                        $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60)); // Remaining hours
-                                        
-                                                        // Display the delay duration
-                                                        echo "<br><small class='text-danger'>{$delayDays} days, {$delayHours} hours delayed</small>";
-                                                    }
-                                                    ?>
-                                                <?php endif; ?>
                                             <?php else: ?>
                                                 N/A
                                             <?php endif; ?>
@@ -1335,7 +1383,7 @@ function getWeekdayHours($start, $end)
 
                                                 // Define the available statuses based on the user role and current status
                                                 $statuses = [];
-                                                if ($user_role === 'Admin' || $assigned_by_id == $user_id) {
+                                                if (hasPermission('status_change_main', 'Tasks') || $assigned_by_id == $user_id) {
                                                     // Admin or the user who assigned the task can change status to "Closed"
                                                     if (in_array($currentStatus, ['Completed on Time', 'Delayed Completion'])) {
                                                         $statuses = ['Closed'];
@@ -1357,6 +1405,49 @@ function getWeekdayHours($start, $end)
                                                     // Display the status as plain text if the user is not allowed to change it
                                                     echo $currentStatus;
                                                 }
+
+                                                // Show delay information for delayed completion
+                                                if ($currentStatus === 'Delayed Completion') {
+                                                    $plannedStartDate = strtotime($row['planned_start_date']);
+                                                    $plannedFinishDate = strtotime($row['planned_finish_date']);
+
+                                                    // Ensure planned finish date is after planned start date
+                                                    if ($plannedFinishDate < $plannedStartDate) {
+                                                        $plannedFinishDate += 86400; // Add 24 hours to correct AM/PM crossing
+                                                    }
+
+                                                    // Calculate planned duration
+                                                    $plannedDuration = $plannedFinishDate - $plannedStartDate;
+
+                                                    if (!empty($row['actual_start_date']) && !empty($row['task_actual_finish_date'])) {
+                                                        $actualStartDate = strtotime($row['actual_start_date']);
+                                                        $actualFinishDate = strtotime($row['task_actual_finish_date']);
+
+                                                        // Ensure actual finish date is after actual start date
+                                                        if ($actualFinishDate < $actualStartDate) {
+                                                            $actualFinishDate += 86400; // Add 24 hours if needed
+                                                        }
+
+                                                        // Calculate actual duration
+                                                        $actualDuration = $actualFinishDate - $actualStartDate;
+                                                        $delaySeconds = max(0, $actualDuration - $plannedDuration); // Prevent negative delays
+                                            
+                                                        if ($delaySeconds > 0) {
+                                                            $delayDays = floor($delaySeconds / (60 * 60 * 24));
+                                                            $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60));
+
+                                                            $delayText = [];
+                                                            if ($delayDays > 0) {
+                                                                $delayText[] = "$delayDays days";
+                                                            }
+                                                            if ($delayHours > 0 || empty($delayText)) {
+                                                                $delayText[] = "$delayHours hours";
+                                                            }
+
+                                                            echo "<br><small class='text-danger'>" . implode(", ", $delayText) . " delayed</small>";
+                                                        }
+                                                    }
+                                                }
                                                 ?>
                                             </form>
                                         </td>
@@ -1364,7 +1455,7 @@ function getWeekdayHours($start, $end)
                                         <td><?= htmlspecialchars($row['assigned_by']) ?>
                                             (<?= htmlspecialchars($row['assigned_by_department']) ?>)
                                         </td>
-                                        <?php if ($user_role !== 'User'): ?>
+                                        <?php if (hasPermission('assign_tasks', 'Tasks')): ?>
                                             <td><?= htmlspecialchars($row['assigned_to']) ?>
                                                 (<?= htmlspecialchars($row['assigned_to_department']) ?>)
                                             </td>
@@ -1813,6 +1904,12 @@ function getWeekdayHours($start, $end)
 
             <script>
                 $(document).ready(function () {
+                    // Get the user's timezone
+                    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+                    // Send the timezone to the server (via AJAX or hidden form field)
+                    document.cookie = "user_timezone=" + userTimeZone; // Store it as a cookie
+
                     const tasksPerPage = 10; // Number of tasks per table per page
                     let currentPage = 1; // Current page for both tables
 
@@ -1864,33 +1961,32 @@ function getWeekdayHours($start, $end)
                             const departmentName = $(this).find('td:nth-child(12)').text().trim().match(/\(([^)]+)\)/)?.[1] || '';
                             const plannedStartDate = new Date($(this).find('td:nth-child(5)').text().trim());
                             const plannedFinishDate = new Date($(this).find('td:nth-child(6)').text().trim());
-                            const actualStartDate = new Date($(this).find('td:nth-child(7)').text().trim()); // Adjust the column index if needed
-                            const actualFinishDate = new Date($(this).find('td:nth-child(8)').text().trim()); // Adjust the column index if needed
-                            const taskStatus = $(this).find('td:nth-child(9) select').val() || $(this).find('td:nth-child(7)').text().trim();
+                            const actualStartDate = new Date($(this).find('td:nth-child(7)').text().trim());
+                            const actualFinishDate = new Date($(this).find('td:nth-child(8)').text().trim());
+                            const taskStatus = $(this).find('td:nth-child(9) select').val() || $(this).find('td:nth-child(9)').text().trim();
+
+                            // Enhanced date range filtering
+                            let dateInRange = true;
+                            if (startDate && endDate) {
+                                const filterStartDate = new Date(startDate);
+                                const filterEndDate = new Date(endDate);
+
+                                // Check planned dates
+                                const plannedInRange = plannedStartDate >= filterStartDate && plannedFinishDate <= filterEndDate;
+
+                                // Check actual dates if they exist
+                                const actualInRange = !isNaN(actualStartDate) && !isNaN(actualFinishDate) &&
+                                    actualStartDate >= filterStartDate && actualFinishDate <= filterEndDate;
+
+                                dateInRange = plannedInRange || actualInRange;
+                            }
 
                             // Check if the row matches the selected filters
                             const projectMatch = selectedProjects.length === 0 || selectedProjects.includes('All') || selectedProjects.includes(projectName);
                             const departmentMatch = selectedDepartments.length === 0 || selectedDepartments.includes('All') || departmentName.split(', ').some(dept => selectedDepartments.includes(dept));
                             const statusMatch = tableId !== '#pending-tasks' || selectedStatuses.length === 0 || selectedStatuses.includes('All') || selectedStatuses.includes(taskStatus);
 
-                            // Date filtering logic
-                            let dateMatch = true; // Assume the row matches the date filter by default
-
-                            if (startDate || endDate) {
-                                // Use actual dates if available, otherwise fall back to planned dates
-                                const startDateToCompare = actualStartDate || plannedStartDate;
-                                const finishDateToCompare = actualFinishDate || plannedFinishDate;
-
-                                // Check if the task's dates fall within the selected date range
-                                if (startDate && startDateToCompare < new Date(startDate)) {
-                                    dateMatch = false;
-                                }
-                                if (endDate && finishDateToCompare > new Date(endDate)) {
-                                    dateMatch = false;
-                                }
-                            }
-
-                            if (projectMatch && departmentMatch && statusMatch && dateMatch) {
+                            if (projectMatch && departmentMatch && statusMatch && dateInRange) {
                                 visibleRows.push(this);
                             }
                         });
@@ -2020,7 +2116,6 @@ function getWeekdayHours($start, $end)
 
                         timestampCells.forEach(cell => {
                             const utcTimestamp = cell.getAttribute('data-utc'); // Get the UTC timestamp
-                            console.log('UTC Timestamp:', utcTimestamp); // Debug: Log the UTC timestamp
 
                             const options = {
                                 year: 'numeric',
@@ -2034,8 +2129,6 @@ function getWeekdayHours($start, $end)
 
                             const localTime = new Date(utcTimestamp).toLocaleString('en-US', options);
 
-                            console.log('Local Time:', localTime); // Debug: Log the local time
-
                             // Update the cell content with the local time
                             cell.textContent = localTime;
                         });
@@ -2045,6 +2138,25 @@ function getWeekdayHours($start, $end)
                 });
             </script>
 
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Select all delete buttons
+                    const deleteButtons = document.querySelectorAll('.btn-danger[data-bs-toggle="modal"]');
+                    deleteButtons.forEach(button => {
+                        button.addEventListener('click', function () {
+                            const targetModalId = button.getAttribute('data-bs-target');
+                            const targetModal = document.querySelector(targetModalId);
+
+                            if (targetModal) {
+                                console.log(`Opening modal: ${targetModalId}`);
+                                // Modal opens automatically due to Bootstrap behavior
+                            } else {
+                                console.error(`Modal not found: ${targetModalId}`);
+                            }
+                        });
+                    });
+                }); 
+            </script>
             <!-- To check if task desc is more than 2 lines -->
             <script>
                 document.addEventListener('DOMContentLoaded', function () {

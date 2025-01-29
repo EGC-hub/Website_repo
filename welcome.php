@@ -1,11 +1,16 @@
 <?php
 
 ini_set('display_errors', 1);
+// This code sets the display_errors configuration directive to 1, which enables error reporting.
 ini_set('display_startup_errors', 1);
+// This code sets the display_startup_errors configuration directive to 1, which enables error reporting when PHP is starting up.
 error_reporting(E_ALL);
+// This code sets the error_reporting configuration directive to E_ALL, which enables all types of error reporting.
 
 // Start session
 session_start();
+
+require 'permissions.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
@@ -73,7 +78,7 @@ try {
     }
 
     // Fetch total tasks
-    if ($userRole === 'Admin') {
+    if (hasPermission('view_all_tasks', 'Tasks')) {
         $stmt = $pdo->prepare("SELECT COUNT(*) as total_tasks FROM tasks");
         $stmt->execute();
         $totalTasks = $stmt->fetch(PDO::FETCH_ASSOC)['total_tasks'];
@@ -95,12 +100,20 @@ try {
 
         // Fetch average task duration
         $stmt = $pdo->prepare(
-            "SELECT AVG(TIMESTAMPDIFF(DAY, planned_start_date, planned_finish_date)) as avg_duration FROM tasks WHERE status = 'Completed on Time'"
+            "SELECT AVG(
+                CASE 
+                    WHEN actual_start_date IS NOT NULL AND actual_finish_date IS NOT NULL 
+                    THEN TIMESTAMPDIFF(DAY, actual_start_date, actual_finish_date)
+                    ELSE TIMESTAMPDIFF(DAY, planned_start_date, planned_finish_date)
+                END
+            ) as avg_duration 
+            FROM tasks 
+            WHERE status = 'Completed on Time'"
+
         );
         $stmt->execute();
         $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
-        $avgDuration = $avgDurationResult['avg_duration'] ?? 0; // Default to 0 if null
-        $avgDuration = round($avgDuration, 1); // Now safe to round
+        $avgDuration = round($avgDuration ?? 0, 1); // Default to 0 if null and round
 
         // Fetch tasks by department
         $stmt = $pdo->prepare("
@@ -167,7 +180,7 @@ try {
 
     }
 
-    if ($userRole === 'Manager') {
+    if (hasPermission('view_department_tasks', 'Tasks')) {
         // For manager
         // Fetch total tasks for manager's departments
         $stmt = $pdo->prepare("SELECT COUNT(*) as total_tasks 
@@ -315,25 +328,32 @@ try {
 
         // Fetch average task duration for manager's departments
         $stmt = $pdo->prepare("
-            SELECT AVG(TIMESTAMPDIFF(DAY, planned_start_date, planned_finish_date)) as avg_duration 
+            SELECT AVG(
+                CASE 
+                    WHEN actual_start_date IS NOT NULL AND actual_finish_date IS NOT NULL 
+                    THEN TIMESTAMPDIFF(DAY, actual_start_date, actual_finish_date)
+                    ELSE TIMESTAMPDIFF(DAY, planned_start_date, planned_finish_date)
+                END
+            ) as avg_duration
             FROM tasks t
             JOIN user_departments ud ON t.user_id = ud.user_id
-            WHERE t.status = 'Completed on Time' 
+            WHERE t.status = 'Completed on Time'
             AND ud.department_id IN (
-                SELECT department_id 
-                FROM user_departments 
+                SELECT department_id
+                FROM user_departments
                 WHERE user_id = :user_id
             )
         ");
+
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
         $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
-        $avgDuration = $avgDurationResult['avg_duration'] ?? 0; // Default to 0 if null
-        $avgDuration = round($avgDuration, 1); // Now safe to round
+        $avgDuration = round($avgDuration ?? 0, 1); // Default to 0 if null and round
+
     }
 
     // For User
-    if ($userRole === 'User') {
+    if (hasPermission('view_own_tasks', 'Tasks')) {
         // Fetch total tasks for the user
         $stmt = $pdo->prepare("SELECT COUNT(*) as total_tasks FROM tasks WHERE user_id = :user_id");
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
@@ -393,15 +413,23 @@ try {
 
         // Fetch average task duration for the user
         $stmt = $pdo->prepare("
-        SELECT AVG(TIMESTAMPDIFF(DAY, planned_start_date, planned_finish_date)) as avg_duration 
-        FROM tasks 
-        WHERE status = 'Completed on Time' AND user_id = :user_id
-    ");
+            SELECT AVG(
+                CASE 
+                    WHEN actual_start_date IS NOT NULL AND actual_finish_date IS NOT NULL 
+                    THEN TIMESTAMPDIFF(DAY, actual_start_date, actual_finish_date)
+                    ELSE TIMESTAMPDIFF(DAY, planned_start_date, planned_finish_date)
+                END
+            ) as avg_duration 
+            FROM tasks 
+            WHERE status = 'Completed on Time' 
+            AND user_id = :user_id
+        ");
+
         $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
         $avgDuration = $stmt->fetch(PDO::FETCH_ASSOC)['avg_duration'];
-        $avgDuration = $avgDurationResult['avg_duration'] ?? 0; // Default to 0 if null
-        $avgDuration = round($avgDuration, 1); // Now safe to round
+        $avgDuration = round($avgDuration ?? 0, 1);
+
     }
 
     // Optional: Session timeout settings
@@ -583,11 +611,14 @@ try {
         <div class="sidebar">
             <h3>Menu</h3>
             <a href="tasks.php">Tasks</a>
-            <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
+            <?php if (hasPermission('read_users', 'Users')): ?>
                 <a href="view-users.php">View Users</a>
             <?php endif; ?>
-            <?php if ($userRole === 'Admin'): ?>
+            <?php if (hasPermission('read_roles_&_departments', 'Roles & Departments')): ?>
                 <a href="view-roles-departments.php">View Role or Department</a>
+            <?php endif; ?>
+            <?php if (hasPermission('read_&_write_privileges', 'Privileges')): ?>
+                <a href="assign-privilege.php">Assign & View Privileges</a>
             <?php endif; ?>
         </div>
 
@@ -702,12 +733,12 @@ try {
                     </div>
 
                     <!-- Tasks by Department (Only for Admin and Manager) -->
-                    <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
+                    <?php if (hasPermission('dashboard_tasks', 'Dashboard')): ?>
                         <div class="col-md-4">
                             <div class="card h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">
-                                        <?= ($userRole === 'Manager') ? 'Tasks in My Departments' : 'Tasks by Department' ?>
+                                        <?= (hasPermission('dashboard_tasks_department', 'Dashboard')) ? 'Tasks in My Departments' : 'Tasks by Department' ?>
                                     </h5>
                                     <div class="text-center">
                                         <canvas id="tasksByDepartmentChart"></canvas>
@@ -718,12 +749,12 @@ try {
                     <?php endif; ?>
 
                     <!-- User Performance (Only for Admin and Manager) -->
-                    <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
+                    <?php if (hasPermission('dashboard_tasks', 'Dashboard')): ?>
                         <div class="col-md-4">
                             <div class="card h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">
-                                        <?= ($userRole === 'Manager') ? 'Top Performers in My Departments' : 'Top Performers' ?>
+                                        <?= (hasPermission('dashboard_tasks_department', 'Dashboard')) ? 'Top Performers in My Departments' : 'Top Performers' ?>
                                     </h5>
                                     <ul class="list-group list-group-flush">
                                         <?php foreach ($topPerformers as $performer): ?>
@@ -1137,7 +1168,8 @@ try {
             });
 
             function fetchTaskData(status) {
-                fetch(`fetch-tasks.php?status=${status}`)
+                const encodedStatus = encodeURIComponent(status);
+                fetch(`fetch-tasks.php?status=${encodedStatus}`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -1209,15 +1241,24 @@ try {
                 } else {
                     data.forEach((task, index) => {
                         const row = document.createElement('tr');
+                        let displayDate;
+
+                        if ((status === 'Delayed Completion' || status === 'Completed on Time') && task.actual_completion_date) {
+                            displayDate = task.actual_completion_date;
+                        } else {
+                            displayDate = task.completion_date || task.start_date || task.planned_finish_date;
+                        }
+
                         row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${task.task_name}</td>
-                <td>${task.assigned_to}</td>
-                <td>${task.department}</td>
-                <td>${task.completion_date || task.start_date || task.planned_finish_date}</td>
-            `;
+                            <td>${index + 1}</td>
+                            <td>${task.task_name}</td>
+                            <td>${task.assigned_to}</td>
+                            <td>${task.department}</td>
+                            <td>${displayDate}</td>
+                        `;
                         tableBody.appendChild(row);
                     });
+
                 }
 
                 // Show the modal
@@ -1257,7 +1298,7 @@ try {
                 }
             });
 
-            <?php if ($userRole === 'Admin' || $userRole === 'Manager'): ?>
+            <?php if (hasPermission('dashboard_tasks', 'Dashboard')): ?>
                 // Tasks by Department (Bar Chart)
                 const tasksByDepartmentChart = new Chart(document.getElementById('tasksByDepartmentChart'), {
                     type: 'bar',
