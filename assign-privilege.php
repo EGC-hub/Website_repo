@@ -65,21 +65,29 @@ try {
         $permission_ids = $_POST['permissions'] ?? [];
 
         // Add validation check
-        if (empty($role_id) || empty($module_id) || empty($permission_ids)) {
-            $_SESSION['errorMsg'] = "Please select both Role and Privileges to assign.";
+        if (empty($role_id)) {
+            $_SESSION['errorMsg'] = "Please select a Role to assign or revoke privileges.";
             header("Location: assign-privilege.php");
             exit;
         }
 
+        // Delete existing permissions for the role and module
         $pdo->prepare("DELETE FROM role_permissions WHERE role_id = ? AND module_id = ?")
             ->execute([$role_id, $module_id]);
 
+        // Insert new permissions for the role and module
         foreach ($permission_ids as $permission_id) {
             $pdo->prepare("INSERT IGNORE INTO role_permissions (role_id, permission_id, module_id) VALUES (?, ?, ?)")
                 ->execute([$role_id, $permission_id, $module_id]);
         }
 
-        $_SESSION['successMsg'] = "Permissions assigned successfully.";
+        // If no permissions were selected, delete all permissions for the role and module
+        if (empty($permission_ids)) {
+            $pdo->prepare("DELETE FROM role_permissions WHERE role_id = ? AND module_id = ?")
+                ->execute([$role_id, $module_id]);
+        }
+
+        $_SESSION['successMsg'] = "Privileges updated successfully.";
         header("Location: assign-privilege.php");
         exit;
     }
