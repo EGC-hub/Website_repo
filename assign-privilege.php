@@ -554,7 +554,7 @@ function formatPermissionName($permissionName)
 
                     // Check the checkboxes based on the filtered privileges
                     data.forEach(function (privilege) {
-                        const checkbox = document.querySelector(`input[name="permissions[]"][value="${privilege.permission_id}"]`);
+                        const checkbox = document.querySelector(`input[name="permissions[]"][value="${privilege.permission_id}"][data-module-id="${moduleId}"]`);
                         if (checkbox) {
                             checkbox.checked = true;
                         }
