@@ -64,6 +64,13 @@ try {
         $module_id = $_POST['module_id'];
         $permission_ids = $_POST['permissions'] ?? [];
 
+        // Add validation check
+        if (empty($role_id) || empty($module_id) || empty($permission_ids)) {
+            $_SESSION['errorMsg'] = "Please select both Role and Privileges to assign.";
+            header("Location: assign-privilege.php");
+            exit;
+        }
+
         $pdo->prepare("DELETE FROM role_permissions WHERE role_id = ? AND module_id = ?")
             ->execute([$role_id, $module_id]);
 
