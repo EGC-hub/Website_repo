@@ -5,6 +5,7 @@ $config = include '../config.php';
 $dbHost = 'localhost';
 $dbUsername = $config['dbUsername'];
 $dbPassword = $config['dbPassword'];
+// push try
 $dbName = 'euro_login_system_2';
 
 // Establish database connection
