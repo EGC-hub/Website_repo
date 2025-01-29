@@ -68,7 +68,7 @@ try {
             ->execute([$role_id, $module_id]);
 
         foreach ($permission_ids as $permission_id) {
-            $pdo->prepare("INSERT INTO role_permissions (role_id, permission_id, module_id) VALUES (?, ?, ?)")
+            $pdo->prepare("INSERT IGNORE INTO role_permissions (role_id, permission_id, module_id) VALUES (?, ?, ?)")
                 ->execute([$role_id, $permission_id, $module_id]);
         }
 
@@ -109,7 +109,8 @@ function formatPermissionName($permissionName)
     // Capitalize first letter of each word using ucwords()
     $formattedWords = array_map('ucwords', $words);
     // Join words back together with spaces between them
-    return implode(' ', $formattedWords);}
+    return implode(' ', $formattedWords);
+}
 ?>
 
 <!DOCTYPE html>
