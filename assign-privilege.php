@@ -454,7 +454,7 @@ function formatPermissionName($permissionName)
                                             <?php foreach ($moduleData['permissions'] as $permission): ?>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="checkbox" name="permissions[]"
-                                                        value="<?= $permission['id'] ?>">
+                                                        value="<?= $permission['id'] ?>" data-module-id="<?= $moduleId ?>">
                                                     <label
                                                         class="form-check-label"><?= formatPermissionName($permission['name']) ?></label>
                                                 </div>
