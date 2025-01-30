@@ -1346,7 +1346,7 @@ function getWeekdayHours($start, $end)
                                                 </div>
                                             </td>
                                         <?php else: ?>
-
+                                            echo "N/A";
                                         <?php endif; ?>
                                     </tr>
                                 <?php endforeach; ?>
