@@ -924,6 +924,22 @@ function getWeekdayHours($start, $end)
             width: 300px;
             /* Adjust width as needed */
         }
+
+        .button-container {
+            display: inline-flex;
+            /* Use flexbox for horizontal alignment */
+            gap: 8px;
+            /* Adds spacing between buttons */
+            align-items: center;
+            /* Vertically center the buttons */
+        }
+
+        .btn {
+            min-width: 70px;
+            /* Ensure both buttons have the same width */
+            text-align: center;
+            /* Center text inside buttons */
+        }
     </style>
 </head>
 
@@ -1270,11 +1286,14 @@ function getWeekdayHours($start, $end)
                                         </td>
                                         <?php if ((hasPermission('update_tasks') && $row['assigned_by_id'] == $_SESSION['user_id']) || hasPermission('upate_tasks_all')): ?>
                                             <td>
-                                                <a href="edit-tasks.php?id=<?= $row['task_id'] ?>" class="edit-button">Edit</a>
-                                                <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                                    data-bs-target="#deleteModal<?= $row['task_id'] ?>">
-                                                    Delete
-                                                </button>
+                                                <div class="button-container">
+                                                    <a href="edit-tasks.php?id=<?= $row['task_id'] ?>"
+                                                        class="edit-button">Edit</a>
+                                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                        data-bs-target="#deleteModal<?= $row['task_id'] ?>">
+                                                        Delete
+                                                    </button>
+                                                </div>
                                                 <!-- Delete Modal -->
                                                 <div class="modal fade" id="deleteModal<?= $row['task_id'] ?>" tabindex="-1"
                                                     aria-labelledby="deleteModalLabel" aria-hidden="true">
