@@ -166,6 +166,10 @@ function sendTaskNotification($email, $username, $project_name, $project_type, $
             $assignedByName = "Unknown"; // Fallback if the assigned by user is not found
         }
 
+        // Format the start and end dates
+        $formattedStartDate = (new DateTime($start_date))->format('d M Y, h:i A'); // e.g., 30 Jan 2025, 06:45 PM
+        $formattedEndDate = (new DateTime($end_date))->format('d M Y, h:i A'); // e.g., 01 Feb 2025, 06:45 PM
+
         // Server settings
         $mail->isSMTP();
         $mail->Host = 'smtppro.zoho.com'; // Update with your SMTP server
@@ -189,8 +193,8 @@ function sendTaskNotification($email, $username, $project_name, $project_type, $
             "<li><strong>Task Name:</strong> $task_name</li>" .
             "<li><strong>Task Description:</strong> $task_description</li>" .
             "<li><strong>Project Type:</strong> $project_type</li>" .
-            "<li><strong>Start Date:</strong> $start_date</li>" .
-            "<li><strong>End Date:</strong> $end_date</li>" .
+            "<li><strong>Start Date:</strong> $formattedStartDate</li>" .
+            "<li><strong>End Date:</strong> $formattedEndDate</li>" .
             "</ul>" .
             "<p>Please log in to your account for more details.</p>";
 
@@ -199,7 +203,6 @@ function sendTaskNotification($email, $username, $project_name, $project_type, $
         error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
     }
 }
-
 
 // Handle form submission for adding a task
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
