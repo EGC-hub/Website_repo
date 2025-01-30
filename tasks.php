@@ -926,19 +926,32 @@ function getWeekdayHours($start, $end)
         }
 
         .button-container {
-            display: inline-flex;
-            /* Use flexbox for horizontal alignment */
+            display: flex;
+            /* Use flexbox for layout */
+            flex-direction: column;
+            /* Stack buttons vertically */
             gap: 8px;
-            /* Adds spacing between buttons */
-            align-items: center;
-            /* Vertically center the buttons */
+            /* Add spacing between buttons */
+            align-items: stretch;
+            /* Make buttons stretch to the same width */
         }
 
-        .btn {
-            min-width: 70px;
-            /* Ensure both buttons have the same width */
+        .button-container .btn {
+            width: 100%;
+            /* Make buttons take full width of the container */
             text-align: center;
             /* Center text inside buttons */
+            padding: 0.375rem 0.75rem;
+            /* Match Bootstrap's default button padding */
+        }
+
+        /* Ensure the <a> and <button> elements look the same */
+        .button-container a.btn,
+        .button-container button.btn {
+            display: inline-block;
+            /* Make <a> behave like a block element */
+            text-decoration: none;
+            /* Remove underline from <a> */
         }
     </style>
 </head>
