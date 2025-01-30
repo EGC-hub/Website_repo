@@ -41,6 +41,7 @@ function generateColors($count)
 try {
     $pdo = new PDO($dsn, $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->exec("SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''))");
 
     // Retrieve the username, role, and user ID from the session
     $username = $_SESSION['username'] ?? 'Unknown'; // Fallback to 'Unknown' if not set
@@ -155,7 +156,7 @@ try {
         FROM tasks
         WHERE status = 'Completed on Time'
         GROUP BY DATE_FORMAT(planned_finish_date, '%Y-%m')
-        ORDER BY planned_finish_date;
+        ORDER BY MIN(planned_finish_date);
         ");
         $stmt->execute();
         $taskCompletionOverTime = $stmt->fetchAll(PDO::FETCH_ASSOC);
