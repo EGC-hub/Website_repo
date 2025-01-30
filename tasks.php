@@ -660,6 +660,7 @@ function getWeekdayHours($start, $end)
             border-radius: 5px;
             font-size: 0.9rem;
             transition: background-color 0.3s ease;
+            text-align: center;
         }
 
         .edit-button:hover {
@@ -955,7 +956,6 @@ function getWeekdayHours($start, $end)
         .button-container a.btn,
         .button-container button.btn {
             text-decoration: none;
-            text-align: center;
         }
     </style>
 </head>
