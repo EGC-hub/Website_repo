@@ -267,7 +267,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
 }
 
 if (hasPermission('view_all_tasks')) {
-    // Admin-like query: Fetch all tasks
     $taskQuery = "
         SELECT 
             tasks.task_id,
@@ -283,8 +282,8 @@ if (hasPermission('view_all_tasks')) {
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
-            task_transactions.delayed_reason,
-            task_transactions.actual_finish_date AS transaction_actual_finish_date,
+            MAX(task_transactions.delayed_reason) AS delayed_reason,  -- Apply aggregate function
+            MAX(task_transactions.actual_finish_date) AS transaction_actual_finish_date,  -- Apply aggregate function
             tasks.completion_description,
             assigned_to_user.username AS assigned_to, 
             GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
@@ -298,17 +297,16 @@ if (hasPermission('view_all_tasks')) {
         JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
-        GROUP BY tasks.task_id
+        GROUP BY tasks.task_id, tasks.project_name, tasks.task_name, tasks.task_description, tasks.planned_start_date, tasks.planned_finish_date, tasks.actual_start_date, tasks.status, tasks.project_type, tasks.recorded_timestamp, tasks.assigned_by_id, tasks.user_id, tasks.completion_description, assigned_to_user.username, assigned_by_user.username
         ORDER BY 
             CASE 
                 WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
                 WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
                 WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
             END DESC, 
-            tasks.recorded_timestamp DESC
+            tasks.recorded_timestamp DESC;
     ";
 } elseif (hasPermission('view_department_tasks')) {
-    //Fetch tasks for users in the same department
     $taskQuery = "
         SELECT 
             tasks.task_id,
@@ -324,8 +322,8 @@ if (hasPermission('view_all_tasks')) {
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
-            task_transactions.delayed_reason,
-            task_transactions.actual_finish_date AS transaction_actual_finish_date,
+            MAX(task_transactions.delayed_reason) AS delayed_reason,  -- Apply aggregate function
+            MAX(task_transactions.actual_finish_date) AS transaction_actual_finish_date,  -- Apply aggregate function
             tasks.completion_description,
             assigned_to_user.username AS assigned_to, 
             GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
@@ -340,17 +338,16 @@ if (hasPermission('view_all_tasks')) {
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
         WHERE assigned_to_ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
-        GROUP BY tasks.task_id
+        GROUP BY tasks.task_id, tasks.project_name, tasks.task_name, tasks.task_description, tasks.planned_start_date, tasks.planned_finish_date, tasks.actual_start_date, tasks.status, tasks.project_type, tasks.recorded_timestamp, tasks.assigned_by_id, tasks.user_id, tasks.completion_description, assigned_to_user.username, assigned_by_user.username
         ORDER BY 
             CASE 
                 WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
                 WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
                 WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
             END DESC, 
-            tasks.recorded_timestamp DESC
+            tasks.recorded_timestamp DESC;
     ";
 } elseif (hasPermission('view_own_tasks')) {
-    //Fetch only tasks assigned to the current user
     $taskQuery = "
         SELECT 
             tasks.task_id,
@@ -366,8 +363,8 @@ if (hasPermission('view_all_tasks')) {
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
-            task_transactions.delayed_reason,
-            task_transactions.actual_finish_date AS transaction_actual_finish_date,
+            MAX(task_transactions.delayed_reason) AS delayed_reason,  -- Apply aggregate function
+            MAX(task_transactions.actual_finish_date) AS transaction_actual_finish_date,  -- Apply aggregate function
             tasks.completion_description,
             assigned_by_user.username AS assigned_by,
             GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
@@ -377,14 +374,14 @@ if (hasPermission('view_all_tasks')) {
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
         WHERE tasks.user_id = ? 
-        GROUP BY tasks.task_id
+        GROUP BY tasks.task_id, tasks.project_name, tasks.task_name, tasks.task_description, tasks.planned_start_date, tasks.planned_finish_date, tasks.actual_start_date, tasks.status, tasks.project_type, tasks.recorded_timestamp, tasks.assigned_by_id, tasks.user_id, tasks.completion_description, assigned_by_user.username
         ORDER BY 
             CASE 
                 WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
                 WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
                 WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
             END DESC, 
-            tasks.recorded_timestamp DESC
+            tasks.recorded_timestamp DESC;
     ";
 } else {
     // No permission: Fetch no tasks
