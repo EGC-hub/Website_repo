@@ -943,13 +943,17 @@ function getWeekdayHours($start, $end)
             /* Center text inside buttons */
             padding: 0.375rem 0.75rem;
             /* Match Bootstrap's default button padding */
+            display: flex;
+            /* Use flexbox for centering */
+            justify-content: center;
+            /* Center text horizontally */
+            align-items: center;
+            /* Center text vertically */
         }
 
         /* Ensure the <a> and <button> elements look the same */
         .button-container a.btn,
         .button-container button.btn {
-            display: inline-block;
-            /* Make <a> behave like a block element */
             text-decoration: none;
             /* Remove underline from <a> */
         }
