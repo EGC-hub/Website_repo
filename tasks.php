@@ -68,6 +68,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+$conn->query("SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''))");
+
 // Fetch departments from the database
 $departments = $conn->query("SELECT id, name FROM departments")->fetch_all(MYSQLI_ASSOC);
 
