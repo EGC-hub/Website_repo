@@ -76,13 +76,15 @@ $roles = $conn->query("SELECT id, name FROM roles")->fetch_all(MYSQLI_ASSOC);
 
 // Fetch logged-in user's details
 $userQuery = $conn->prepare("
-    SELECT u.id, u.username, u.email, GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, r.name AS role 
-    FROM users u
-    JOIN user_departments ud ON u.id = ud.user_id
-    JOIN departments d ON ud.department_id = d.id
-    JOIN roles r ON u.role_id = r.id
-    WHERE u.id = ?
-    GROUP BY u.id
+    SELECT u.id, u.username, u.email, 
+       GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, 
+       r.name AS role
+FROM users u
+JOIN user_departments ud ON u.id = ud.user_id
+JOIN departments d ON ud.department_id = d.id
+JOIN roles r ON u.role_id = r.id
+WHERE u.id = ?
+GROUP BY u.id, r.name;  -- Add r.name to the GROUP BY clause
 ");
 $userQuery->bind_param("i", $user_id);
 $userQuery->execute();
@@ -110,25 +112,30 @@ if (hasPermission('assign_tasks')) {
     if (hasPermission('assign_to_any_user_tasks')) {
         // assign_to_any_user_tasks privilege can assign tasks to users and managers
         $userQuery = "
-            SELECT u.id, u.username, u.email, GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, r.name AS role 
-            FROM users u
-            JOIN user_departments ud ON u.id = ud.user_id
-            JOIN departments d ON ud.department_id = d.id
-            JOIN roles r ON u.role_id = r.id
-            WHERE r.name != 'Admin'
-            GROUP BY u.id
+            SELECT u.id, u.username, u.email, 
+       GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, 
+       r.name AS role
+FROM users u
+JOIN user_departments ud ON u.id = ud.user_id
+JOIN departments d ON ud.department_id = d.id
+JOIN roles r ON u.role_id = r.id
+WHERE r.name != 'Admin'
+GROUP BY u.id, r.name;  -- Add r.name to the GROUP BY clause
+
         ";
     } else {
         // others can only assign tasks to users in their department
         $userQuery = "
-            SELECT u.id, u.username, u.email, GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, r.name AS role 
-            FROM users u
-            JOIN user_departments ud ON u.id = ud.user_id
-            JOIN departments d ON ud.department_id = d.id
-            JOIN roles r ON u.role_id = r.id
-            WHERE ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
-              AND r.name = 'User'
-            GROUP BY u.id
+            SELECT u.id, u.username, u.email, 
+       GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, 
+       r.name AS role
+FROM users u
+JOIN user_departments ud ON u.id = ud.user_id
+JOIN departments d ON ud.department_id = d.id
+JOIN roles r ON u.role_id = r.id
+WHERE ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
+  AND r.name = 'User'
+GROUP BY u.id, r.name;  -- Add r.name to the GROUP BY clause
         ";
     }
 
