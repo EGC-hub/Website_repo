@@ -60,7 +60,7 @@ $config = include '../config.php';
 $dbHost = 'localhost';
 $dbUsername = $config['dbUsername'];
 $dbPassword = $config['dbPassword'];
-$dbName = 'euro_login_system_2';
+$dbName = 'euro_login_system';
 
 $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 
@@ -76,15 +76,13 @@ $roles = $conn->query("SELECT id, name FROM roles")->fetch_all(MYSQLI_ASSOC);
 
 // Fetch logged-in user's details
 $userQuery = $conn->prepare("
-    SELECT u.id, u.username, u.email, 
-       GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, 
-       r.name AS role
-FROM users u
-JOIN user_departments ud ON u.id = ud.user_id
-JOIN departments d ON ud.department_id = d.id
-JOIN roles r ON u.role_id = r.id
-WHERE u.id = ?
-GROUP BY u.id, r.name;  -- Add r.name to the GROUP BY clause
+    SELECT u.id, u.username, u.email, GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, r.name AS role 
+    FROM users u
+    JOIN user_departments ud ON u.id = ud.user_id
+    JOIN departments d ON ud.department_id = d.id
+    JOIN roles r ON u.role_id = r.id
+    WHERE u.id = ?
+    GROUP BY u.id
 ");
 $userQuery->bind_param("i", $user_id);
 $userQuery->execute();
@@ -112,30 +110,25 @@ if (hasPermission('assign_tasks')) {
     if (hasPermission('assign_to_any_user_tasks')) {
         // assign_to_any_user_tasks privilege can assign tasks to users and managers
         $userQuery = "
-            SELECT u.id, u.username, u.email, 
-       GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, 
-       r.name AS role
-FROM users u
-JOIN user_departments ud ON u.id = ud.user_id
-JOIN departments d ON ud.department_id = d.id
-JOIN roles r ON u.role_id = r.id
-WHERE r.name != 'Admin'
-GROUP BY u.id, r.name;  -- Add r.name to the GROUP BY clause
-
+            SELECT u.id, u.username, u.email, GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, r.name AS role 
+            FROM users u
+            JOIN user_departments ud ON u.id = ud.user_id
+            JOIN departments d ON ud.department_id = d.id
+            JOIN roles r ON u.role_id = r.id
+            WHERE r.name != 'Admin'
+            GROUP BY u.id
         ";
     } else {
         // others can only assign tasks to users in their department
         $userQuery = "
-            SELECT u.id, u.username, u.email, 
-       GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, 
-       r.name AS role
-FROM users u
-JOIN user_departments ud ON u.id = ud.user_id
-JOIN departments d ON ud.department_id = d.id
-JOIN roles r ON u.role_id = r.id
-WHERE ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
-  AND r.name = 'User'
-GROUP BY u.id, r.name;  -- Add r.name to the GROUP BY clause
+            SELECT u.id, u.username, u.email, GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, r.name AS role 
+            FROM users u
+            JOIN user_departments ud ON u.id = ud.user_id
+            JOIN departments d ON ud.department_id = d.id
+            JOIN roles r ON u.role_id = r.id
+            WHERE ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
+              AND r.name = 'User'
+            GROUP BY u.id
         ";
     }
 
@@ -267,6 +260,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
 }
 
 if (hasPermission('view_all_tasks')) {
+    // Admin-like query: Fetch all tasks
     $taskQuery = "
         SELECT 
             tasks.task_id,
@@ -282,8 +276,8 @@ if (hasPermission('view_all_tasks')) {
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
-            MAX(task_transactions.delayed_reason) AS delayed_reason,  -- Apply aggregate function
-            MAX(task_transactions.actual_finish_date) AS transaction_actual_finish_date,  -- Apply aggregate function
+            task_transactions.delayed_reason,
+            task_transactions.actual_finish_date AS transaction_actual_finish_date,
             tasks.completion_description,
             assigned_to_user.username AS assigned_to, 
             GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
@@ -297,16 +291,17 @@ if (hasPermission('view_all_tasks')) {
         JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
-        GROUP BY tasks.task_id, tasks.project_name, tasks.task_name, tasks.task_description, tasks.planned_start_date, tasks.planned_finish_date, tasks.actual_start_date, tasks.status, tasks.project_type, tasks.recorded_timestamp, tasks.assigned_by_id, tasks.user_id, tasks.completion_description, assigned_to_user.username, assigned_by_user.username
+        GROUP BY tasks.task_id
         ORDER BY 
             CASE 
                 WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
                 WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
                 WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
             END DESC, 
-            tasks.recorded_timestamp DESC;
+            tasks.recorded_timestamp DESC
     ";
 } elseif (hasPermission('view_department_tasks')) {
+    //Fetch tasks for users in the same department
     $taskQuery = "
         SELECT 
             tasks.task_id,
@@ -322,8 +317,8 @@ if (hasPermission('view_all_tasks')) {
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
-            MAX(task_transactions.delayed_reason) AS delayed_reason,  -- Apply aggregate function
-            MAX(task_transactions.actual_finish_date) AS transaction_actual_finish_date,  -- Apply aggregate function
+            task_transactions.delayed_reason,
+            task_transactions.actual_finish_date AS transaction_actual_finish_date,
             tasks.completion_description,
             assigned_to_user.username AS assigned_to, 
             GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
@@ -338,16 +333,17 @@ if (hasPermission('view_all_tasks')) {
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
         WHERE assigned_to_ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
-        GROUP BY tasks.task_id, tasks.project_name, tasks.task_name, tasks.task_description, tasks.planned_start_date, tasks.planned_finish_date, tasks.actual_start_date, tasks.status, tasks.project_type, tasks.recorded_timestamp, tasks.assigned_by_id, tasks.user_id, tasks.completion_description, assigned_to_user.username, assigned_by_user.username
+        GROUP BY tasks.task_id
         ORDER BY 
             CASE 
                 WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
                 WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
                 WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
             END DESC, 
-            tasks.recorded_timestamp DESC;
+            tasks.recorded_timestamp DESC
     ";
 } elseif (hasPermission('view_own_tasks')) {
+    //Fetch only tasks assigned to the current user
     $taskQuery = "
         SELECT 
             tasks.task_id,
@@ -363,8 +359,8 @@ if (hasPermission('view_all_tasks')) {
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
-            MAX(task_transactions.delayed_reason) AS delayed_reason,  -- Apply aggregate function
-            MAX(task_transactions.actual_finish_date) AS transaction_actual_finish_date,  -- Apply aggregate function
+            task_transactions.delayed_reason,
+            task_transactions.actual_finish_date AS transaction_actual_finish_date,
             tasks.completion_description,
             assigned_by_user.username AS assigned_by,
             GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
@@ -374,14 +370,14 @@ if (hasPermission('view_all_tasks')) {
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
         WHERE tasks.user_id = ? 
-        GROUP BY tasks.task_id, tasks.project_name, tasks.task_name, tasks.task_description, tasks.planned_start_date, tasks.planned_finish_date, tasks.actual_start_date, tasks.status, tasks.project_type, tasks.recorded_timestamp, tasks.assigned_by_id, tasks.user_id, tasks.completion_description, assigned_by_user.username
+        GROUP BY tasks.task_id
         ORDER BY 
             CASE 
                 WHEN tasks.status = 'Completed on Time' THEN tasks.planned_finish_date 
                 WHEN tasks.status = 'Delayed Completion' THEN task_transactions.actual_finish_date 
                 WHEN tasks.status = 'Closed' THEN tasks.planned_finish_date 
             END DESC, 
-            tasks.recorded_timestamp DESC;
+            tasks.recorded_timestamp DESC
     ";
 } else {
     // No permission: Fetch no tasks
