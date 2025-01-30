@@ -955,7 +955,7 @@ function getWeekdayHours($start, $end)
         .button-container a.btn,
         .button-container button.btn {
             text-decoration: none;
-            /* Remove underline from <a> */
+            text-align: center;
         }
     </style>
 </head>
