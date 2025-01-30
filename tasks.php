@@ -146,12 +146,26 @@ if (hasPermission('assign_tasks')) {
 }
 
 // Function to send email notifications
-function sendTaskNotification($email, $username, $project_name, $project_type, $task_name, $task_description, $start_date, $end_date)
+function sendTaskNotification($email, $username, $project_name, $project_type, $task_name, $task_description, $start_date, $end_date, $assigned_by_id, $conn)
 {
     $mail = new PHPMailer(true);
 
     try {
         $config = include("../config.php");
+
+        // Fetch the assigned by user's details
+        $assignedByQuery = $conn->prepare("SELECT username FROM users WHERE id = ?");
+        $assignedByQuery->bind_param("i", $assigned_by_id);
+        $assignedByQuery->execute();
+        $assignedByResult = $assignedByQuery->get_result();
+
+        if ($assignedByResult->num_rows > 0) {
+            $assignedByUser = $assignedByResult->fetch_assoc();
+            $assignedByName = $assignedByUser['username'];
+        } else {
+            $assignedByName = "Unknown"; // Fallback if the assigned by user is not found
+        }
+
         // Server settings
         $mail->isSMTP();
         $mail->Host = 'smtppro.zoho.com'; // Update with your SMTP server
@@ -169,7 +183,7 @@ function sendTaskNotification($email, $username, $project_name, $project_type, $
         $mail->isHTML(true);
         $mail->Subject = 'New Task Assigned';
         $mail->Body = "<h3>Hello $username,</h3>" .
-            "<p>You have been assigned a new task:</p>" .
+            "<p>You have been assigned a new task by <strong>$assignedByName</strong>:</p>" .
             "<ul>" .
             "<li><strong>Project Name:</strong> $project_name</li>" .
             "<li><strong>Task Name:</strong> $task_name</li>" .
@@ -185,6 +199,7 @@ function sendTaskNotification($email, $username, $project_name, $project_type, $
         error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
     }
 }
+
 
 // Handle form submission for adding a task
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
@@ -251,8 +266,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
                 $email = $user['email'];
                 $username = $user['username'];
 
-                // Send email notification
-                sendTaskNotification($email, $username, $project_name, $task_name, $task_description, $project_type, $planned_start_date, $planned_finish_date);
+                // Send email notification with assigned_by_id
+                sendTaskNotification(
+                    $email,
+                    $username,
+                    $project_name,
+                    $task_name,
+                    $task_description,
+                    $project_type,
+                    $planned_start_date,
+                    $planned_finish_date,
+                    $assigned_by_id, // Pass the assigned_by_id
+                    $conn // Pass the database connection
+                );
             }
         } else {
             echo '<script>alert("Failed to add task.");</script>';
