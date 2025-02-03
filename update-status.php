@@ -45,6 +45,8 @@ if (!$dbUsername || !$dbPassword) {
     exit;
 }
 
+include 'permissions.php';
+
 // DSN for PDO
 $dsn = "mysql:host=$dbHost;dbname=$dbName;charset=utf8";
 
