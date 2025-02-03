@@ -68,6 +68,13 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+
+// Prepare and execute the query to fetch the session token
+$checkStmt = $conn->prepare("SELECT session_token FROM users WHERE id = ?");
+$checkStmt->bind_param("i", $_SESSION['user_id']);
+$checkStmt->execute();
+$sessionToken = $checkStmt->get_result()->fetch_assoc()['session_token'];
+
 if ($sessionToken !== $_SESSION['session_token']) {
     session_unset();
     session_destroy();
