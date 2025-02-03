@@ -64,7 +64,6 @@ try {
         session_unset();
         session_destroy();
         echo "<script>alert('Another person has logged in using the same account. Please try logging in again.');</script>";
-        header("Location: portal-login.html");
         exit;
     }
 
