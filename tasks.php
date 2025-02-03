@@ -68,6 +68,13 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+if ($sessionToken !== $_SESSION['session_token']) {
+    session_unset();
+    session_destroy();
+    header("Location: portal-login.html");
+    exit;
+}
+
 $conn->query("SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''))");
 
 // Fetch departments from the database
