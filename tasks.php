@@ -1837,7 +1837,7 @@ function getWeekdayHours($start, $end)
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                alert('An error occurred while updating the status.' + error.message);
+                                alert('An error occurred while updating the status.');
                             });
                     } else {
                         // Existing logic for other statuses
@@ -1863,7 +1863,7 @@ function getWeekdayHours($start, $end)
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                alert('An error occurred while updating the status: ' + error.message);
+                                alert('An error occurred while updating the status.');
                             });
                     }
                 }
@@ -1970,7 +1970,7 @@ function getWeekdayHours($start, $end)
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            alert('An error occurred while updating the status: ' + error.message);
+                            alert('An error occurred while updating the status.');
                         });
                 }
             </script>
