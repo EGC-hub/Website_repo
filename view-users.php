@@ -63,8 +63,7 @@ try {
     if ($sessionToken !== $_SESSION['session_token']) {
         session_unset();
         session_destroy();
-        echo "<script>alert('Another person has logged in using the same account. Please try logging in again.');</script>";
-        exit;
+        echo "<script>alert('Another person has logged in using the same account. Please try logging in again.'); window.location.href='portal-login.html';</script>";
     }
 
     if (hasPermission('read_all_users')) {
