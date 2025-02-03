@@ -93,7 +93,8 @@ try {
 
     // Permission validation (Ensure `hasPermission()` exists)
     if (!function_exists('hasPermission')) {
-        function hasPermission($perm) {
+        function hasPermission($perm)
+        {
             return false; // Default to no permission if the function is missing
         }
     }
