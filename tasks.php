@@ -50,11 +50,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
 
 $_SESSION['last_activity'] = time();
 
-echo "<script>
-console.log('User ID: . $user_id . '); 
-console.log('hasPermission(\"update_status_low\"): " . (hasPermission('update_status_low') ? 'true' : 'false') . "');
-</script>";
-
 // Enable error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);

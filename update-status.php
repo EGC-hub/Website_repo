@@ -111,7 +111,7 @@ try {
             exit;
         }
     } elseif (hasPermission('update_status_low') && $user_id === $assigned_user_id) {
-        if (in_array($current_status, ['Assigned', 'Reassigned']) && in_array($new_status, ['In Progress', 'Completed on Time', 'Delayed Completion'])) {
+        if (in_array($current_status, ['Assigned', 'Reassigned', 'In Progress']) && in_array($new_status, ['In Progress', 'Completed on Time', 'Delayed Completion'])) {
             // Allow status change
         } else {
             echo json_encode(['success' => false, 'message' => 'Unauthorized status change.']);
