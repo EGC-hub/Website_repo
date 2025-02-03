@@ -10,8 +10,6 @@ ob_start(); // Prevent unwanted output before JSON response
 
 session_start();
 
-include_once '../permissions.php';
-
 // Check if the user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
@@ -93,7 +91,8 @@ try {
 
     // Permission validation (Ensure `hasPermission()` exists)
     if (!function_exists('hasPermission')) {
-        function hasPermission($perm) {
+        function hasPermission($perm)
+        {
             return false; // Default to no permission if the function is missing
         }
     }
