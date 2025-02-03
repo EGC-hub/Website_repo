@@ -52,7 +52,7 @@ $_SESSION['last_activity'] = time();
 
 echo "<script>
 console.log('User ID: 31'); 
-console.log('hasPermission(\"update_status_low\")');
+console.log('hasPermission(\"update_status_low\"): " . (hasPermission('update_status_low') ? 'true' : 'false') . "');
 </script>";
 
 // Enable error reporting
