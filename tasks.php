@@ -1256,40 +1256,18 @@ function getWeekdayHours($start, $end)
                                                 // Define the available statuses based on the user role and current status
                                                 $statuses = [];
 
-                                                // Check if the user is both the assigner and assignee
-                                                $isSelfAssigned = ($assigned_by_id == $user_id && $assigned_user_id == $user_id);
-
                                                 // Logic for status_change_main privilege or the user who assigned the task
-                                                if (hasPermission('status_change_main') || ($assigned_by_id == $user_id && $isSelfAssigned)) {
-                                                    echo '<script>console.log("User is assigner or has status_change_main privilege")</script>';
-                                                    // status_change_main privilege or assigner (except self-assigned) can change status to anything except restricted ones
+                                                if (hasPermission('status_change_main') || $assigned_by_id == $user_id) {
+                                                    // status_change_main privilege or the user who assigned the task can change status to anything except "In Progress", "Completed on Time", and "Delayed Completion"
                                                     if (in_array($currentStatus, ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'])) {
                                                         $statuses = ['Assigned', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'];
                                                     }
                                                 }
-                                                // Logic for self-assigned user with status_change_normal privilege
-                                                elseif ($isSelfAssigned && hasPermission('status_change_normal')) {
-                                                    echo '<script>console.log("User is self-assigned and has status_change_normal privilege")</script>';
-                                                    // Self-assigned users follow both logics
-                                                    if ($currentStatus === 'Assigned') {
-                                                        // If the task is "Assigned", only "In Progress" is allowed
-                                                        $statuses = ['In Progress'];
-                                                    } elseif ($currentStatus === 'In Progress') {
-                                                        // If the task is "In Progress", allow completion statuses
-                                                        $statuses = ['Completed on Time', 'Delayed Completion'];
-                                                    } else {
-                                                        // Allow transitions similar to a regular assigned user
-                                                        $allowedStatuses = ['Assigned', 'Reassigned', 'In Progress', 'Completed on Time', 'Delayed Completion'];
-                                                        if (in_array($currentStatus, $allowedStatuses)) {
-                                                            $statuses = $allowedStatuses;
-                                                        }
-                                                    }
-                                                }
                                                 // Logic for Regular User (assigned user)
                                                 elseif (hasPermission('status_change_normal') && $user_id == $assigned_user_id) {
-                                                    echo '<script>console.log("User is assigned and has status_change_normal privilege")</script>';
+                                                    // Regular user can only change status if they are the assigned user
                                                     if ($currentStatus === 'Assigned') {
-                                                        // If the task is "Assigned", the next viable option is "In Progress"
+                                                        // If the task is "Assigned", the next viable options are "In Progress"
                                                         $statuses = ['In Progress'];
                                                     } elseif ($currentStatus === 'In Progress') {
                                                         // If the task is "In Progress", use the available statuses calculated earlier
