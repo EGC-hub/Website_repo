@@ -142,7 +142,6 @@ if (hasPermission('assign_tasks')) {
             JOIN departments d ON ud.department_id = d.id
             JOIN roles r ON u.role_id = r.id
             WHERE ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
-              AND r.name = 'User'
             GROUP BY u.id
         ";
     }
