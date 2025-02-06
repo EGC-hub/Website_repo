@@ -99,7 +99,7 @@ try {
         }
     }
 
-    if (hasPermission('update_status_main') || $assigned_by_id == $user_id) {
+    if (hasPermission('statsus_change_main') || $assigned_by_id == $user_id) {
         if (in_array($current_status, $top_table_statuses) && !in_array($new_status, ['In Progress', 'Completed on Time', 'Delayed Completion'])) {
             // Allow status change
         } elseif (in_array($current_status, ['Completed on Time', 'Delayed Completion']) && $new_status === 'Closed') {
@@ -110,7 +110,7 @@ try {
             echo json_encode(['success' => false, 'message' => 'Invalid status change.']);
             exit;
         }
-    } elseif (hasPermission('update_status_low') && $user_id === $assigned_user_id) {
+    } elseif (hasPermission('statsus_change_normal') && $user_id === $assigned_user_id) {
         if (in_array($current_status, ['Assigned', 'Reassigned', 'In Progress']) && in_array($new_status, ['In Progress', 'Completed on Time', 'Delayed Completion'])) {
             // Allow status change
         } else {
