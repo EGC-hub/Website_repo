@@ -1260,7 +1260,7 @@ function getWeekdayHours($start, $end)
                                                 $isSelfAssigned = ($assigned_by_id == $user_id && $assigned_user_id == $user_id);
 
                                                 // Logic for status_change_main privilege or the user who assigned the task
-                                                if (hasPermission('status_change_main') || ($assigned_by_id == $user_id && !$isSelfAssigned)) {
+                                                if (hasPermission('status_change_main') || ($assigned_by_id == $user_id && $isSelfAssigned)) {
                                                     echo '<script>console.log("User is assigner or has status_change_main privilege")</script>';
                                                     // status_change_main privilege or assigner (except self-assigned) can change status to anything except restricted ones
                                                     if (in_array($currentStatus, ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'])) {
