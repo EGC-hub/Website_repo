@@ -89,6 +89,14 @@ $departments = $conn->query("SELECT id, name FROM departments")->fetch_all(MYSQL
 // Fetch roles from the database
 $roles = $conn->query("SELECT id, name FROM roles")->fetch_all(MYSQLI_ASSOC);
 
+// Fetch all unique project names from the projects table
+$projectQuery = $conn->query("SELECT id, project_name FROM projects");
+if ($projectQuery) {
+    $projects = $projectQuery->fetch_all(MYSQLI_ASSOC);
+} else {
+    die("Error fetching projects: " . $conn->error);
+}
+
 // Fetch logged-in user's details
 $userQuery = $conn->prepare("
     SELECT u.id, u.username, u.email, GROUP_CONCAT(d.name SEPARATOR ', ') AS departments, r.name AS role 
@@ -218,7 +226,7 @@ function sendTaskNotification($email, $username, $project_name, $project_type, $
 
 // Handle form submission for adding a task
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
-    $project_name = trim($_POST['project_name']);
+    $project_id = isset($_POST['project_id']) ? (int) $_POST['project_id'] : null;
     $task_name = trim($_POST['task_name']);
     $task_description = trim($_POST['task_description']);
     $project_type = trim($_POST['project_type']);
@@ -228,6 +236,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     $assigned_user_id = isset($_POST['assigned_user_id']) ? (int) $_POST['assigned_user_id'] : null;
     $recorded_timestamp = date("Y-m-d H:i:s");
     $assigned_by_id = $_SESSION['user_id'];
+    $predecessor_task_id = isset($_POST['predecessor_task_id']) && !empty($_POST['predecessor_task_id']) ? (int) $_POST['predecessor_task_id'] : null;
 
     $currentDate = new DateTime();
 
@@ -242,21 +251,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     $threeMonthsAhead = clone $currentDate;
     $threeMonthsAhead->modify('+3 months');
 
-
-
-    if (empty($project_name) || empty($task_name) || empty($task_description) || empty($project_type) || empty($planned_start_date) || empty($planned_finish_date) || !$assigned_user_id) {
+    if (empty($task_name) || empty($task_description) || empty($project_type) || empty($planned_start_date) || empty($planned_finish_date) || !$assigned_user_id || !$project_id) {
         echo '<script>alert("Please fill in all required fields.");</script>';
     } elseif ($datePlannedStartDate < $threeMonthsAgo || $datePlannedEndDate > $threeMonthsAhead) {
         echo '<script>alert("Error: Planned start date is too far in the past or too far in the future.");</script>';
     } else {
-        $stmt = $conn->prepare(
-            "INSERT INTO tasks (user_id, project_name, task_name, task_description, project_type, planned_start_date, planned_finish_date, status, recorded_timestamp, assigned_by_id) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        );
-        $stmt->bind_param(
-            "issssssssi",
+        // Prepare the SQL query with the appropriate number of placeholders
+        $placeholders = [
+            'user_id',
+            'project_id',
+            'task_name',
+            'task_description',
+            'project_type',
+            'planned_start_date',
+            'planned_finish_date',
+            'status',
+            'recorded_timestamp',
+            'assigned_by_id'
+        ];
+
+        if ($predecessor_task_id !== null) {
+            $placeholders[] = 'predecessor_task_id';
+        }
+
+        $sql = "INSERT INTO tasks (" . implode(", ", $placeholders) . ") VALUES (" . str_repeat('?,', count($placeholders) - 1) . "?)";
+
+        $stmt = $conn->prepare($sql);
+        $params = [
             $assigned_user_id,
-            $project_name,
+            $project_id,
             $task_name,
             $task_description,
             $project_type,
@@ -265,7 +288,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
             $status,
             $recorded_timestamp,
             $assigned_by_id
-        );
+        ];
+
+        if ($predecessor_task_id !== null) {
+            $params[] = $predecessor_task_id;
+        }
+
+        $types = str_repeat('s', count($params) - 1) . 'i'; // Adjust types for the last parameter which is an integer
+
+        $stmt->bind_param($types, ...$params);
 
         if ($stmt->execute()) {
             echo '<script>alert("Task added successfully.");</script>';
@@ -281,19 +312,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
                 $email = $user['email'];
                 $username = $user['username'];
 
-                // Send email notification with assigned_by_id
-                sendTaskNotification(
-                    $email,
-                    $username,
-                    $project_name,
-                    $task_name,
-                    $task_description,
-                    $project_type,
-                    $planned_start_date,
-                    $planned_finish_date,
-                    $assigned_by_id, // Pass the assigned_by_id
-                    $conn // Pass the database connection
-                );
+                // Fetch the project name from the projects table
+                $projectQuery = $conn->prepare("SELECT project_name FROM projects WHERE id = ?");
+                $projectQuery->bind_param("i", $project_id);
+                $projectQuery->execute();
+                $projectResult = $projectQuery->get_result();
+
+                if ($projectResult->num_rows > 0) {
+                    $project = $projectResult->fetch_assoc();
+                    $project_name = $project['project_name'];
+
+                    // Send email notification with assigned_by_id
+                    sendTaskNotification(
+                        $email,
+                        $username,
+                        $project_name,
+                        $task_name,
+                        $task_description,
+                        $project_type,
+                        $planned_start_date,
+                        $planned_finish_date,
+                        $assigned_by_id, // Pass the assigned_by_id
+                        $conn // Pass the database connection
+                    );
+                }
             }
         } else {
             echo '<script>alert("Failed to add task.");</script>';
@@ -307,7 +349,7 @@ if (hasPermission('view_all_tasks')) {
     $taskQuery = "
         SELECT 
             tasks.task_id,
-            tasks.project_name,
+            projects.project_name,
             tasks.task_name,
             tasks.task_description,
             tasks.planned_start_date,
@@ -319,13 +361,15 @@ if (hasPermission('view_all_tasks')) {
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
+            tasks.predecessor_task_id, -- Add predecessor_task_id
             task_transactions.delayed_reason,
             task_transactions.actual_finish_date AS transaction_actual_finish_date,
             tasks.completion_description,
             assigned_to_user.username AS assigned_to, 
             GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
             assigned_by_user.username AS assigned_by,
-            GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
+            GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department,
+            predecessor_task.task_name AS predecessor_task_name -- Add predecessor task name
         FROM tasks 
         LEFT JOIN task_transactions ON tasks.task_id = task_transactions.task_id
         JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
@@ -334,6 +378,8 @@ if (hasPermission('view_all_tasks')) {
         JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
+        LEFT JOIN tasks AS predecessor_task ON tasks.predecessor_task_id = predecessor_task.task_id -- Join predecessor task
+        JOIN projects ON tasks.project_id = projects.id -- Join projects table
         GROUP BY tasks.task_id
         ORDER BY 
             CASE 
@@ -348,7 +394,7 @@ if (hasPermission('view_all_tasks')) {
     $taskQuery = "
         SELECT 
             tasks.task_id,
-            tasks.project_name,
+            projects.project_name,
             tasks.task_name,
             tasks.task_description,
             tasks.planned_start_date,
@@ -375,6 +421,7 @@ if (hasPermission('view_all_tasks')) {
         JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
+        JOIN projects ON tasks.project_id = projects.id -- Join projects table
         WHERE assigned_to_ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
         GROUP BY tasks.task_id
         ORDER BY 
@@ -390,7 +437,7 @@ if (hasPermission('view_all_tasks')) {
     $taskQuery = "
         SELECT 
             tasks.task_id,
-            tasks.project_name,
+            projects.project_name,
             tasks.task_name,
             tasks.task_description,
             tasks.planned_start_date,
@@ -412,6 +459,7 @@ if (hasPermission('view_all_tasks')) {
         JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
+        JOIN projects ON tasks.project_id = projects.id -- Join projects table
         WHERE tasks.user_id = ? 
         GROUP BY tasks.task_id
         ORDER BY 
@@ -440,33 +488,29 @@ $result = $stmt->get_result();
 $allTasks = $result->fetch_all(MYSQLI_ASSOC);
 
 foreach ($allTasks as &$task) {
-    // Calculate planned duration (excluding weekends)
     $plannedStartDate = strtotime($task['planned_start_date']);
     $plannedEndDate = strtotime($task['planned_finish_date']);
     $plannedDurationHours = getWeekdayHours($plannedStartDate, $plannedEndDate);
-
-    // Store planned duration in the task array
     $task['planned_duration_hours'] = $plannedDurationHours;
 
-    // Calculate actual duration (from actual start date to current date)
     if (!empty($task['actual_start_date'])) {
         $actualStartDate = strtotime($task['actual_start_date']);
-        $currentDate = time(); // Current date and time
+        $currentDate = time();
         $actualDurationHours = getWeekdayHours($actualStartDate, $currentDate);
-
-        // Store actual duration in the task array
         $task['actual_duration_hours'] = $actualDurationHours;
 
-        // Determine available statuses based on the comparison
-        if ($actualDurationHours >= $plannedDurationHours) {
-            $task['available_statuses'] = ['Delayed Completion'];
+        // Clear available statuses before assigning
+        $task['available_statuses'] = [];
+
+        // Assign status based on the duration comparison
+        if ($actualDurationHours <= $plannedDurationHours) {
+            $task['available_statuses'][] = 'Completed on Time';
         } else {
-            $task['available_statuses'] = ['Completed on Time'];
+            $task['available_statuses'][] = 'Delayed Completion';
         }
     } else {
-        // If actual start date is not set, no status change is allowed
         $task['available_statuses'] = [];
-        $task['actual_duration_hours'] = null; // Set actual duration to null
+        $task['actual_duration_hours'] = null;
     }
 }
 
@@ -486,32 +530,18 @@ function getWeekdayHours($start, $end)
 {
     $weekdayHours = 0;
     $current = $start;
-
-    // Loop through each day between start and end
     while ($current <= $end) {
-        $dayOfWeek = date('N', $current); // 1 (Monday) to 7 (Sunday)
-
-        // Exclude weekends
+        $dayOfWeek = date('N', $current);
         if ($dayOfWeek <= 5) {
-            // Calculate the start and end of the current day
-            $startOfDay = strtotime('today', $current); // Start of the day (00:00:00)
-            $endOfDay = strtotime('tomorrow', $current) - 1; // End of the day (23:59:59)
-
-            // Adjust the start and end times to fit within the current day
+            $startOfDay = strtotime('today', $current);
+            $endOfDay = strtotime('tomorrow', $current) - 1;
             $startTime = max($start, $startOfDay);
             $endTime = min($end, $endOfDay);
-
-            // Calculate the hours for the current day
-            $hours = ($endTime - $startTime) / 3600; // Convert seconds to hours
-
-            // Add the hours to the total
+            $hours = ($endTime - $startTime) / 3600;
             $weekdayHours += $hours;
         }
-
-        // Move to the next day
         $current = strtotime('+1 day', $current);
     }
-
     return $weekdayHours;
 }
 ?>
@@ -985,24 +1015,44 @@ function getWeekdayHours($start, $end)
                 <div class="modal-body">
                     <form method="post" action="">
                         <input type="hidden" id="user-role" value="<?= htmlspecialchars($user_role) ?>">
+
+                        <!-- Project Name Field -->
                         <div class="form-group">
                             <label for="project_name">Project Name:</label>
-                            <input type="text" id="project_name" name="project_name" required>
+                            <select id="project_name_dropdown" class="form-control mb-2" name="project_id" required>
+                                <option value="">Select an existing project</option>
+                                <?php foreach ($projects as $project): ?>
+                                    <option value="<?= htmlspecialchars($project['id']) ?>">
+                                        <?= htmlspecialchars($project['project_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <!-- Predecessor Task Field -->
+                        <div class="form-group">
+                            <label for="predecessor_task_id">Predecessor Task (Optional):</label>
+                            <select id="predecessor_task_id" name="predecessor_task_id" class="form-control">
+                                <option value="">Select a predecessor task</option>
+                                <!-- Predecessor tasks will be dynamically populated here -->
+                            </select>
+                        </div>
+
+                        <!-- Rest of the form fields -->
+                        <div class="form-group">
+                            <label for="task_name">Task Name:</label>
+                            <input type="text" id="task_name" name="task_name" class="form-control" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="task_name">Task Name:</label>
-                            <input type="text" id="task_name" name="task_name" required>
-                        </div>
-
-                        <div>
                             <label for="task_description">Task Description:</label>
-                            <textarea id="task_description" name="task_description" rows="4"></textarea>
+                            <textarea id="task_description" name="task_description" rows="4"
+                                class="form-control"></textarea>
                         </div>
 
-                        <div>
+                        <div class="form-group">
                             <label for="project_type">Project Type:</label>
-                            <select id="project_type" name="project_type">
+                            <select id="project_type" name="project_type" class="form-control">
                                 <option value="Internal">Internal</option>
                                 <option value="External">External</option>
                             </select>
@@ -1010,17 +1060,19 @@ function getWeekdayHours($start, $end)
 
                         <div class="form-group">
                             <label for="planned_start_date">Expected Start Date & Time</label>
-                            <input type="datetime-local" id="planned_start_date" name="planned_start_date" required>
+                            <input type="datetime-local" id="planned_start_date" name="planned_start_date"
+                                class="form-control" required>
                         </div>
 
                         <div class="form-group">
                             <label for="planned_finish_date">Expected End Date & Time</label>
-                            <input type="datetime-local" id="planned_finish_date" name="planned_finish_date" required>
+                            <input type="datetime-local" id="planned_finish_date" name="planned_finish_date"
+                                class="form-control" required>
                         </div>
 
                         <div class="form-group">
                             <label for="assigned_user_id">Assign to:</label>
-                            <select id="assigned_user_id" name="assigned_user_id" required>
+                            <select id="assigned_user_id" name="assigned_user_id" class="form-control" required>
                                 <option value="">Select a user</option>
                                 <?php foreach ($users as $user): ?>
                                     <option value="<?= $user['id'] ?>">
@@ -1032,7 +1084,7 @@ function getWeekdayHours($start, $end)
                             </select>
                         </div>
 
-                        <button type="submit" class="submit-btn">Add Task</button>
+                        <button type="submit" class="btn btn-primary">Add Task</button>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -1041,9 +1093,33 @@ function getWeekdayHours($start, $end)
             </div>
         </div>
     </div>
+
+    <!-- Modal for Creating New Projects -->
+    <div class="modal fade" id="createProjectModal" tabindex="-1" aria-labelledby="createProjectModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createProjectModalLabel">Create New Project</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createProjectForm" method="POST" action="create-project.php">
+                        <div class="form-group">
+                            <label for="new_project_name">Project Name:</label>
+                            <input type="text" id="new_project_name" name="new_project_name" class="form-control"
+                                required>
+                        </div>
+                        <input type="hidden" name="created_by_user_id" value="<?= $user_id ?>">
+                        <button type="submit" class="btn btn-primary">Create Project</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <?php
     // Fetch all unique project names from the tasks table
-    $projectQuery = $conn->query("SELECT DISTINCT project_name FROM tasks");
+    $projectQuery = $conn->query("SELECT id, project_name FROM projects");
     if ($projectQuery) {
         $projects = $projectQuery->fetch_all(MYSQLI_ASSOC);
     } else {
@@ -1100,6 +1176,10 @@ function getWeekdayHours($start, $end)
                         <div class="filter-container">
                             <div class="filter-buttons">
                                 <?php if (hasPermission('create_tasks')): ?>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#createProjectModal">
+                                        Create New Project
+                                    </button>
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                         data-bs-target="#taskManagementModal">
                                         Create New Task
@@ -1192,6 +1272,7 @@ function getWeekdayHours($start, $end)
                                         <th>Assigned To</th>
                                     <?php endif; ?>
                                     <th>Created On</th>
+                                    <th>Predecessor Task</th>
                                     <?php if (hasPermission('assign_tasks')): ?>
                                         <th>Actions</th>
                                     <?php endif; ?>
@@ -1261,7 +1342,10 @@ function getWeekdayHours($start, $end)
 
                                                 // Define status sets
                                                 $assignerStatuses = ['Assigned', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'];
-                                                $normalUserStatuses = ['Assigned' => ['In Progress'], 'In Progress' => ['Completed on Time', 'Delayed Completion']];
+                                                $normalUserStatuses = [
+                                                    'Assigned' => ['In Progress'],
+                                                    'In Progress' => isset($row['available_statuses'][0]) ? [$row['available_statuses'][0]] : []
+                                                ];
 
                                                 // Logic for status_change_main privilege or the user who assigned the task (excluding self-assigned)
                                                 if (hasPermission('status_change_main') || ($assigned_by_id == $user_id && !$isSelfAssigned)) {
@@ -1327,6 +1411,7 @@ function getWeekdayHours($start, $end)
                                         <td data-utc="<?= htmlspecialchars($row['recorded_timestamp']) ?>">
                                             <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
                                         </td>
+                                        <td><?= htmlspecialchars($row['predecessor_task_name'] ?? 'N/A') ?></td>
                                         <?php if ((hasPermission('update_tasks') && $row['assigned_by_id'] == $_SESSION['user_id']) || hasPermission('update_tasks_all')): ?>
                                             <td>
                                                 <div class="button-container">
@@ -1406,6 +1491,7 @@ function getWeekdayHours($start, $end)
                                         <th>Assigned To</th>
                                     <?php endif; ?>
                                     <th>Created On</th>
+                                    <th>Predecessor Task</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1556,6 +1642,7 @@ function getWeekdayHours($start, $end)
                                         <td data-utc="<?= htmlspecialchars($row['recorded_timestamp']) ?>">
                                             <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['recorded_timestamp']))) ?>
                                         </td>
+                                        <td><?= htmlspecialchars($row['predecessor_task_name'] ?? 'N/A') ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -1591,6 +1678,9 @@ function getWeekdayHours($start, $end)
                                 <input type="hidden" id="modal-status" name="status">
                                 <!-- Hidden input for Actual Completion Date (automatically populated) -->
                                 <input type="hidden" id="actual-completion-date" name="actual_finish_date">
+
+                                <!-- Display predecessor task name -->
+                                <p><strong>Predecessor Task:</strong> <span id="predecessor-task-name"></span></p>
 
                                 <!-- Completion Description -->
                                 <div class="mb-3">
@@ -1803,6 +1893,9 @@ function getWeekdayHours($start, $end)
                     const status = event.target.value;
                     const form = event.target.form;
 
+                    // Fetch the predecessor task name
+                    const predecessorTaskName = $(`#pending-tasks tr[data-task-id="${taskId}"]`).find('td:eq(12)').text();
+
                     if (status === 'Reassigned') {
                         // Show the reassignment modal
                         document.getElementById('reassign-task-id').value = taskId;
@@ -1812,6 +1905,7 @@ function getWeekdayHours($start, $end)
                         // Set the task ID and status in the completion modal
                         document.getElementById('task-id').value = taskId;
                         document.getElementById('modal-status').value = status;
+                        document.getElementById('predecessor-task-name').innerText = predecessorTaskName; // Set predecessor task name
 
                         // Show or hide the delayed reason container based on the status
                         const delayedReasonContainer = document.getElementById('delayed-reason-container');
@@ -2277,6 +2371,73 @@ function getWeekdayHours($start, $end)
 
                     // Optional: Re-check if the window is resized (in case of dynamic content or layout changes)
                     window.addEventListener('resize', checkDescriptionHeight);
+                });
+            </script>
+            <!-- JavaScript to handle the dropdown and text input interaction -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const projectNameDropdown = document.getElementById('project_name_dropdown');
+                    const projectNameInput = document.getElementById('project_name');
+
+                    // When an option is selected from the dropdown, populate the text input
+                    projectNameDropdown.addEventListener('change', function () {
+                        if (this.value) {
+                            projectNameInput.value = this.value;
+                        }
+                    });
+                });
+            </script>
+            <!-- JavaScript to handle the fecthing of predecessor tasks -->
+            <script>
+                function fetchPredecessorTasks(projectId) {
+                    if (!projectId) {
+                        document.getElementById('predecessor_task_id').innerHTML = '<option value="">Select a predecessor task</option>';
+                        return;
+                    }
+
+                    console.log("Fetching predecessor tasks for project ID:", projectId);
+
+                    // Fetch predecessor tasks for the selected project
+                    fetch('fetch-predecessor-tasks.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `project_id=${encodeURIComponent(projectId)}&user_id=<?= $user_id ?>`
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Received response:", data); // Debugging
+
+                            const predecessorDropdown = document.getElementById('predecessor_task_id');
+                            predecessorDropdown.innerHTML = '<option value="">Select a predecessor task</option>';
+
+                            if (Array.isArray(data)) {
+                                if (data.length > 0) {
+                                    data.forEach(task => {
+                                        const option = document.createElement('option');
+                                        option.value = task.task_id;
+                                        option.textContent = task.task_name;
+                                        predecessorDropdown.appendChild(option);
+                                    });
+                                } else {
+                                    const option = document.createElement('option');
+                                    option.value = '';
+                                    option.textContent = 'No available predecessor tasks';
+                                    option.disabled = true;
+                                    predecessorDropdown.appendChild(option);
+                                }
+                            } else {
+                                console.error("Invalid response format:", data);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching predecessor tasks:', error);
+                        });
+                }
+                document.getElementById('project_name_dropdown').addEventListener('change', function () {
+                    const projectId = this.value;
+                    fetchPredecessorTasks(projectId);
                 });
             </script>
     </body>
