@@ -37,7 +37,7 @@ $config = include $configPath;
 $dbHost = 'localhost';
 $dbUsername = $config['dbUsername'] ?? null;
 $dbPassword = $config['dbPassword'] ?? null;
-$dbName = 'new';
+$dbName = 'euro_new';
 
 // Check if database credentials exist
 // if (!$dbUsername || !$dbPassword) {

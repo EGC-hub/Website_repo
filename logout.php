@@ -8,7 +8,7 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
     $dbHost = 'localhost';
     $dbUsername = $config['dbUsername'];
     $dbPassword = $config['dbPassword'];
-    $dbName = 'new';
+    $dbName = 'euro_new';
 
     $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 

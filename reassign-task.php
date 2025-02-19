@@ -18,7 +18,7 @@ $config = include '../config.php';
 $dbHost = 'localhost';
 $dbUsername = $config['dbUsername'];
 $dbPassword = $config['dbPassword'];
-$dbName = 'new';
+$dbName = 'euro_new';
 
 // DSN for PDO
 $dsn = "mysql:host=$dbHost;dbname=$dbName;charset=utf8";
