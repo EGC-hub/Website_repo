@@ -225,7 +225,6 @@ function sendTaskNotification($email, $username, $project_name, $project_type, $
 }
 
 // Handle form submission for adding a task
-// Handle form submission for adding a task
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     $project_id = isset($_POST['project_id']) ? (int) $_POST['project_id'] : null;
     $task_name = trim($_POST['task_name']);
