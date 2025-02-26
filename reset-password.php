@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_GET['token'])) {
             $mail->addAddress($email);
 
             // Content
-            $resetLink = "http://euroglobalconsultancy/reset-password.php?token=" . $resetToken;
+            $resetLink = "http://euroglobalconsultancy.com/reset-password.php?token=" . $resetToken;
             $mail->isHTML(true);
             $mail->Subject = 'Password Reset Request';
             $mail->Body = "Hello,<br><br>Click the following link to reset your password:<br><a href='$resetLink'>$resetLink</a><br><br>This link will expire in 1 hour.<br><br>If you didn’t request this, ignore this email.";
