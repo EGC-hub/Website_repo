@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_GET['token'])) {
             $mail->Port = 587;
 
             // Recipients
-            $mail->setFrom('enquiry@euroglobalconsultancy.com', 'Your App');
+            $mail->setFrom('enquiry@euroglobalconsultancy.com', 'Task Management System Password Reset');
             $mail->addAddress($email);
 
             // Content
