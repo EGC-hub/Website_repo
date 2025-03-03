@@ -2,749 +2,1364 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>TRAVELER</title>
+    <title>Travela - Tourism Website Template</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta content="Free HTML Templates" name="keywords" />
-    <meta content="Free HTML Templates" name="description" />
-
-    <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon" />
+    <meta content="" name="keywords" />
+    <meta content="" name="description" />
 
     <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600&family=Roboto&display=swap"
       rel="stylesheet"
     />
 
-    <!-- Font Awesome -->
+    <!-- Icon Font Stylesheet -->
     <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
       rel="stylesheet"
     />
 
     <!-- Libraries Stylesheet -->
     <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
-    <link
-      href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css"
-      rel="stylesheet"
-    />
+    <link href="lib/lightbox/css/lightbox.min.css" rel="stylesheet" />
 
     <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet" />
   </head>
 
   <body>
+    <!-- Spinner Start -->
+    <div
+      id="spinner"
+      class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center"
+    >
+      <div
+        class="spinner-border text-primary"
+        style="width: 3rem; height: 3rem"
+        role="status"
+      >
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <!-- Spinner End -->
+
     <!-- Topbar Start -->
-    <div class="container-fluid bg-light pt-3 d-none d-lg-block">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-6 text-center text-lg-left mb-2 mb-lg-0">
-            <div class="d-inline-flex align-items-center">
-              <p><i class="fa fa-envelope mr-2"></i>info@arabicadunes.com
-</p>
-              <p class="text-body px-3">|</p>
-              <p><i class="fa fa-phone-alt mr-2"></i>+968 9 259 7488
-</p>
-            </div>
-          </div>
-          <div class="col-lg-6 text-center text-lg-right">
-            <div class="d-inline-flex align-items-center">
-              <a class="text-primary px-3" href="">
-                <i class="fab fa-facebook-f"></i>
-              </a>
-              <a class="text-primary px-3" href="">
-                <i class="fab fa-twitter"></i>
-              </a>
-              <a class="text-primary px-3" href="">
-                <i class="fab fa-linkedin-in"></i>
-              </a>
-              <a class="text-primary px-3" href="">
-                <i class="fab fa-instagram"></i>
-              </a>
-              <a class="text-primary pl-3" href="">
-                <i class="fab fa-youtube"></i>
-              </a>
-            </div>
+    <div class="container-fluid bg-primary px-5 d-none d-lg-block">
+      <div class="row gx-0">
+        <div class="col-lg-12 text-end">
+          <div class="d-inline-flex align-items-center" style="height: 45px">
+            <a
+              class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2"
+              href="tel:+96892597488"
+            >
+              <i class="fas fa-phone-alt" style="color: #ffffff"></i>
+            </a>
+            <a
+              class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2"
+              href="https://wa.me/+96892597488"
+            >
+              <i class="fab fa-whatsapp fw-normal"></i>
+            </a>
+            <small class="text-light">+968 9 259 7488</small>
           </div>
         </div>
       </div>
     </div>
     <!-- Topbar End -->
 
-    <!-- Navbar Start -->
-    <div class="container-fluid position-relative nav-bar p-0">
-      <div
-        class="container-lg position-relative p-0 px-lg-3"
-        style="z-index: 9"
+    <!-- Navbar & Hero Start -->
+    <div class="container-fluid position-relative p-0">
+      <nav
+        class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0"
       >
-        <nav
-          class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5"
+        <a href="index.html" class="navbar-brand p-0">
+          <img src="img/Untitled design (2).png" alt="Logo" />
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarCollapse"
         >
-          <a href="" class="navbar-brand">
-            <h1 class="m-0 text-primary">
-              <span class="text-dark">ARABICA</span>DUNES
-            </h1>
-          </a>
+          <span class="fa fa-bars"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <div class="navbar-nav ms-auto py-0">
+            <a href="index.html" class="nav-item nav-link active">Home</a>
+            <a href="about.html" class="nav-item nav-link">About</a>
+            <!-- <a href="services.html" class="nav-item nav-link">Services</a> -->
+            <a href="packages.html" class="nav-item nav-link">Packages</a>
+            <!-- <a href="blog.html" class="nav-item nav-link">Blog</a> -->
+            <!-- <div class="nav-item dropdown">
+              <a
+                href="#"
+                class="nav-link dropdown-toggle"
+                data-bs-toggle="dropdown"
+                >Pages</a
+              >
+              <div class="dropdown-menu m-0">
+                <a href="destination.html" class="dropdown-item">Destination</a>
+                <a href="tour.html" class="dropdown-item">Explore Tour</a>
+                <a href="booking.html" class="dropdown-item">Travel Booking</a>
+                <a href="gallery.html" class="dropdown-item">Our Gallery</a>
+                <a href="guides.html" class="dropdown-item">Travel Guides</a>
+                <a href="testimonial.html" class="dropdown-item">Testimonial</a>
+                <a href="404.html" class="dropdown-item">404 Page</a>
+              </div>
+            </div> -->
+            <a href="contact.html" class="nav-item nav-link">Contact Us</a>
+          </div>
+          <a href="contact.html" class="btn btn-primary rounded-pill py-2 px-4 ms-lg-4"
+            >Book Now</a
+          >
+        </div>
+      </nav>
+
+      <!-- Carousel Start -->
+      <div class="carousel-header">
+        <div id="carouselId" class="carousel slide" data-bs-ride="carousel">
+          <ol class="carousel-indicators">
+            <li
+              data-bs-target="#carouselId"
+              data-bs-slide-to="0"
+              class="active"
+            ></li>
+            <li data-bs-target="#carouselId" data-bs-slide-to="1"></li>
+            <li data-bs-target="#carouselId" data-bs-slide-to="2"></li>
+          </ol>
+          <div class="carousel-inner" role="listbox">
+            <div class="carousel-item active">
+              <img src="img/carousel-4.png" class="img-fluid" alt="Image" />
+              <div class="carousel-caption">
+                <div class="p-3" style="max-width: 900px">
+                  <h4
+                    class="text-white text-uppercase fw-bold mb-4"
+                    style="letter-spacing: 3px"
+                  >
+                    Let’s Make Your Dream
+                  </h4>
+                  <h1 class="display-2 text-capitalize text-white mb-4">
+                    Destination Happen!
+                  </h1>
+                  <div class="d-flex align-items-center justify-content-center">
+                    <a
+                      class="btn-hover-bg btn btn-primary rounded-pill text-white py-3 px-5"
+                      href="#"
+                      >Discover Now</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="img/carousel-6.png" class="img-fluid" alt="Image" />
+              <div class="carousel-caption">
+                <div class="p-3" style="max-width: 900px">
+                  <h4
+                    class="text-white text-uppercase fw-bold mb-4"
+                    style="letter-spacing: 3px"
+                  >
+                    From Skyscrapers to Sand Dunes,
+                  </h4>
+                  <h1 class="display-2 text-capitalize text-white mb-4">
+                    Explore Dubai in Style!
+                  </h1>
+                  <div class="d-flex align-items-center justify-content-center">
+                    <a
+                      class="btn-hover-bg btn btn-primary rounded-pill text-white py-3 px-5"
+                      href="#"
+                      >Discover Now</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="img/carousel-5.png" class="img-fluid" alt="Image" />
+              <div class="carousel-caption">
+                <div class="p-3" style="max-width: 900px">
+                  <h4
+                    class="text-white text-uppercase fw-bold mb-4"
+                    style="letter-spacing: 3px"
+                  >
+                    Explore Oman:
+                  </h4>
+                  <h1 class="display-2 text-capitalize text-white mb-4">
+                    A Land of Wonders and Traditions
+                  </h1>
+                  <div class="d-flex align-items-center justify-content-center">
+                    <a
+                      class="btn-hover-bg btn btn-primary rounded-pill text-white py-3 px-5"
+                      href="#"
+                      >Discover Now</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <button
+            class="carousel-control-prev"
             type="button"
-            class="navbar-toggler"
-            data-toggle="collapse"
-            data-target="#navbarCollapse"
+            data-bs-target="#carouselId"
+            data-bs-slide="prev"
           >
-            <span class="navbar-toggler-icon"></span>
+            <span
+              class="carousel-control-prev-icon btn bg-primary"
+              aria-hidden="false"
+            ></span>
+            <span class="visually-hidden">Previous</span>
           </button>
-          <div
-            class="collapse navbar-collapse justify-content-between px-3"
-            id="navbarCollapse"
+          <button
+            class="carousel-control-next"
+            type="button"
+            data-bs-target="#carouselId"
+            data-bs-slide="next"
           >
-            <div class="navbar-nav ml-auto py-0">
-              <a href="index.html" class="nav-item nav-link active">Home</a>
-              <a href="about.html" class="nav-item nav-link">About</a>
-              <a href="service.html" class="nav-item nav-link">Services</a>
-              <div class="nav-item dropdown">
-                <a
-                  href="#"
-                  class="nav-link dropdown-toggle"
-                  data-toggle="dropdown"
-                  >Destinations</a
-                >
-                <div class="dropdown-menu border-0 rounded-0 m-0">
-                  <a href="package.html" class="dropdown-item">Dubai</a>
-                  <a href="package1.html" class="dropdown-item">Oman</a>
-                </div>
-              </div>
-              <div class="nav-item dropdown">
-                <a
-                  href="#"
-                  class="nav-link dropdown-toggle"
-                  data-toggle="dropdown"
-                  >Pages</a
-                >
-                <div class="dropdown-menu border-0 rounded-0 m-0">
-                  <a href="blog.html" class="dropdown-item">Blog Grid</a>
-                  <a href="single.html" class="dropdown-item">Blog Detail</a>
-                  <a href="destination.html" class="dropdown-item"
-                    >Destination</a
-                  >
-                  <a href="guide.html" class="dropdown-item">Travel Guides</a>
-                  <a href="testimonial.html" class="dropdown-item"
-                    >Testimonial</a
-                  >
-                </div>
-              </div>
-              <a href="contact.html" class="nav-item nav-link">Contact</a>
-            </div>
-          </div>
-        </nav>
-      </div>
-    </div>
-    <!-- Navbar End -->
-
-    <!-- Carousel Start -->
-    <div class="container-fluid p-0">
-      <div id="header-carousel" class="carousel slide" data-ride="carousel">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <img class="w-100" src="img/carousel-3.jpg" alt="Image" />
-            <div
-              class="carousel-caption d-flex flex-column align-items-center justify-content-center"
-            >
-              <div class="p-3" style="max-width: 900px">
-                <h4 class="text-white text-uppercase mb-md-3">Dubai</h4>
-                <h1 class="display-3 text-white mb-md-4">
-                  Let's Discover Dubai Together
-                </h1>
-                <a href="" class="btn btn-primary py-md-3 px-md-5 mt-2"
-                  >Book Now</a
-                >
-              </div>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <img class="w-100" src="img/carousel-4.jpg" alt="Image" />
-            <div
-              class="carousel-caption d-flex flex-column align-items-center justify-content-center"
-            >
-              <div class="p-3" style="max-width: 900px">
-                <h4 class="text-white text-uppercase mb-md-3">Oman</h4>
-                <h1 class="display-3 text-white mb-md-4">
-                  Discover Amazing Places With Us In Oman
-                </h1>
-                <a href="" class="btn btn-primary py-md-3 px-md-5 mt-2"
-                  >Book Now</a
-                >
-              </div>
-            </div>
-          </div>
+            <span
+              class="carousel-control-next-icon btn bg-primary"
+              aria-hidden="false"
+            ></span>
+            <span class="visually-hidden">Next</span>
+          </button>
         </div>
-        <a
-          class="carousel-control-prev"
-          href="#header-carousel"
-          data-slide="prev"
-        >
-          <div class="btn btn-dark" style="width: 45px; height: 45px">
-            <span class="carousel-control-prev-icon mb-n2"></span>
-          </div>
-        </a>
-        <a
-          class="carousel-control-next"
-          href="#header-carousel"
-          data-slide="next"
-        >
-          <div class="btn btn-dark" style="width: 45px; height: 45px">
-            <span class="carousel-control-next-icon mb-n2"></span>
-          </div>
-        </a>
       </div>
+      <!-- Carousel End -->
     </div>
-    <!-- Carousel End -->
-
-    <!-- Booking Start -->
-    <!-- <div class="container-fluid booking mt-5 pb-5">
-        <div class="container pb-5">
-            <div class="bg-light shadow" style="padding: 30px;">
-                <div class="row align-items-center" style="min-height: 60px;">
-                    <div class="col-md-10">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="mb-3 mb-md-0">
-                                    <select class="custom-select px-4" style="height: 47px;">
-                                        <option selected>Destination</option>
-                                        <option value="1">Destination 1</option>
-                                        <option value="2">Destination 1</option>
-                                        <option value="3">Destination 1</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3 mb-md-0">
-                                    <div class="date" id="date1" data-target-input="nearest">
-                                        <input type="text" class="form-control p-4 datetimepicker-input" placeholder="Depart Date" data-target="#date1" data-toggle="datetimepicker"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3 mb-md-0">
-                                    <div class="date" id="date2" data-target-input="nearest">
-                                        <input type="text" class="form-control p-4 datetimepicker-input" placeholder="Return Date" data-target="#date2" data-toggle="datetimepicker"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3 mb-md-0">
-                                    <select class="custom-select px-4" style="height: 47px;">
-                                        <option selected>Duration</option>
-                                        <option value="1">Duration 1</option>
-                                        <option value="2">Duration 1</option>
-                                        <option value="3">Duration 1</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-primary btn-block" type="submit" style="height: 47px; margin-top: -2px;">Submit</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
-    <!-- Booking End -->
+    <!-- Navbar & Hero End -->
 
     <!-- About Start -->
-    <div class="container-fluid py-5">
-      <div class="container pt-5">
-        <div class="row">
-          <div class="col-lg-6" style="min-height: 500px">
-            <div class="position-relative h-100">
+    <div class="container-fluid about py-3">
+      <div class="container py-5">
+        <div class="row g-5 align-items-center">
+          <div class="col-lg-5">
+            <div
+              class="h-100"
+              style="
+                border: 50px solid;
+                border-color: transparent #13357b transparent #13357b;
+              "
+            >
               <img
-                class="position-absolute w-100 h-100"
-                src="img/IMG-20250218-WA0015.jpg"
-                style="object-fit: cover"
+                src="img/about-img2.png"
+                class="img-fluid w-100 h-100"
+                alt=""
               />
             </div>
           </div>
-          <div class="col-lg-6 pt-5 pb-lg-5">
-            <div class="about-text bg-white p-4 p-lg-5 my-lg-5">
-              <h6
-                class="text-primary text-uppercase"
-                style="letter-spacing: 5px"
-              >
-                About Us
-              </h6>
-              <h1 class="mb-3">We Provide Best Tour Packages In Your Budget</h1>
-              <p>
-                Dolores lorem lorem ipsum sit et ipsum. Sadip sea amet diam
-                dolore sed et. Sit rebum labore sit sit ut vero no sit. Et elitr
-                stet dolor sed sit et sed ipsum et kasd ut. Erat duo eos et erat
-                sed diam duo
-              </p>
-              <div class="row mb-4">
-                <div class="col-md-6">
-                  <img
-                    class="img-fluid"
-                    src="img/IMG-20250218-WA0016.jpg"
-                    alt="Landscape"
-                  />
-                  <img
-                    class="img-fluid mt-3"
-                    src="img/IMG-20250218-WA0014.jpg"
-                    alt="Another Image"
-                  />
-                </div>
-                <div class="col-md-6">
-                  <video class="img-fluid" controls>
-                    <source
-                      src="img/VID-20250218-WA0009.mp4"
-                      type="video/mp4"
-                    />
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
+          <div
+            class="col-lg-7"
+            style="
+              background: linear-gradient(
+                  rgba(255, 255, 255, 0.8),
+                  rgba(255, 255, 255, 0.8)
+                ),
+                url(img/about-img-1.png);
+            "
+          >
+            <h5 class="section-about-title pe-3">About Us</h5>
+            <h1 class="mb-4">
+              Welcome to <span class="text-primary">Arabica Dunes</span> - Your
+              Trusted Partner in Travel Adventures!
+            </h1>
+            <p class="mb-4">
+              At Arabica Dunes, we are passionate about creating unforgettable
+              travel experiences. With years of expertise in the travel
+              industry, we specialize in crafting tailor-made vacations that
+              cater to every type of traveler. Whether you’re seeking a relaxing
+              beach getaway, an adventurous trek through the mountains, or a
+              cultural exploration of a new city, we are here to turn your dream
+              trip into reality.
+            </p>
+            <p class="mb-4">
+              Our team of travel experts is dedicated to providing personalized
+              services, ensuring that each journey is seamless and stress-free.
+              From flight bookings to hotel accommodations, guided tours, and
+              unique local experiences, we handle every detail, so you can focus
+              on making memories.
+            </p>
+            <p class="mb-4">
+              We believe travel should be more than just a trip – it should be
+              an experience that enriches your life. Join us on a journey to
+              explore the world, one destination at a time!
+            </p>
+            <div class="row gy-2 gx-4 mb-4">
+              <div class="col-sm-6">
+                <p class="mb-0">
+                  <i class="fa fa-arrow-right text-primary me-2"></i
+                  >Personalized Itineraries
+                </p>
               </div>
-              <a href="" class="btn btn-primary mt-1">Book Now</a>
+              <div class="col-sm-6">
+                <p class="mb-0">
+                  <i class="fa fa-arrow-right text-primary me-2"></i>Stress-Free
+                  Planning
+                </p>
+              </div>
             </div>
+            <a class="btn btn-primary rounded-pill py-3 px-5 mt-2" href=""
+              >Read More</a
+            >
           </div>
         </div>
       </div>
     </div>
     <!-- About End -->
 
-    <!-- Feature Start -->
-    <div class="container-fluid pb-5">
-      <div class="container pb-5">
-        <div class="row">
-          <div class="col-md-4">
-            <div class="d-flex mb-4 mb-lg-0">
-              <div
-                class="d-flex flex-shrink-0 align-items-center justify-content-center bg-primary mr-3"
-                style="height: 100px; width: 100px"
-              >
-                <i class="fa fa-2x fa-money-check-alt text-white"></i>
+    <!-- Services Start -->
+    <!-- <div class="container-fluid bg-light service py-5">
+      <div class="container py-5">
+        <div class="mx-auto text-center mb-5" style="max-width: 900px">
+          <h5 class="section-title px-3">Searvices</h5>
+          <h1 class="mb-0">Our Services</h1>
+        </div>
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="row g-4">
+              <div class="col-12">
+                <div
+                  class="service-content-inner d-flex align-items-center bg-white border border-primary rounded p-4 pe-0"
+                >
+                  <div class="service-content text-end">
+                    <h5 class="mb-4">WorldWide Tours</h5>
+                    <p class="mb-0">
+                      Dolor sit amet consectetur adipisicing elit. Non alias
+                      eum, suscipit expedita corrupti officiis debitis possimus
+                      nam laudantium beatae quidem dolore consequuntur voluptate
+                      rem reiciendis, omnis sequi harum earum.
+                    </p>
+                  </div>
+                  <div class="service-icon p-4">
+                    <i class="fa fa-globe fa-4x text-primary"></i>
+                  </div>
+                </div>
               </div>
-              <div class="d-flex flex-column">
-                <h5 class="">Competitive Pricing</h5>
-                <p class="m-0">
-                  Magna sit magna dolor duo dolor labore rebum amet elitr est
-                  diam sea
-                </p>
+              <div class="col-12">
+                <div
+                  class="service-content-inner d-flex align-items-center bg-white border border-primary rounded p-4 pe-0"
+                >
+                  <div class="service-content text-end">
+                    <h5 class="mb-4">Hotel Reservation</h5>
+                    <p class="mb-0">
+                      Dolor sit amet consectetur adipisicing elit. Non alias
+                      eum, suscipit expedita corrupti officiis debitis possimus
+                      nam laudantium beatae quidem dolore consequuntur voluptate
+                      rem reiciendis, omnis sequi harum earum.
+                    </p>
+                  </div>
+                  <div class="service-icon p-4">
+                    <i class="fa fa-hotel fa-4x text-primary"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div
+                  class="service-content-inner d-flex align-items-center bg-white border border-primary rounded p-4 pe-0"
+                >
+                  <div class="service-content text-end">
+                    <h5 class="mb-4">Travel Guides</h5>
+                    <p class="mb-0">
+                      Dolor sit amet consectetur adipisicing elit. Non alias
+                      eum, suscipit expedita corrupti officiis debitis possimus
+                      nam laudantium beatae quidem dolore consequuntur voluptate
+                      rem reiciendis, omnis sequi harum earum.
+                    </p>
+                  </div>
+                  <div class="service-icon p-4">
+                    <i class="fa fa-user fa-4x text-primary"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div
+                  class="service-content-inner d-flex align-items-center bg-white border border-primary rounded p-4 pe-0"
+                >
+                  <div class="service-content text-end">
+                    <h5 class="mb-4">Event Management</h5>
+                    <p class="mb-0">
+                      Dolor sit amet consectetur adipisicing elit. Non alias
+                      eum, suscipit expedita corrupti officiis debitis possimus
+                      nam laudantium beatae quidem dolore consequuntur voluptate
+                      rem reiciendis, omnis sequi harum earum.
+                    </p>
+                  </div>
+                  <div class="service-icon p-4">
+                    <i class="fa fa-cog fa-4x text-primary"></i>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="d-flex mb-4 mb-lg-0">
-              <div
-                class="d-flex flex-shrink-0 align-items-center justify-content-center bg-primary mr-3"
-                style="height: 100px; width: 100px"
-              >
-                <i class="fa fa-2x fa-award text-white"></i>
+          <div class="col-lg-6">
+            <div class="row g-4">
+              <div class="col-12">
+                <div
+                  class="service-content-inner d-flex align-items-center bg-white border border-primary rounded p-4 ps-0"
+                >
+                  <div class="service-icon p-4">
+                    <i class="fa fa-globe fa-4x text-primary"></i>
+                  </div>
+                  <div class="service-content">
+                    <h5 class="mb-4">WorldWide Tours</h5>
+                    <p class="mb-0">
+                      Dolor sit amet consectetur adipisicing elit. Non alias
+                      eum, suscipit expedita corrupti officiis debitis possimus
+                      nam laudantium beatae quidem dolore consequuntur voluptate
+                      rem reiciendis, omnis sequi harum earum.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div class="d-flex flex-column">
-                <h5 class="">Best Services</h5>
-                <p class="m-0">
-                  Magna sit magna dolor duo dolor labore rebum amet elitr est
-                  diam sea
-                </p>
+              <div class="col-12">
+                <div
+                  class="service-content-inner d-flex align-items-center bg-white border border-primary rounded p-4 ps-0"
+                >
+                  <div class="service-icon p-4">
+                    <i class="fa fa-hotel fa-4x text-primary"></i>
+                  </div>
+                  <div class="service-content">
+                    <h5 class="mb-4">Hotel Reservation</h5>
+                    <p class="mb-0">
+                      Dolor sit amet consectetur adipisicing elit. Non alias
+                      eum, suscipit expedita corrupti officiis debitis possimus
+                      nam laudantium beatae quidem dolore consequuntur voluptate
+                      rem reiciendis, omnis sequi harum earum.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div
+                  class="service-content-inner d-flex align-items-center bg-white border border-primary rounded p-4 ps-0"
+                >
+                  <div class="service-icon p-4">
+                    <i class="fa fa-user fa-4x text-primary"></i>
+                  </div>
+                  <div class="service-content">
+                    <h5 class="mb-4">Travel Guides</h5>
+                    <p class="mb-0">
+                      Dolor sit amet consectetur adipisicing elit. Non alias
+                      eum, suscipit expedita corrupti officiis debitis possimus
+                      nam laudantium beatae quidem dolore consequuntur voluptate
+                      rem reiciendis, omnis sequi harum earum.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div
+                  class="service-content-inner d-flex align-items-center bg-white border border-primary rounded p-4 ps-0"
+                >
+                  <div class="service-icon p-4">
+                    <i class="fa fa-cog fa-4x text-primary"></i>
+                  </div>
+                  <div class="service-content">
+                    <h5 class="mb-4">Event Management</h5>
+                    <p class="mb-0">
+                      Dolor sit amet consectetur adipisicing elit. Non alias
+                      eum, suscipit expedita corrupti officiis debitis possimus
+                      nam laudantium beatae quidem dolore consequuntur voluptate
+                      rem reiciendis, omnis sequi harum earum.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="d-flex mb-4 mb-lg-0">
-              <div
-                class="d-flex flex-shrink-0 align-items-center justify-content-center bg-primary mr-3"
-                style="height: 100px; width: 100px"
+          <div class="col-12">
+            <div class="text-center">
+              <a class="btn btn-primary rounded-pill py-3 px-5 mt-2" href=""
+                >Service More</a
               >
-                <i class="fa fa-2x fa-globe text-white"></i>
-              </div>
-              <div class="d-flex flex-column">
-                <h5 class="">Worldwide Coverage</h5>
-                <p class="m-0">
-                  Magna sit magna dolor duo dolor labore rebum amet elitr est
-                  diam sea
-                </p>
-              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- Feature End -->
+    </div> -->
+    <!-- Services End -->
 
     <!-- Destination Start -->
-    <div class="container-fluid py-5">
-      <div class="container pt-5 pb-3">
-        <div class="text-center mb-3 pb-3">
-          <h6 class="text-primary text-uppercase" style="letter-spacing: 5px">
-            Destinations
-          </h6>
-          <h1>Explore Top Destination</h1>
+    <div class="container-fluid destination py-5">
+      <div class="container py-5">
+        <div class="mx-auto text-center mb-5" style="max-width: 900px">
+          <h5 class="section-title px-3">Destination</h5>
+          <h1 class="mb-0">Popular Destination</h1>
         </div>
-        <div class="row">
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div
-              class="destination-item position-relative overflow-hidden mb-2"
-            >
-              <img class="img-fluid" src="img/destination-7.png" alt="" />
+        <div class="tab-class text-center">
+          <ul class="nav nav-pills d-inline-flex justify-content-center mb-5">
+            <li class="nav-item">
               <a
-                class="destination-overlay text-white text-decoration-none"
-                href=""
+                class="d-flex mx-3 py-2 border border-primary bg-light rounded-pill active"
+                data-bs-toggle="pill"
+                href="#tab-1"
               >
-                <h5 class="text-white">Dubai</h5>
-                <span>100 Cities</span>
+                <span class="text-dark" style="width: 150px">All</span>
               </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="d-flex py-2 mx-3 border border-primary bg-light rounded-pill"
+                data-bs-toggle="pill"
+                href="#tab-2"
+              >
+                <span class="text-dark" style="width: 150px">Oman</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="d-flex mx-3 py-2 border border-primary bg-light rounded-pill"
+                data-bs-toggle="pill"
+                href="#tab-3"
+              >
+                <span class="text-dark" style="width: 150px">Dubai</span>
+              </a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div id="tab-1" class="tab-pane fade show p-0 active">
+              <div class="row g-4">
+                <div class="col-xl-8">
+                  <div class="row g-4">
+                    <div class="col-lg-6">
+                      <div class="destination-img">
+                        <img
+                          class="img-fluid rounded w-100"
+                          src="img/23.JPG"
+                          alt=""
+                        />
+                        <div class="destination-overlay p-4">
+                          <a
+                            href="#"
+                            class="btn btn-primary text-white rounded-pill border py-2 px-3"
+                            >20 Photos</a
+                          >
+                          <h4 class="text-white mb-2 mt-3">Oman Desert</h4>
+                          <a href="#" class="btn-hover text-white"
+                            >View <i class="fa fa-arrow-right ms-2"></i
+                          ></a>
+                        </div>
+                        <div class="search-icon">
+                          <a href="img/23.JPG" data-lightbox="destination-1"
+                            ><i
+                              class="fa fa-plus-square fa-1x btn btn-light btn-lg-square text-primary"
+                            ></i
+                          ></a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="destination-img">
+                        <img
+                          class="img-fluid rounded w-100"
+                          src="img/7.JPG"
+                          alt=""
+                        />
+                        <div class="destination-overlay p-4">
+                          <a
+                            href="#"
+                            class="btn btn-primary text-white rounded-pill border py-2 px-3"
+                            >20 Photos</a
+                          >
+                          <h4 class="text-white mb-2 mt-3">Oman Sinkhole</h4>
+                          <a href="#" class="btn-hover text-white"
+                            >View <i class="fa fa-arrow-right ms-2"></i
+                          ></a>
+                        </div>
+                        <div class="search-icon">
+                          <a href="img/7.JPG" data-lightbox="destination-2"
+                            ><i
+                              class="fa fa-plus-square fa-1x btn btn-light btn-lg-square text-primary"
+                            ></i
+                          ></a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="destination-img">
+                        <img
+                          class="img-fluid rounded w-100"
+                          src="img/55.png"
+                          alt=""
+                        />
+                        <div class="destination-overlay p-4">
+                          <a
+                            href="#"
+                            class="btn btn-primary text-white rounded-pill border py-2 px-3"
+                            >20 Photos</a
+                          >
+                          <h4 class="text-white mb-2 mt-3">Dubai Desert</h4>
+                          <a href="#" class="btn-hover text-white"
+                            >View <i class="fa fa-arrow-right ms-2"></i
+                          ></a>
+                        </div>
+                        <div class="search-icon">
+                          <a href="img/55.png" data-lightbox="destination-7"
+                            ><i
+                              class="fa fa-plus-square fa-1x btn btn-light btn-lg-square text-primary"
+                            ></i
+                          ></a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="destination-img">
+                        <img
+                          class="img-fluid rounded w-100"
+                          src="img/50.jpg"
+                          alt=""
+                        />
+                        <div class="destination-overlay p-4">
+                          <a
+                            href="#"
+                            class="btn btn-primary text-white rounded-pill border py-2 px-3"
+                            >20 Photos</a
+                          >
+                          <h4 class="text-white mb-2 mt-3">Dubai Frame</h4>
+                          <a href="#" class="btn-hover text-white"
+                            >View <i class="fa fa-arrow-right ms-2"></i
+                          ></a>
+                        </div>
+                        <div class="search-icon">
+                          <a href="img/50.jpg" data-lightbox="destination-8"
+                            ><i
+                              class="fa fa-plus-square fa-1x btn btn-light btn-lg-square text-primary"
+                            ></i
+                          ></a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-4">
+                  <div class="destination-img h-100">
+                    <img
+                      class="img-fluid rounded w-100 h-100"
+                      src="img/40.jpg"
+                      style="object-fit: cover; min-height: 300px"
+                      alt=""
+                    />
+                    <div class="destination-overlay p-4">
+                      <a
+                        href="#"
+                        class="btn btn-primary text-white rounded-pill border py-2 px-3"
+                        >20 Photos</a
+                      >
+                      <h4 class="text-white mb-2 mt-3">Oman Salalah</h4>
+                      <a href="#" class="btn-hover text-white"
+                        >View<i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                    <div class="search-icon">
+                      <a href="img/40.jpg" data-lightbox="destination-4"
+                        ><i
+                          class="fa fa-plus-square fa-1x btn btn-light btn-lg-square text-primary"
+                        ></i
+                      ></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div
-              class="destination-item position-relative overflow-hidden mb-2"
-            >
-              <img class="img-fluid" src="img/destination-8.png" alt="" />
-              <a
-                class="destination-overlay text-white text-decoration-none"
-                href=""
-              >
-                <h5 class="text-white">Oman</h5>
-                <span>100 Cities</span>
-              </a>
+            <div id="tab-2" class="tab-pane fade show p-0">
+              <div class="row g-4">
+                <div class="col-lg-6">
+                  <div class="destination-img">
+                    <img
+                      class="img-fluid rounded w-100"
+                      src="img/15.JPG"
+                      alt=""
+                    />
+                    <div class="destination-overlay p-4">
+                      <a
+                        href="#"
+                        class="btn btn-primary text-white rounded-pill border py-2 px-3"
+                        >20 Photos</a
+                      >
+                      <h4 class="text-white mb-2 mt-3">Oman Sink Hole</h4>
+                      <a href="#" class="btn-hover text-white"
+                        >View<i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                    <div class="search-icon">
+                      <a href="img/15.JPG" data-lightbox="destination-5"
+                        ><i
+                          class="fa fa-plus-square fa-1x btn btn-light btn-lg-square text-primary"
+                        ></i
+                      ></a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="destination-img">
+                    <img
+                      class="img-fluid rounded w-100"
+                      src="img/26.JPG"
+                      alt=""
+                    />
+                    <div class="destination-overlay p-4">
+                      <a
+                        href="#"
+                        class="btn btn-primary text-white rounded-pill border py-2 px-3"
+                        >20 Photos</a
+                      >
+                      <h4 class="text-white mb-2 mt-3">Oman Desert</h4>
+                      <a href="#" class="btn-hover text-white"
+                        >View<i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                    <div class="search-icon">
+                      <a href="img/26.JPG" data-lightbox="destination-6"
+                        ><i
+                          class="fa fa-plus-square fa-1x btn btn-light btn-lg-square text-primary"
+                        ></i
+                      ></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div
-              class="destination-item position-relative overflow-hidden mb-2"
-            >
-              <img class="img-fluid" src="img/destination-3.jpg" alt="" />
-              <a
-                class="destination-overlay text-white text-decoration-none"
-                href=""
-              >
-                <h5 class="text-white">Australia</h5>
-                <span>100 Cities</span>
-              </a>
-            </div>
-          </div>
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div
-              class="destination-item position-relative overflow-hidden mb-2"
-            >
-              <img class="img-fluid" src="img/about-1.jpg" alt="" />
-              <a
-                class="destination-overlay text-white text-decoration-none"
-                href=""
-              >
-                <h5 class="text-white">India</h5>
-                <span>100 Cities</span>
-              </a>
-            </div>
-          </div>
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div
-              class="destination-item position-relative overflow-hidden mb-2"
-            >
-              <img class="img-fluid" src="img/destination-5.jpg" alt="" />
-              <a
-                class="destination-overlay text-white text-decoration-none"
-                href=""
-              >
-                <h5 class="text-white">South Africa</h5>
-                <span>100 Cities</span>
-              </a>
-            </div>
-          </div>
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div
-              class="destination-item position-relative overflow-hidden mb-2"
-            >
-              <img class="img-fluid" src="img/destination-9.png" alt="" />
-              <a
-                class="destination-overlay text-white text-decoration-none"
-                href=""
-              >
-                <h5 class="text-white">Indonesia</h5>
-                <span>100 Cities</span>
-              </a>
+            <div id="tab-3" class="tab-pane fade show p-0">
+              <div class="row g-4">
+                <div class="col-lg-6">
+                  <div class="destination-img">
+                    <img
+                      class="img-fluid rounded w-100"
+                      src="img/11.png"
+                      alt=""
+                    />
+                    <div class="destination-overlay p-4">
+                      <a
+                        href="#"
+                        class="btn btn-primary text-white rounded-pill border py-2 px-3"
+                        >20 Photos</a
+                      >
+                      <h4 class="text-white mb-2 mt-3">Dubai Aquarium</h4>
+                      <a href="#" class="btn-hover text-white"
+                        >View<i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                    <div class="search-icon">
+                      <a href="img/11.png" data-lightbox="destination-5"
+                        ><i
+                          class="fa fa-plus-square fa-1x btn btn-light btn-lg-square text-primary"
+                        ></i
+                      ></a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="destination-img">
+                    <img
+                      class="img-fluid rounded w-100"
+                      src="img/44.png"
+                      alt=""
+                    />
+                    <div class="destination-overlay p-4">
+                      <a
+                        href="#"
+                        class="btn btn-primary text-white rounded-pill border py-2 px-3"
+                        >20 Photos</a
+                      >
+                      <h4 class="text-white mb-2 mt-3">Dubai Burj Al Arab</h4>
+                      <a href="#" class="btn-hover text-white"
+                        >View<i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                    <div class="search-icon">
+                      <a href="img/44.png" data-lightbox="destination-6"
+                        ><i
+                          class="fa fa-plus-square fa-1x btn btn-light btn-lg-square text-primary"
+                        ></i
+                      ></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Destination Start -->
+    <!-- Destination End -->
 
-    <!-- Service Start -->
-    <div class="container-fluid py-5">
-      <div class="container pt-5 pb-3">
-        <div class="text-center mb-3 pb-3">
-          <h6 class="text-primary text-uppercase" style="letter-spacing: 5px">
-            Services
-          </h6>
-          <h1>Tours & Travel Services</h1>
+    <!-- Explore Tour Start -->
+    <!-- <div class="container-fluid ExploreTour py-5">
+      <div class="container py-5">
+        <div class="mx-auto text-center mb-5" style="max-width: 900px">
+          <h5 class="section-title px-3">Explore Tour</h5>
+          <h1 class="mb-4">The World</h1>
+          <p class="mb-0">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum
+            tempore nam, architecto doloremque velit explicabo? Voluptate sunt
+            eveniet fuga eligendi! Expedita laudantium fugiat corrupti eum cum
+            repellat a laborum quasi.
+          </p>
         </div>
-        <div class="row">
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div class="service-item bg-white text-center mb-2 py-5 px-4">
-              <i class="fa fa-2x fa-route mx-auto mb-4"></i>
-              <h5 class="mb-2">Travel Guide</h5>
-              <p class="m-0">
-                Justo sit justo eos amet tempor amet clita amet ipsum eos elitr.
-                Amet lorem est amet labore
-              </p>
+        <div class="tab-class text-center">
+          <ul class="nav nav-pills d-inline-flex justify-content-center mb-5">
+            <li class="nav-item">
+              <a
+                class="d-flex mx-3 py-2 border border-primary bg-light rounded-pill active"
+                data-bs-toggle="pill"
+                href="#NationalTab-1"
+              >
+                <span class="text-dark" style="width: 250px"
+                  >National Tour Category</span
+                >
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="d-flex py-2 mx-3 border border-primary bg-light rounded-pill"
+                data-bs-toggle="pill"
+                href="#InternationalTab-2"
+              >
+                <span class="text-dark" style="width: 250px"
+                  >International tour Category</span
+                >
+              </a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div id="NationalTab-1" class="tab-pane fade show p-0 active">
+              <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                  <div class="national-item">
+                    <img
+                      src="img/explore-tour-1.jpg"
+                      class="img-fluid w-100 rounded"
+                      alt="Image"
+                    />
+                    <div class="national-content">
+                      <div class="national-info">
+                        <h5 class="text-white text-uppercase mb-2">
+                          Weekend Tour
+                        </h5>
+                        <a href="#" class="btn-hover text-white"
+                          >View All Place <i class="fa fa-arrow-right ms-2"></i
+                        ></a>
+                      </div>
+                    </div>
+                    <div class="national-plus-icon">
+                      <a href="#" class="my-auto"
+                        ><i class="fas fa-link fa-2x text-white"></i
+                      ></a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                  <div class="national-item">
+                    <img
+                      src="img/explore-tour-2.jpg"
+                      class="img-fluid w-100 rounded"
+                      alt="Image"
+                    />
+                    <div class="national-content">
+                      <div class="national-info">
+                        <h5 class="text-white text-uppercase mb-2">
+                          Holiday Tour
+                        </h5>
+                        <a href="#" class="btn-hover text-white"
+                          >View All Place <i class="fa fa-arrow-right ms-2"></i
+                        ></a>
+                      </div>
+                    </div>
+                    <div class="national-plus-icon">
+                      <a href="#" class="my-auto"
+                        ><i class="fas fa-link fa-2x text-white"></i
+                      ></a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                  <div class="national-item">
+                    <img
+                      src="img/explore-tour-3.jpg"
+                      class="img-fluid w-100 rounded"
+                      alt="Image"
+                    />
+                    <div class="national-content">
+                      <div class="national-info">
+                        <h5 class="text-white text-uppercase mb-2">
+                          Road Trip
+                        </h5>
+                        <a href="#" class="btn-hover text-white"
+                          >View All Place <i class="fa fa-arrow-right ms-2"></i
+                        ></a>
+                      </div>
+                    </div>
+                    <div class="tour-offer bg-info">15% Off</div>
+                    <div class="national-plus-icon">
+                      <a href="#" class="my-auto"
+                        ><i class="fas fa-link fa-2x text-white"></i
+                      ></a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                  <div class="national-item">
+                    <img
+                      src="img/explore-tour-4.jpg"
+                      class="img-fluid w-100 rounded"
+                      alt="Image"
+                    />
+                    <div class="national-content">
+                      <div class="national-info">
+                        <h5 class="text-white text-uppercase mb-2">
+                          Historical Trip
+                        </h5>
+                        <a href="#" class="btn-hover text-white"
+                          >View All Place <i class="fa fa-arrow-right ms-2"></i
+                        ></a>
+                      </div>
+                    </div>
+                    <div class="national-plus-icon">
+                      <a href="#" class="my-auto"
+                        ><i class="fas fa-link fa-2x text-white"></i
+                      ></a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                  <div class="national-item">
+                    <img
+                      src="img/explore-tour-5.jpg"
+                      class="img-fluid w-100 rounded"
+                      alt="Image"
+                    />
+                    <div class="national-content">
+                      <div class="national-info">
+                        <h5 class="text-white text-uppercase mb-2">
+                          Family Tour
+                        </h5>
+                        <a href="#" class="btn-hover text-white"
+                          >View All Place <i class="fa fa-arrow-right ms-2"></i
+                        ></a>
+                      </div>
+                    </div>
+                    <div class="tour-offer bg-warning">50% Off</div>
+                    <div class="national-plus-icon">
+                      <a href="#" class="my-auto"
+                        ><i class="fas fa-link fa-2x text-white"></i
+                      ></a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                  <div class="national-item">
+                    <img
+                      src="img/explore-tour-6.jpg"
+                      class="img-fluid w-100 rounded"
+                      alt="Image"
+                    />
+                    <div class="national-content">
+                      <div class="national-info">
+                        <h5 class="text-white text-uppercase mb-2">
+                          Beach Tour
+                        </h5>
+                        <a href="#" class="btn-hover text-white"
+                          >View All Place <i class="fa fa-arrow-right ms-2"></i
+                        ></a>
+                      </div>
+                    </div>
+                    <div class="national-plus-icon">
+                      <a href="#" class="my-auto"
+                        ><i class="fas fa-link fa-2x text-white"></i
+                      ></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div class="service-item bg-white text-center mb-2 py-5 px-4">
-              <i class="fa fa-2x fa-ticket-alt mx-auto mb-4"></i>
-              <h5 class="mb-2">Ticket Booking</h5>
-              <p class="m-0">
-                Justo sit justo eos amet tempor amet clita amet ipsum eos elitr.
-                Amet lorem est amet labore
-              </p>
-            </div>
-          </div>
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div class="service-item bg-white text-center mb-2 py-5 px-4">
-              <i class="fa fa-2x fa-hotel mx-auto mb-4"></i>
-              <h5 class="mb-2">Hotel Booking</h5>
-              <p class="m-0">
-                Justo sit justo eos amet tempor amet clita amet ipsum eos elitr.
-                Amet lorem est amet labore
-              </p>
+            <div id="InternationalTab-2" class="tab-pane fade show p-0">
+              <div class="InternationalTour-carousel owl-carousel">
+                <div class="international-item">
+                  <img
+                    src="img/explore-tour-1.jpg"
+                    class="img-fluid w-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="international-content">
+                    <div class="international-info">
+                      <h5 class="text-white text-uppercase mb-2">Australia</h5>
+                      <a href="#" class="btn-hover text-white me-4"
+                        ><i class="fas fa-map-marker-alt me-1"></i> 8 Cities</a
+                      >
+                      <a href="#" class="btn-hover text-white"
+                        ><i class="fa fa-eye ms-2"></i>
+                        <span>143+ Tour Places</span></a
+                      >
+                    </div>
+                  </div>
+                  <div class="tour-offer bg-success">30% Off</div>
+                  <div class="international-plus-icon">
+                    <a href="#" class="my-auto"
+                      ><i class="fas fa-link fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+                <div class="international-item">
+                  <img
+                    src="img/explore-tour-2.jpg"
+                    class="img-fluid w-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="international-content">
+                    <div class="international-info">
+                      <h5 class="text-white text-uppercase mb-2">Germany</h5>
+                      <a href="#" class="btn-hover text-white me-4"
+                        ><i class="fas fa-map-marker-alt me-1"></i> 12 Cities</a
+                      >
+                      <a href="#" class="btn-hover text-white"
+                        ><i class="fa fa-eye ms-2"></i>
+                        <span>21+ Tour Places</span></a
+                      >
+                    </div>
+                  </div>
+                  <div class="international-plus-icon">
+                    <a href="#" class="my-auto"
+                      ><i class="fas fa-link fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+                <div class="international-item">
+                  <img
+                    src="img/explore-tour-3.jpg"
+                    class="img-fluid w-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="international-content">
+                    <div class="tour-offer bg-warning">45% Off</div>
+                    <div class="international-info">
+                      <h5 class="text-white text-uppercase mb-2">Spain</h5>
+                      <a href="#" class="btn-hover text-white me-4"
+                        ><i class="fas fa-map-marker-alt me-1"></i> 9 Cities</a
+                      >
+                      <a href="#" class="btn-hover text-white"
+                        ><i class="fa fa-eye ms-2"></i>
+                        <span>133+ Tour Places</span></a
+                      >
+                    </div>
+                  </div>
+                  <div class="international-plus-icon">
+                    <a href="#" class="my-auto"
+                      ><i class="fas fa-link fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+                <div class="international-item">
+                  <img
+                    src="img/explore-tour-4.jpg"
+                    class="img-fluid w-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="international-content">
+                    <div class="international-info">
+                      <h5 class="text-white text-uppercase mb-2">Japan</h5>
+                      <a href="#" class="btn-hover text-white me-4"
+                        ><i class="fas fa-map-marker-alt me-1"></i> 8 Cities</a
+                      >
+                      <a href="#" class="btn-hover text-white"
+                        ><i class="fa fa-eye ms-2"></i>
+                        <span>137+ Tour Places</span></a
+                      >
+                    </div>
+                  </div>
+                  <div class="international-plus-icon">
+                    <a href="#" class="my-auto"
+                      ><i class="fas fa-link fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+                <div class="international-item">
+                  <img
+                    src="img/explore-tour-5.jpg"
+                    class="img-fluid w-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="international-content">
+                    <div class="tour-offer bg-info">70% Off</div>
+                    <div class="international-info">
+                      <h5 class="text-white text-uppercase mb-2">London</h5>
+                      <a href="#" class="btn-hover text-white me-4"
+                        ><i class="fas fa-map-marker-alt me-1"></i> 17 Cities</a
+                      >
+                      <a href="#" class="btn-hover text-white"
+                        ><i class="fa fa-eye ms-2"></i>
+                        <span>26+ Tour Places</span></a
+                      >
+                    </div>
+                  </div>
+                  <div class="international-plus-icon">
+                    <a href="#" class="my-auto"
+                      ><i class="fas fa-link fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- Service End -->
+    </div> -->
+    <!-- Explore Tour Start -->
 
     <!-- Packages Start -->
-    <div class="container-fluid py-5">
-      <div class="container pt-5 pb-3">
-        <div class="text-center mb-3 pb-3">
-          <h6 class="text-primary text-uppercase" style="letter-spacing: 5px">
-            Packages
-          </h6>
-          <h1>Perfect Tour Packages</h1>
+    <div class="container-fluid packages py-5">
+      <div class="container py-5">
+        <div class="mx-auto text-center mb-5" style="max-width: 900px">
+          <h5 class="section-title px-3">Packages</h5>
+          <h1 class="mb-0">Awesome Packages</h1>
         </div>
-        <div class="row">
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div
-              class="package-item bg-white mb-2 d-flex flex-column"
-              style="height: 400px"
-            >
-              <div style="height: 200px; overflow: hidden">
-                <img class="img-fluid w-100" src="img/33.jpg" alt="" />
+        <div class="packages-carousel owl-carousel">
+          <div class="packages-item">
+            <div class="packages-img">
+              <img
+                src="img/11.png"
+                class="img-fluid w-100 rounded-top"
+                alt="Image"
+              />
+              <div
+                class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
+                style="width: 100%; bottom: 0; left: 0; z-index: 5"
+              >
+                <small class="flex-fill text-center border-end py-2"
+                  ><i class="fa fa-map-marker-alt me-2"></i>Dubai</small
+                >
+                <small class="flex-fill text-center border-end py-2"
+                  ><i class="fa fa-calendar-alt me-2"></i>3 days</small
+                >
+                <small class="flex-fill text-center py-2"
+                  ><i class="fa fa-user me-2"></i>2 Person</small
+                >
               </div>
-              <div class="p-4 d-flex flex-column flex-grow-1">
-                <div class="d-flex justify-content-between mb-3">
-                  <small class="m-0"
-                    ><i class="fa fa-map-marker-alt text-primary mr-2"></i
-                    >Oman</small
-                  >
-                  <small class="m-0"
-                    ><i class="fa fa-calendar-alt text-primary mr-2"></i>3
-                    days</small
-                  >
-                  <small class="m-0"
-                    ><i class="fa fa-user text-primary mr-2"></i>2 Person</small
+              <div class="packages-price py-2 px-4">$349.00</div>
+            </div>
+            <div class="packages-content bg-light">
+              <div class="p-4 pb-0">
+                <h5 class="mb-0">
+                  Dubai's Underwater World: An Immersive Aquarium Experience
+                </h5>
+                <div class="mb-3">
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                </div>
+                <p class="mb-4">
+                  The Dubai Aquarium stands among the most captivating
+                  waterfront experiences which allows exploration into Dubai's
+                  underwater realm. People can experience ocean-depth
+                  exploration through this complete underwater immersion that
+                  exists within the city boundaries.
+                </p>
+              </div>
+              <div class="row bg-primary rounded-bottom mx-0">
+                <div class="col-6 text-start px-0">
+                  <a href="#" class="btn-hover btn text-white py-2 px-4"
+                    >Read More</a
                   >
                 </div>
-                <a class="h5 text-decoration-none" href="package2.html"
-                  >Muscat Half-Day City Tour & Dolphin-Watching Boat
-                  Adventure</a
-                >
-                <div class="border-top mt-4 pt-4 mt-auto">
-                  <div class="d-flex justify-content-between">
-                    <h6 class="m-0">
-                      <i class="fa fa-star text-primary mr-2"></i>4.5
-                      <small>(250)</small>
-                    </h6>
-                    <h5 class="m-0">$350</h5>
-                  </div>
+                <div class="col-6 text-end px-0">
+                  <a href="#" class="btn-hover btn text-white py-2 px-4"
+                    >Book Now</a
+                  >
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div
-              class="package-item bg-white mb-2 d-flex flex-column"
-              style="height: 400px"
-            >
-              <div style="height: 200px; overflow: hidden">
-                <img class="img-fluid w-100" src="img/8.jpg" alt="" />
+          <div class="packages-item">
+            <div class="packages-img">
+              <img
+                src="img/33.jpg"
+                class="img-fluid w-100 rounded-top"
+                alt="Image"
+              />
+              <div
+                class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
+                style="width: 100%; bottom: 0; left: 0; z-index: 5"
+              >
+                <small class="flex-fill text-center border-end py-2"
+                  ><i class="fa fa-map-marker-alt me-2"></i>Oman</small
+                >
+                <small class="flex-fill text-center border-end py-2"
+                  ><i class="fa fa-calendar-alt me-2"></i>3 days</small
+                >
+                <small class="flex-fill text-center py-2"
+                  ><i class="fa fa-user me-2"></i>2 Person</small
+                >
               </div>
-              <div class="p-4 d-flex flex-column flex-grow-1">
-                <div class="d-flex justify-content-between mb-3">
-                  <small class="m-0"
-                    ><i class="fa fa-map-marker-alt text-primary mr-2"></i
-                    >Oman</small
-                  >
-                  <small class="m-0"
-                    ><i class="fa fa-calendar-alt text-primary mr-2"></i>3
-                    days</small
-                  >
-                  <small class="m-0"
-                    ><i class="fa fa-user text-primary mr-2"></i>2 Person</small
+              <div class="packages-price py-2 px-4">$449.00</div>
+            </div>
+            <div class="packages-content bg-light">
+              <div class="p-4 pb-0">
+                <h5 class="mb-0">
+                  Muscat Half-Day City Tour & Dolphin-Watching Boat Adventure
+                </h5>
+                <div class="mb-3">
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                </div>
+                <p class="mb-4">
+                  As the most prosperous Omani city Muscat stands out for its
+                  historical significance alongside its scenic location with
+                  significant natural and cultural human accomplishments. The
+                  city traces its origins many centuries before the arrival of
+                  Islam. The city faces the Sea of ​​Oman while majestic
+                  mountains encircle it in a wonderful setting.
+                </p>
+              </div>
+              <div class="row bg-primary rounded-bottom mx-0">
+                <div class="col-6 text-start px-0">
+                  <a href="#" class="btn-hover btn text-white py-2 px-4"
+                    >Read More</a
                   >
                 </div>
-                <a class="h5 text-decoration-none" href="package3.html"
-                  >Thrilling Mountain Adventure Tour</a
-                >
-                <div class="border-top mt-4 pt-4 mt-auto">
-                  <div class="d-flex justify-content-between">
-                    <h6 class="m-0">
-                      <i class="fa fa-star text-primary mr-2"></i>4.5
-                      <small>(250)</small>
-                    </h6>
-                    <h5 class="m-0">$350</h5>
-                  </div>
+                <div class="col-6 text-end px-0">
+                  <a href="#" class="btn-hover btn text-white py-2 px-4"
+                    >Book Now</a
+                  >
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div
-              class="package-item bg-white mb-2 d-flex flex-column"
-              style="height: 400px"
-            >
-              <div style="height: 200px; overflow: hidden">
-                <img class="img-fluid w-100" src="img/15.JPG" alt="" />
+          <div class="packages-item">
+            <div class="packages-img">
+              <img
+                src="img/15.JPG"
+                class="img-fluid w-100 rounded-top"
+                alt="Image"
+              />
+              <div
+                class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
+                style="width: 100%; bottom: 0; left: 0; z-index: 5"
+              >
+                <small class="flex-fill text-center border-end py-2"
+                  ><i class="fa fa-map-marker-alt me-2"></i>Oman</small
+                >
+                <small class="flex-fill text-center border-end py-2"
+                  ><i class="fa fa-calendar-alt me-2"></i>3 days</small
+                >
+                <small class="flex-fill text-center py-2"
+                  ><i class="fa fa-user me-2"></i>2 Person</small
+                >
               </div>
-              <div class="p-4 d-flex flex-column flex-grow-1">
-                <div class="d-flex justify-content-between mb-3">
-                  <small class="m-0"
-                    ><i class="fa fa-map-marker-alt text-primary mr-2"></i
-                    >Oman</small
-                  >
-                  <small class="m-0"
-                    ><i class="fa fa-calendar-alt text-primary mr-2"></i>3
-                    days</small
-                  >
-                  <small class="m-0"
-                    ><i class="fa fa-user text-primary mr-2"></i>2 Person</small
+              <div class="packages-price py-2 px-4">$549.00</div>
+            </div>
+            <div class="packages-content bg-light">
+              <div class="p-4 pb-0">
+                <h5 class="mb-0">
+                  Discover Wadi Shab: Hidden Gems & Stunning Sinkhole
+                </h5>
+                <div class="mb-3">
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                </div>
+                <p class="mb-4">
+                  A journey that will take visitors to Wadi Shap and Sink Hole.
+                  Travelling for two hours by car one way from 8 in the morning
+                  will reach Wadi Shap. Climb aboard the boat to reach the
+                  distant bank of the river. The beginning of the adventure
+                  starts with a forty-five-minute walking journey until you
+                  reach a blue swimming pool where you can make the aquatic
+                  journey to observe the waterfall inside a cave. Users must
+                  bring waterproof shoes and swimwear and should choose suitable
+                  hiking footwear for the journey. Driving to the sinkhole near
+                  Wadi Shap on the road to Muscat requires 15 minutes travel
+                  time.
+                </p>
+              </div>
+              <div class="row bg-primary rounded-bottom mx-0">
+                <div class="col-6 text-start px-0">
+                  <a href="#" class="btn-hover btn text-white py-2 px-4"
+                    >Read More</a
                   >
                 </div>
-                <a class="h5 text-decoration-none" href="package4.html"
-                  >Discover Wadi Shab: Hidden Gems & Stunning Sinkhole</a
-                >
-                <div class="border-top mt-4 pt-4 mt-auto">
-                  <div class="d-flex justify-content-between">
-                    <h6 class="m-0">
-                      <i class="fa fa-star text-primary mr-2"></i>4.5
-                      <small>(250)</small>
-                    </h6>
-                    <h5 class="m-0">$350</h5>
-                  </div>
+                <div class="col-6 text-end px-0">
+                  <a href="#" class="btn-hover btn text-white py-2 px-4"
+                    >Book Now</a
+                  >
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div
-              class="package-item bg-white mb-2 d-flex flex-column"
-              style="height: 400px"
-            >
-              <div style="height: 200px; overflow: hidden">
-                <img class="img-fluid w-100" src="img/23.JPG" alt="" />
-              </div>
-              <div class="p-4 d-flex flex-column flex-grow-1">
-                <div class="d-flex justify-content-between mb-3">
-                  <small class="m-0"
-                    ><i class="fa fa-map-marker-alt text-primary mr-2"></i
-                    >Oman</small
-                  >
-                  <small class="m-0"
-                    ><i class="fa fa-calendar-alt text-primary mr-2"></i>3
-                    days</small
-                  >
-                  <small class="m-0"
-                    ><i class="fa fa-user text-primary mr-2"></i>2 Person</small
-                  >
-                </div>
-                <a class="h5 text-decoration-none" href="package5.html"
-                  >Wadi Bani Khalid Oasis & Desert Sunset Magic</a
+          <div class="packages-item">
+            <div class="packages-img">
+              <img
+                src="img/22.png"
+                class="img-fluid w-100 rounded-top"
+                alt="Image"
+              />
+              <div
+                class="packages-info d-flex border border-start-0 border-end-0 position-absolute"
+                style="width: 100%; bottom: 0; left: 0; z-index: 5"
+              >
+                <small class="flex-fill text-center border-end py-2"
+                  ><i class="fa fa-map-marker-alt me-2"></i>Dubai</small
                 >
-                <div class="border-top mt-4 pt-4 mt-auto">
-                  <div class="d-flex justify-content-between">
-                    <h6 class="m-0">
-                      <i class="fa fa-star text-primary mr-2"></i>4.5
-                      <small>(250)</small>
-                    </h6>
-                    <h5 class="m-0">$350</h5>
-                  </div>
-                </div>
+                <small class="flex-fill text-center border-end py-2"
+                  ><i class="fa fa-calendar-alt me-2"></i>3 days</small
+                >
+                <small class="flex-fill text-center py-2"
+                  ><i class="fa fa-user me-2"></i>2 Person</small
+                >
               </div>
+              <div class="packages-price py-2 px-4">$649.00</div>
             </div>
-          </div>
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div
-              class="package-item bg-white mb-2 d-flex flex-column"
-              style="height: 400px"
-            >
-              <div style="height: 200px; overflow: hidden">
-                <img class="img-fluid w-100" src="img/29.jpg" alt="" />
+            <div class="packages-content bg-light">
+              <div class="p-4 pb-0">
+                <h5 class="mb-0">
+                  Dubai's Golden Gateway: The Dubai Frame Experience
+                </h5>
+                <div class="mb-3">
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                  <small class="fa fa-star text-primary"></small>
+                </div>
+                <p class="mb-4">
+                  The Dubai Frame stands as a majestic structure which shows
+                  panoramic views between Dubai's historical and forthcoming
+                  landscapes. This architectural masterpiece functions as an
+                  entry point to the city's skyline whereby it combines
+                  traditional historic areas alongside the contemporary
+                  skyscrapers in Downtown Dubai. The Dubai Frame works as both a
+                  tourist experience and a monumental symbol which provocatively
+                  enables visitors to enter its hollow core to watch how Dubai
+                  transitioned from desert settlement to worldwide urban center.
+                  The Dubai Frame creates an unforgettable experience both for
+                  those fascinated by architecture and photography enthusiasts
+                  or anyone who wants to capture that ideal shot because it
+                  embodies Dubai's essence.
+                </p>
               </div>
-              <div class="p-4 d-flex flex-column flex-grow-1">
-                <div class="d-flex justify-content-between mb-3">
-                  <small class="m-0"
-                    ><i class="fa fa-map-marker-alt text-primary mr-2"></i
-                    >Oman</small
-                  >
-                  <small class="m-0"
-                    ><i class="fa fa-calendar-alt text-primary mr-2"></i>3
-                    days</small
-                  >
-                  <small class="m-0"
-                    ><i class="fa fa-user text-primary mr-2"></i>2 Person</small
+              <div class="row bg-primary rounded-bottom mx-0">
+                <div class="col-6 text-start px-0">
+                  <a href="#" class="btn-hover btn text-white py-2 px-4"
+                    >Read More</a
                   >
                 </div>
-                <a class="h5 text-decoration-none" href="package6.html"
-                  >Dolphin Watching & Snorkeling Adventure</a
-                >
-                <div class="border-top mt-4 pt-4 mt-auto">
-                  <div class="d-flex justify-content-between">
-                    <h6 class="m-0">
-                      <i class="fa fa-star text-primary mr-2"></i>4.5
-                      <small>(250)</small>
-                    </h6>
-                    <h5 class="m-0">$350</h5>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4 col-md-6 mb-4">
-            <div
-              class="package-item bg-white mb-2 d-flex flex-column"
-              style="height: 400px"
-            >
-              <div style="height: 200px; overflow: hidden">
-                <img class="img-fluid w-100" src="img/37.JPG" alt="" />
-              </div>
-              <div class="p-4 d-flex flex-column flex-grow-1">
-                <div class="d-flex justify-content-between mb-3">
-                  <small class="m-0"
-                    ><i class="fa fa-map-marker-alt text-primary mr-2"></i
-                    >Oman</small
+                <div class="col-6 text-end px-0">
+                  <a href="#" class="btn-hover btn text-white py-2 px-4"
+                    >Book Now</a
                   >
-                  <small class="m-0"
-                    ><i class="fa fa-calendar-alt text-primary mr-2"></i>3
-                    days</small
-                  >
-                  <small class="m-0"
-                    ><i class="fa fa-user text-primary mr-2"></i>2 Person</small
-                  >
-                </div>
-                <a class="h5 text-decoration-none" href="package7.html"
-                  >Nizwa, Oman: Discover Ancient Treasures at Ages Museum &
-                  Birkt Al Mool</a
-                >
-                <div class="border-top mt-4 pt-4 mt-auto">
-                  <div class="d-flex justify-content-between">
-                    <h6 class="m-0">
-                      <i class="fa fa-star text-primary mr-2"></i>4.5
-                      <small>(250)</small>
-                    </h6>
-                    <h5 class="m-0">$350</h5>
-                  </div>
                 </div>
               </div>
             </div>
@@ -754,274 +1369,1104 @@
     </div>
     <!-- Packages End -->
 
-    <!-- Registration Start -->
-    <div class="container-fluid bg-registration py-5" style="margin: 90px 0">
-      <div class="container py-5">
-        <div class="row align-items-center">
-          <div class="col-lg-7 mb-5 mb-lg-0">
-            <div class="mb-4">
-              <h6
-                class="text-primary text-uppercase"
-                style="letter-spacing: 5px"
-              >
-                Mega Offer
-              </h6>
-              <h1 class="text-white">
-                <span class="text-primary">30% OFF</span> For Honeymoon
-              </h1>
-            </div>
-            <p class="text-white">
-              Invidunt lorem justo sanctus clita. Erat lorem labore ea, justo
-              dolor lorem ipsum ut sed eos, ipsum et dolor kasd sit ea justo.
-              Erat justo sed sed diam. Ea et erat ut sed diam sea ipsum est
-              dolor
-            </p>
-            <ul class="list-inline text-white m-0">
-              <li class="py-2">
-                <i class="fa fa-check text-primary mr-3"></i>Labore eos amet
-                dolor amet diam
-              </li>
-              <li class="py-2">
-                <i class="fa fa-check text-primary mr-3"></i>Etsea et sit dolor
-                amet ipsum
-              </li>
-              <li class="py-2">
-                <i class="fa fa-check text-primary mr-3"></i>Diam dolor diam
-                elitripsum vero.
-              </li>
-            </ul>
-          </div>
-          <div class="col-lg-5">
-            <div class="card border-0">
-              <div class="card-header bg-primary text-center p-4">
-                <h1 class="text-white m-0">Sign Up Now</h1>
+    <!-- Gallery Start -->
+    <div class="container-fluid gallery py-5 my-5">
+      <div class="mx-auto text-center mb-5" style="max-width: 900px">
+        <h5 class="section-title px-3">Our Gallery</h5>
+        <h1 class="mb-4">Tourism & Traveling Gallery.</h1>
+        <p class="mb-0">
+          Dive into our 'Tourism & Traveling Gallery' for a snapshot of the
+          world's wonders. Explore stunning landscapes, cultural treasures, and
+          unforgettable adventures through our curated collection of travel
+          images. Inspire your next journey or feed your wanderlust with a
+          glimpse into the beauty of global exploration.
+        </p>
+      </div>
+      <div class="tab-class text-center">
+        <ul class="nav nav-pills d-inline-flex justify-content-center mb-5">
+          <li class="nav-item">
+            <a
+              class="d-flex mx-3 py-2 border border-primary bg-light rounded-pill active"
+              data-bs-toggle="pill"
+              href="#GalleryTab-1"
+            >
+              <span class="text-dark" style="width: 150px">All</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="d-flex py-2 mx-3 border border-primary bg-light rounded-pill"
+              data-bs-toggle="pill"
+              href="#GalleryTab-2"
+            >
+              <span class="text-dark" style="width: 150px">Oman</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="d-flex mx-3 py-2 border border-primary bg-light rounded-pill"
+              data-bs-toggle="pill"
+              href="#GalleryTab-3"
+            >
+              <span class="text-dark" style="width: 150px">Dubai</span>
+            </a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div id="GalleryTab-1" class="tab-pane fade show p-0 active">
+            <div class="row g-2">
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/33.jpg"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Oman</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/33.jpg"
+                      data-lightbox="gallery-1"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
               </div>
-              <div class="card-body rounded-bottom bg-white p-5">
-                <form>
-                  <div class="form-group">
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/37.JPG"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Oman</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/37.JPG"
+                      data-lightbox="gallery-2"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/40.jpg"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Oman</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/40.jpg"
+                      data-lightbox="gallery-3"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/66.png"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Dubai</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/66.png"
+                      data-lightbox="gallery-4"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/55.png"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Dubai</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/55.png"
+                      data-lightbox="gallery-5"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/44.png"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Dubai</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/44.png"
+                      data-lightbox="gallery-6"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/23.JPG"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Oman</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/23.JPG"
+                      data-lightbox="gallery-7"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/19.JPG"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Oman</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/19.JPG"
+                      data-lightbox="gallery-8"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/7.JPG"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Oman</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/7.JPG"
+                      data-lightbox="gallery-9"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/29.jpg"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Oman</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/29.jpg"
+                      data-lightbox="gallery-10"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="GalleryTab-2" class="tab-pane fade show p-0">
+            <div class="row g-2">
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/10.JPG"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Oman</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/10.JPG"
+                      data-lightbox="gallery-2"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/41.jpg"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Oman</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/41.jpg"
+                      data-lightbox="gallery-3"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/23.JPG"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Oman</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/23.JPG"
+                      data-lightbox="gallery-3"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/21.JPG"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Oman</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/21.JPG"
+                      data-lightbox="gallery-3"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="GalleryTab-3" class="tab-pane fade show p-0">
+            <div class="row g-2">
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/56.jpg"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Dubai</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/56.jpg"
+                      data-lightbox="gallery-2"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/53.webp"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Dubai</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/53.webp"
+                      data-lightbox="gallery-3"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/49.jpg"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Dubai</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/49.jpg"
+                      data-lightbox="gallery-3"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                <div class="gallery-item h-100">
+                  <img
+                    src="img/46.webp"
+                    class="img-fluid w-100 h-100 rounded"
+                    alt="Image"
+                  />
+                  <div class="gallery-content">
+                    <div class="gallery-info">
+                      <h5 class="text-white text-uppercase mb-2">Dubai</h5>
+                      <a href="#" class="btn-hover text-white"
+                        >View All Place <i class="fa fa-arrow-right ms-2"></i
+                      ></a>
+                    </div>
+                  </div>
+                  <div class="gallery-plus-icon">
+                    <a
+                      href="img/46.webp"
+                      data-lightbox="gallery-3"
+                      class="my-auto"
+                      ><i class="fas fa-plus fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Gallery End -->
+
+    <!-- Tour Booking Start -->
+    <div class="container-fluid booking py-5">
+      <div class="container py-5">
+        <div class="row g-5 align-items-center">
+          <div class="col-lg-6">
+            <h5 class="section-booking-title pe-3">Booking</h5>
+            <h1 class="text-white mb-4">Online Booking</h1>
+            <p class="text-white mb-4">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Aspernatur maxime ullam esse fuga blanditiis accusantium pariatur
+              quis sapiente, veniam doloribus praesentium? Repudiandae iste
+              voluptatem fugiat doloribus quasi quo iure officia.
+            </p>
+            <p class="text-white mb-4">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Aspernatur maxime ullam esse fuga blanditiis accusantium pariatur
+              quis sapiente, veniam doloribus praesentium? Repudiandae iste
+              voluptatem fugiat doloribus quasi quo iure officia.
+            </p>
+            <a
+              href="#"
+              class="btn btn-light text-primary rounded-pill py-3 px-5 mt-2"
+              >Read More</a
+            >
+          </div>
+          <div class="col-lg-6">
+            <h1 class="text-white mb-3">Book A Tour Deals</h1>
+            <p class="text-white mb-4">
+              Get <span class="text-warning">50% Off</span> On Your First
+              Adventure Trip With Travela. Get More Deal Offers Here.
+            </p>
+            <form>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="form-floating">
                     <input
                       type="text"
-                      class="form-control p-4"
-                      placeholder="Your name"
-                      required="required"
+                      class="form-control bg-white border-0"
+                      id="name"
+                      placeholder="Your Name"
                     />
+                    <label for="name">Your Name</label>
                   </div>
-                  <div class="form-group">
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
                     <input
                       type="email"
-                      class="form-control p-4"
-                      placeholder="Your email"
-                      required="required"
+                      class="form-control bg-white border-0"
+                      id="email"
+                      placeholder="Your Email"
                     />
+                    <label for="email">Your Email</label>
                   </div>
-                  <div class="form-group">
-                    <select class="custom-select px-4" style="height: 47px">
-                      <option selected>Select a destination</option>
-                      <option value="1">destination 1</option>
-                      <option value="2">destination 1</option>
-                      <option value="3">destination 1</option>
+                </div>
+                <div class="col-md-6">
+                  <div
+                    class="form-floating date"
+                    id="date3"
+                    data-target-input="nearest"
+                  >
+                    <input
+                      type="text"
+                      class="form-control bg-white border-0"
+                      id="datetime"
+                      placeholder="Date & Time"
+                      data-target="#date3"
+                      data-toggle="datetimepicker"
+                    />
+                    <label for="datetime">Date & Time</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <select class="form-select bg-white border-0" id="select1">
+                      <option value="1">Destination 1</option>
+                      <option value="2">Destination 2</option>
+                      <option value="3">Destination 3</option>
                     </select>
+                    <label for="select1">Destination</label>
                   </div>
-                  <div>
-                    <button
-                      class="btn btn-primary btn-block py-3"
-                      type="submit"
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <select
+                      class="form-select bg-white border-0"
+                      id="SelectPerson"
                     >
-                      Sign Up Now
-                    </button>
+                      <option value="1">Persons 1</option>
+                      <option value="2">Persons 2</option>
+                      <option value="3">Persons 3</option>
+                    </select>
+                    <label for="SelectPerson">Persons</label>
                   </div>
-                </form>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <select
+                      class="form-select bg-white border-0"
+                      id="CategoriesSelect"
+                    >
+                      <option value="1">Kids</option>
+                      <option value="2">1</option>
+                      <option value="3">2</option>
+                      <option value="3">3</option>
+                    </select>
+                    <label for="CategoriesSelect">Categories</label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-floating">
+                    <textarea
+                      class="form-control bg-white border-0"
+                      placeholder="Special Request"
+                      id="message"
+                      style="height: 100px"
+                    ></textarea>
+                    <label for="message">Special Request</label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <button
+                    class="btn btn-primary text-white w-100 py-3"
+                    type="submit"
+                  >
+                    Book Now
+                  </button>
+                </div>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
     </div>
-    <!-- Registration End -->
+    <!-- Tour Booking End -->
 
-    <!-- Team Start -->
-    <div class="container-fluid py-5">
-      <div class="container pt-5 pb-3">
-        <div class="text-center mb-3 pb-3">
-          <h6 class="text-primary text-uppercase" style="letter-spacing: 5px">
-            Guides
-          </h6>
-          <h1>Our Travel Guides</h1>
+    <!-- Travel Guide Start -->
+    <!-- <div class="container-fluid guide py-5">
+      <div class="container py-5">
+        <div class="mx-auto text-center mb-5" style="max-width: 900px">
+          <h5 class="section-title px-3">Travel Guide</h5>
+          <h1 class="mb-0">Meet Our Guide</h1>
         </div>
-        <div class="row">
-          <div class="col-lg-3 col-md-4 col-sm-6 pb-2">
-            <div class="team-item bg-white mb-4">
-              <div class="team-img position-relative overflow-hidden">
-                <img class="img-fluid w-100" src="img/team-1.jpg" alt="" />
-                <div class="team-social">
-                  <a class="btn btn-outline-primary btn-square" href=""
-                    ><i class="fab fa-twitter"></i
-                  ></a>
-                  <a class="btn btn-outline-primary btn-square" href=""
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-3">
+            <div class="guide-item">
+              <div class="guide-img">
+                <div class="guide-img-efects">
+                  <img
+                    src="img/guide-1.jpg"
+                    class="img-fluid w-100 rounded-top"
+                    alt="Image"
+                  />
+                </div>
+                <div class="guide-icon rounded-pill p-2">
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
                     ><i class="fab fa-facebook-f"></i
                   ></a>
-                  <a class="btn btn-outline-primary btn-square" href=""
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
+                    ><i class="fab fa-twitter"></i
+                  ></a>
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
                     ><i class="fab fa-instagram"></i
                   ></a>
-                  <a class="btn btn-outline-primary btn-square" href=""
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
                     ><i class="fab fa-linkedin-in"></i
                   ></a>
                 </div>
               </div>
-              <div class="text-center py-4">
-                <h5 class="text-truncate">Guide Name</h5>
-                <p class="m-0">Designation</p>
+              <div class="guide-title text-center rounded-bottom p-4">
+                <div class="guide-title-inner">
+                  <h4 class="mt-3">Full Name</h4>
+                  <p class="mb-0">Designation</p>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-lg-3 col-md-4 col-sm-6 pb-2">
-            <div class="team-item bg-white mb-4">
-              <div class="team-img position-relative overflow-hidden">
-                <img class="img-fluid w-100" src="img/team-2.jpg" alt="" />
-                <div class="team-social">
-                  <a class="btn btn-outline-primary btn-square" href=""
-                    ><i class="fab fa-twitter"></i
-                  ></a>
-                  <a class="btn btn-outline-primary btn-square" href=""
+          <div class="col-md-6 col-lg-3">
+            <div class="guide-item">
+              <div class="guide-img">
+                <div class="guide-img-efects">
+                  <img
+                    src="img/guide-2.jpg"
+                    class="img-fluid w-100 rounded-top"
+                    alt="Image"
+                  />
+                </div>
+                <div class="guide-icon rounded-pill p-2">
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
                     ><i class="fab fa-facebook-f"></i
                   ></a>
-                  <a class="btn btn-outline-primary btn-square" href=""
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
+                    ><i class="fab fa-twitter"></i
+                  ></a>
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
                     ><i class="fab fa-instagram"></i
                   ></a>
-                  <a class="btn btn-outline-primary btn-square" href=""
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
                     ><i class="fab fa-linkedin-in"></i
                   ></a>
                 </div>
               </div>
-              <div class="text-center py-4">
-                <h5 class="text-truncate">Guide Name</h5>
-                <p class="m-0">Designation</p>
+              <div class="guide-title text-center rounded-bottom p-4">
+                <div class="guide-title-inner">
+                  <h4 class="mt-3">Full Name</h4>
+                  <p class="mb-0">Designation</p>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-lg-3 col-md-4 col-sm-6 pb-2">
-            <div class="team-item bg-white mb-4">
-              <div class="team-img position-relative overflow-hidden">
-                <img class="img-fluid w-100" src="img/team-3.jpg" alt="" />
-                <div class="team-social">
-                  <a class="btn btn-outline-primary btn-square" href=""
-                    ><i class="fab fa-twitter"></i
-                  ></a>
-                  <a class="btn btn-outline-primary btn-square" href=""
+          <div class="col-md-6 col-lg-3">
+            <div class="guide-item">
+              <div class="guide-img">
+                <div class="guide-img-efects">
+                  <img
+                    src="img/guide-3.jpg"
+                    class="img-fluid w-100 rounded-top"
+                    alt="Image"
+                  />
+                </div>
+                <div class="guide-icon rounded-pill p-2">
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
                     ><i class="fab fa-facebook-f"></i
                   ></a>
-                  <a class="btn btn-outline-primary btn-square" href=""
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
+                    ><i class="fab fa-twitter"></i
+                  ></a>
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
                     ><i class="fab fa-instagram"></i
                   ></a>
-                  <a class="btn btn-outline-primary btn-square" href=""
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
                     ><i class="fab fa-linkedin-in"></i
                   ></a>
                 </div>
               </div>
-              <div class="text-center py-4">
-                <h5 class="text-truncate">Guide Name</h5>
-                <p class="m-0">Designation</p>
+              <div class="guide-title text-center rounded-bottom p-4">
+                <div class="guide-title-inner">
+                  <h4 class="mt-3">Full Name</h4>
+                  <p class="mb-0">Designation</p>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-lg-3 col-md-4 col-sm-6 pb-2">
-            <div class="team-item bg-white mb-4">
-              <div class="team-img position-relative overflow-hidden">
-                <img class="img-fluid w-100" src="img/team-4.jpg" alt="" />
-                <div class="team-social">
-                  <a class="btn btn-outline-primary btn-square" href=""
-                    ><i class="fab fa-twitter"></i
-                  ></a>
-                  <a class="btn btn-outline-primary btn-square" href=""
+          <div class="col-md-6 col-lg-3">
+            <div class="guide-item">
+              <div class="guide-img">
+                <div class="guide-img-efects">
+                  <img
+                    src="img/guide-4.jpg"
+                    class="img-fluid w-100 rounded-top"
+                    alt="Image"
+                  />
+                </div>
+                <div class="guide-icon rounded-pill p-2">
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
                     ><i class="fab fa-facebook-f"></i
                   ></a>
-                  <a class="btn btn-outline-primary btn-square" href=""
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
+                    ><i class="fab fa-twitter"></i
+                  ></a>
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
                     ><i class="fab fa-instagram"></i
                   ></a>
-                  <a class="btn btn-outline-primary btn-square" href=""
+                  <a
+                    class="btn btn-square btn-primary rounded-circle mx-1"
+                    href=""
                     ><i class="fab fa-linkedin-in"></i
                   ></a>
                 </div>
               </div>
-              <div class="text-center py-4">
-                <h5 class="text-truncate">Guide Name</h5>
-                <p class="m-0">Designation</p>
+              <div class="guide-title text-center rounded-bottom p-4">
+                <div class="guide-title-inner">
+                  <h4 class="mt-3">Full Name</h4>
+                  <p class="mb-0">Designation</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- Team End -->
+    </div> -->
+    <!-- Travel Guide End -->
+
+    <!-- Blog Start -->
+    <!-- <div class="container-fluid blog py-5">
+      <div class="container py-5">
+        <div class="mx-auto text-center mb-5" style="max-width: 900px">
+          <h5 class="section-title px-3">Our Blog</h5>
+          <h1 class="mb-4">Popular Travel Blogs</h1>
+          <p class="mb-0">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti
+            deserunt tenetur sapiente atque. Magni non explicabo beatae sit, vel
+            reiciendis consectetur numquam id similique sunt error obcaecati
+            ducimus officia maiores.
+          </p>
+        </div>
+        <div class="row g-4 justify-content-center">
+          <div class="col-lg-4 col-md-6">
+            <div class="blog-item">
+              <div class="blog-img">
+                <div class="blog-img-inner">
+                  <img
+                    class="img-fluid w-100 rounded-top"
+                    src="img/blog-1.jpg"
+                    alt="Image"
+                  />
+                  <div class="blog-icon">
+                    <a href="#" class="my-auto"
+                      ><i class="fas fa-link fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+                <div
+                  class="blog-info d-flex align-items-center border border-start-0 border-end-0"
+                >
+                  <small class="flex-fill text-center border-end py-2"
+                    ><i class="fa fa-calendar-alt text-primary me-2"></i>28 Jan
+                    2050</small
+                  >
+                  <a
+                    href="#"
+                    class="btn-hover flex-fill text-center text-white border-end py-2"
+                    ><i class="fa fa-thumbs-up text-primary me-2"></i>1.7K</a
+                  >
+                  <a
+                    href="#"
+                    class="btn-hover flex-fill text-center text-white py-2"
+                    ><i class="fa fa-comments text-primary me-2"></i>1K</a
+                  >
+                </div>
+              </div>
+              <div class="blog-content border border-top-0 rounded-bottom p-4">
+                <p class="mb-3">Posted By: Royal Hamblin</p>
+                <a href="#" class="h4">Adventures Trip</a>
+                <p class="my-3">
+                  Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit
+                  diam amet diam eos
+                </p>
+                <a href="#" class="btn btn-primary rounded-pill py-2 px-4"
+                  >Read More</a
+                >
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="blog-item">
+              <div class="blog-img">
+                <div class="blog-img-inner">
+                  <img
+                    class="img-fluid w-100 rounded-top"
+                    src="img/blog-2.jpg"
+                    alt="Image"
+                  />
+                  <div class="blog-icon">
+                    <a href="#" class="my-auto"
+                      ><i class="fas fa-link fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+                <div
+                  class="blog-info d-flex align-items-center border border-start-0 border-end-0"
+                >
+                  <small class="flex-fill text-center border-end py-2"
+                    ><i class="fa fa-calendar-alt text-primary me-2"></i>28 Jan
+                    2050</small
+                  >
+                  <a
+                    href="#"
+                    class="btn-hover flex-fill text-center text-white border-end py-2"
+                    ><i class="fa fa-thumbs-up text-primary me-2"></i>1.7K</a
+                  >
+                  <a
+                    href="#"
+                    class="btn-hover flex-fill text-center text-white py-2"
+                    ><i class="fa fa-comments text-primary me-2"></i>1K</a
+                  >
+                </div>
+              </div>
+              <div class="blog-content border border-top-0 rounded-bottom p-4">
+                <p class="mb-3">Posted By: Royal Hamblin</p>
+                <a href="#" class="h4">Adventures Trip</a>
+                <p class="my-3">
+                  Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit
+                  diam amet diam eos
+                </p>
+                <a href="#" class="btn btn-primary rounded-pill py-2 px-4"
+                  >Read More</a
+                >
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="blog-item">
+              <div class="blog-img">
+                <div class="blog-img-inner">
+                  <img
+                    class="img-fluid w-100 rounded-top"
+                    src="img/blog-3.jpg"
+                    alt="Image"
+                  />
+                  <div class="blog-icon">
+                    <a href="#" class="my-auto"
+                      ><i class="fas fa-link fa-2x text-white"></i
+                    ></a>
+                  </div>
+                </div>
+                <div
+                  class="blog-info d-flex align-items-center border border-start-0 border-end-0"
+                >
+                  <small class="flex-fill text-center border-end py-2"
+                    ><i class="fa fa-calendar-alt text-primary me-2"></i>28 Jan
+                    2050</small
+                  >
+                  <a
+                    href="#"
+                    class="btn-hover flex-fill text-center text-white border-end py-2"
+                    ><i class="fa fa-thumbs-up text-primary me-2"></i>1.7K</a
+                  >
+                  <a
+                    href="#"
+                    class="btn-hover flex-fill text-center text-white py-2"
+                    ><i class="fa fa-comments text-primary me-2"></i>1K</a
+                  >
+                </div>
+              </div>
+              <div class="blog-content border border-top-0 rounded-bottom p-4">
+                <p class="mb-3">Posted By: Royal Hamblin</p>
+                <a href="#" class="h4">Adventures Trip</a>
+                <p class="my-3">
+                  Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit
+                  diam amet diam eos
+                </p>
+                <a href="#" class="btn btn-primary rounded-pill py-2 px-4"
+                  >Read More</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+    <!-- Blog End -->
 
     <!-- Testimonial Start -->
-    <div class="container-fluid py-5">
+    <div class="container-fluid testimonial py-5">
       <div class="container py-5">
-        <div class="text-center mb-3 pb-3">
-          <h6 class="text-primary text-uppercase" style="letter-spacing: 5px">
-            Testimonial
-          </h6>
-          <h1>What Say Our Clients</h1>
+        <div class="mx-auto text-center mb-5" style="max-width: 900px">
+          <h5 class="section-title px-3">Testimonial</h5>
+          <h1 class="mb-0">Our Clients Say!!!</h1>
         </div>
-        <div class="owl-carousel testimonial-carousel">
-          <div class="text-center pb-4">
-            <img
-              class="img-fluid mx-auto"
-              src="img/testimonial-1.jpg"
-              style="width: 100px; height: 100px"
-            />
-            <div class="testimonial-text bg-white p-4 mt-n5">
-              <p class="mt-5">
-                Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor
-                stet amet eirmod eos labore diam
+        <div class="testimonial-carousel owl-carousel">
+          <div class="testimonial-item text-center rounded pb-4">
+            <div class="testimonial-comment bg-light rounded p-4">
+              <p class="text-center mb-5">
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quis
+                nostrum cupiditate, eligendi repellendus saepe illum earum
+                architecto dicta quisquam quasi porro officiis. Vero reiciendis,
               </p>
-              <h5 class="text-truncate">Client Name</h5>
-              <span>Profession</span>
+            </div>
+            <div class="testimonial-img p-1">
+              <img
+                src="img/testimonial-1.jpg"
+                class="img-fluid rounded-circle"
+                alt="Image"
+              />
+            </div>
+            <div style="margin-top: -35px">
+              <h5 class="mb-0">John Abraham</h5>
+              <p class="mb-0">New York, USA</p>
+              <div class="d-flex justify-content-center">
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+              </div>
             </div>
           </div>
-          <div class="text-center">
-            <img
-              class="img-fluid mx-auto"
-              src="img/testimonial-2.jpg"
-              style="width: 100px; height: 100px"
-            />
-            <div class="testimonial-text bg-white p-4 mt-n5">
-              <p class="mt-5">
-                Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor
-                stet amet eirmod eos labore diam
+          <div class="testimonial-item text-center rounded pb-4">
+            <div class="testimonial-comment bg-light rounded p-4">
+              <p class="text-center mb-5">
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quis
+                nostrum cupiditate, eligendi repellendus saepe illum earum
+                architecto dicta quisquam quasi porro officiis. Vero reiciendis,
               </p>
-              <h5 class="text-truncate">Client Name</h5>
-              <span>Profession</span>
+            </div>
+            <div class="testimonial-img p-1">
+              <img
+                src="img/testimonial-2.jpg"
+                class="img-fluid rounded-circle"
+                alt="Image"
+              />
+            </div>
+            <div style="margin-top: -35px">
+              <h5 class="mb-0">John Abraham</h5>
+              <p class="mb-0">New York, USA</p>
+              <div class="d-flex justify-content-center">
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+              </div>
             </div>
           </div>
-          <div class="text-center">
-            <img
-              class="img-fluid mx-auto"
-              src="img/testimonial-3.jpg"
-              style="width: 100px; height: 100px"
-            />
-            <div class="testimonial-text bg-white p-4 mt-n5">
-              <p class="mt-5">
-                Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor
-                stet amet eirmod eos labore diam
+          <div class="testimonial-item text-center rounded pb-4">
+            <div class="testimonial-comment bg-light rounded p-4">
+              <p class="text-center mb-5">
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quis
+                nostrum cupiditate, eligendi repellendus saepe illum earum
+                architecto dicta quisquam quasi porro officiis. Vero reiciendis,
               </p>
-              <h5 class="text-truncate">Client Name</h5>
-              <span>Profession</span>
+            </div>
+            <div class="testimonial-img p-1">
+              <img
+                src="img/testimonial-3.jpg"
+                class="img-fluid rounded-circle"
+                alt="Image"
+              />
+            </div>
+            <div style="margin-top: -35px">
+              <h5 class="mb-0">John Abraham</h5>
+              <p class="mb-0">New York, USA</p>
+              <div class="d-flex justify-content-center">
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+              </div>
             </div>
           </div>
-          <div class="text-center">
-            <img
-              class="img-fluid mx-auto"
-              src="img/testimonial-4.jpg"
-              style="width: 100px; height: 100px"
-            />
-            <div class="testimonial-text bg-white p-4 mt-n5">
-              <p class="mt-5">
-                Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor
-                stet amet eirmod eos labore diam
+          <div class="testimonial-item text-center rounded pb-4">
+            <div class="testimonial-comment bg-light rounded p-4">
+              <p class="text-center mb-5">
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quis
+                nostrum cupiditate, eligendi repellendus saepe illum earum
+                architecto dicta quisquam quasi porro officiis. Vero reiciendis,
               </p>
-              <h5 class="text-truncate">Client Name</h5>
-              <span>Profession</span>
+            </div>
+            <div class="testimonial-img p-1">
+              <img
+                src="img/testimonial-4.jpg"
+                class="img-fluid rounded-circle"
+                alt="Image"
+              />
+            </div>
+            <div style="margin-top: -35px">
+              <h5 class="mb-0">John Abraham</h5>
+              <p class="mb-0">New York, USA</p>
+              <div class="d-flex justify-content-center">
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+                <i class="fas fa-star text-primary"></i>
+              </div>
             </div>
           </div>
         </div>
@@ -1029,274 +2474,178 @@
     </div>
     <!-- Testimonial End -->
 
-    <!-- Blog Start -->
-    <div class="container-fluid py-5">
-      <div class="container pt-5 pb-3">
-        <div class="text-center mb-3 pb-3">
-          <h6 class="text-primary text-uppercase" style="letter-spacing: 5px">
-            Our Blog
-          </h6>
-          <h1>Latest From Our Blog</h1>
-        </div>
-        <div class="row pb-3">
-          <div class="col-lg-4 col-md-6 mb-4 pb-2">
-            <div class="blog-item">
-              <div class="position-relative">
-                <img class="img-fluid w-100" src="img/blog-1.jpg" alt="" />
-                <div class="blog-date">
-                  <h6 class="font-weight-bold mb-n1">01</h6>
-                  <small class="text-white text-uppercase">Jan</small>
-                </div>
-              </div>
-              <div class="bg-white p-4">
-                <div class="d-flex mb-2">
-                  <a
-                    class="text-primary text-uppercase text-decoration-none"
-                    href=""
-                    >Admin</a
-                  >
-                  <span class="text-primary px-2">|</span>
-                  <a
-                    class="text-primary text-uppercase text-decoration-none"
-                    href=""
-                    >Tours & Travel</a
-                  >
-                </div>
-                <a class="h5 m-0 text-decoration-none" href=""
-                  >Dolor justo sea kasd lorem clita justo diam amet</a
-                >
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4 col-md-6 mb-4 pb-2">
-            <div class="blog-item">
-              <div class="position-relative">
-                <img class="img-fluid w-100" src="img/blog-2.jpg" alt="" />
-                <div class="blog-date">
-                  <h6 class="font-weight-bold mb-n1">01</h6>
-                  <small class="text-white text-uppercase">Jan</small>
-                </div>
-              </div>
-              <div class="bg-white p-4">
-                <div class="d-flex mb-2">
-                  <a
-                    class="text-primary text-uppercase text-decoration-none"
-                    href=""
-                    >Admin</a
-                  >
-                  <span class="text-primary px-2">|</span>
-                  <a
-                    class="text-primary text-uppercase text-decoration-none"
-                    href=""
-                    >Tours & Travel</a
-                  >
-                </div>
-                <a class="h5 m-0 text-decoration-none" href=""
-                  >Dolor justo sea kasd lorem clita justo diam amet</a
-                >
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4 col-md-6 mb-4 pb-2">
-            <div class="blog-item">
-              <div class="position-relative">
-                <img class="img-fluid w-100" src="img/blog-3.jpg" alt="" />
-                <div class="blog-date">
-                  <h6 class="font-weight-bold mb-n1">01</h6>
-                  <small class="text-white text-uppercase">Jan</small>
-                </div>
-              </div>
-              <div class="bg-white p-4">
-                <div class="d-flex mb-2">
-                  <a
-                    class="text-primary text-uppercase text-decoration-none"
-                    href=""
-                    >Admin</a
-                  >
-                  <span class="text-primary px-2">|</span>
-                  <a
-                    class="text-primary text-uppercase text-decoration-none"
-                    href=""
-                    >Tours & Travel</a
-                  >
-                </div>
-                <a class="h5 m-0 text-decoration-none" href=""
-                  >Dolor justo sea kasd lorem clita justo diam amet</a
-                >
-              </div>
-            </div>
+    <!-- Subscribe Start -->
+    <div class="container-fluid subscribe py-5">
+      <div class="container text-center py-5">
+        <div class="mx-auto text-center" style="max-width: 900px">
+          <h5 class="subscribe-title px-3">Subscribe</h5>
+          <h1 class="text-white mb-4">Our Newsletter</h1>
+          <p class="text-white mb-5">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum
+            tempore nam, architecto doloremque velit explicabo? Voluptate sunt
+            eveniet fuga eligendi! Expedita laudantium fugiat corrupti eum cum
+            repellat a laborum quasi.
+          </p>
+          <div class="position-relative mx-auto">
+            <input
+              class="form-control border-primary rounded-pill w-100 py-3 ps-4 pe-5"
+              type="text"
+              placeholder="Your email"
+            />
+            <button
+              type="button"
+              class="btn btn-primary rounded-pill position-absolute top-0 end-0 py-2 px-4 mt-2 me-2"
+            >
+              Subscribe
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <!-- Blog End -->
+    <!-- Subscribe End -->
 
     <!-- Footer Start -->
-    <div
-      class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5"
-      style="margin-top: 90px"
-    >
-      <div class="row pt-5">
-        <div class="col-lg-3 col-md-6 mb-5">
-          <a href="" class="navbar-brand">
-            <h1 class="text-primary">
-              <span class="text-white">TRAVEL</span>ER
-            </h1>
-          </a>
-          <p>
-            Sed ipsum clita tempor ipsum ipsum amet sit ipsum lorem amet labore
-            rebum lorem ipsum dolor. No sed vero lorem dolor dolor
-          </p>
-          <h6
-            class="text-white text-uppercase mt-4 mb-3"
-            style="letter-spacing: 5px"
-          >
-            Follow Us
-          </h6>
-          <div class="d-flex justify-content-start">
-            <a class="btn btn-outline-primary btn-square mr-2" href="#"
-              ><i class="fab fa-twitter"></i
-            ></a>
-            <a class="btn btn-outline-primary btn-square mr-2" href="#"
-              ><i class="fab fa-facebook-f"></i
-            ></a>
-            <a class="btn btn-outline-primary btn-square mr-2" href="#"
-              ><i class="fab fa-linkedin-in"></i
-            ></a>
-            <a class="btn btn-outline-primary btn-square" href="#"
-              ><i class="fab fa-instagram"></i
-            ></a>
-          </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-5">
-          <h5
-            class="text-white text-uppercase mb-4"
-            style="letter-spacing: 5px"
-          >
-            Our Services
-          </h5>
-          <div class="d-flex flex-column justify-content-start">
-            <a class="text-white-50 mb-2" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>About</a
-            >
-            <a class="text-white-50 mb-2" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>Destination</a
-            >
-            <a class="text-white-50 mb-2" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>Services</a
-            >
-            <a class="text-white-50 mb-2" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>Packages</a
-            >
-            <a class="text-white-50 mb-2" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>Guides</a
-            >
-            <a class="text-white-50 mb-2" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>Testimonial</a
-            >
-            <a class="text-white-50" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>Blog</a
-            >
-          </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-5">
-          <h5
-            class="text-white text-uppercase mb-4"
-            style="letter-spacing: 5px"
-          >
-            Usefull Links
-          </h5>
-          <div class="d-flex flex-column justify-content-start">
-            <a class="text-white-50 mb-2" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>About</a
-            >
-            <a class="text-white-50 mb-2" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>Destination</a
-            >
-            <a class="text-white-50 mb-2" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>Services</a
-            >
-            <a class="text-white-50 mb-2" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>Packages</a
-            >
-            <a class="text-white-50 mb-2" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>Guides</a
-            >
-            <a class="text-white-50 mb-2" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>Testimonial</a
-            >
-            <a class="text-white-50" href="#"
-              ><i class="fa fa-angle-right mr-2"></i>Blog</a
-            >
-          </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-5">
-          <h5
-            class="text-white text-uppercase mb-4"
-            style="letter-spacing: 5px"
-          >
-            Contact Us
-          </h5>
-          <p>
-            <i class="fa fa-map-marker-alt mr-2"></i>123 Street, New York, USA
-          </p>
-          <p><i class="fa fa-phone-alt mr-2"></i>+968 9 259 7488
-0</p>
-          <p><i class="fa fa-envelope mr-2"></i>info@arabicadunes.com
-</p>
-          <h6
-            class="text-white text-uppercase mt-4 mb-3"
-            style="letter-spacing: 5px"
-          >
-            Newsletter
-          </h6>
-          <div class="w-100">
-            <div class="input-group">
-              <input
-                type="text"
-                class="form-control border-light"
-                style="padding: 25px"
-                placeholder="Your Email"
-              />
-              <div class="input-group-append">
-                <button class="btn btn-primary px-3">Sign Up</button>
+    <div class="container-fluid footer py-5">
+      <div class="container py-5">
+        <div class="row g-5">
+          <div class="col-md-6 col-lg-6 col-xl-3">
+            <div class="footer-item d-flex flex-column">
+              <h4 class="mb-4 text-white">Get In Touch</h4>
+              <a href=""
+                ><i class="fas fa-home me-2"></i> Oman</a
+              >
+              <a href=""
+                ><i class="fas fa-envelope me-2"></i> info@arabicadunes.com</a
+              >
+              <a href=""><i class="fas fa-phone me-2"></i> +968 9 259 7488</a>
+              <div class="d-flex align-items-center">
+                <i class="fas fa-share fa-2x text-white me-2"></i>
+                <a
+                  class="btn-square btn btn-primary rounded-circle mx-1"
+                  href=""
+                  ><i class="fab fa-facebook-f"></i
+                ></a>
+                <a
+                  class="btn-square btn btn-primary rounded-circle mx-1"
+                  href=""
+                  ><i class="fab fa-twitter"></i
+                ></a>
+                <a
+                  class="btn-square btn btn-primary rounded-circle mx-1"
+                  href=""
+                  ><i class="fab fa-instagram"></i
+                ></a>
+                <a
+                  class="btn-square btn btn-primary rounded-circle mx-1"
+                  href=""
+                  ><i class="fab fa-linkedin-in"></i
+                ></a>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div
-      class="container-fluid bg-dark text-white border-top py-4 px-sm-3 px-md-5"
-      style="border-color: rgba(256, 256, 256, 0.1) !important"
-    >
-      <div class="row">
-        <div class="col-lg-6 text-center text-md-left mb-3 mb-md-0">
-          <p class="m-0 text-white-50">
-            Copyright &copy; <a href="#">Domain</a>. All Rights Reserved.
-          </p>
+          <div class="col-md-6 col-lg-6 col-xl-3">
+            <div class="footer-item d-flex flex-column">
+              <h4 class="mb-4 text-white">Company</h4>
+              <a href=""><i class="fas fa-angle-right me-2"></i> About</a>
+              <a href=""><i class="fas fa-angle-right me-2"></i> Careers</a>
+              <a href=""><i class="fas fa-angle-right me-2"></i> Blog</a>
+              <a href=""><i class="fas fa-angle-right me-2"></i> Press</a>
+              <a href=""><i class="fas fa-angle-right me-2"></i> Gift Cards</a>
+              <a href=""><i class="fas fa-angle-right me-2"></i> Magazine</a>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-6 col-xl-3">
+            <div class="footer-item d-flex flex-column">
+              <h4 class="mb-4 text-white">Support</h4>
+              <a href=""><i class="fas fa-angle-right me-2"></i> Contact</a>
+              <a href=""
+                ><i class="fas fa-angle-right me-2"></i> Legal Notice</a
+              >
+              <a href=""
+                ><i class="fas fa-angle-right me-2"></i> Privacy Policy</a
+              >
+              <a href=""
+                ><i class="fas fa-angle-right me-2"></i> Terms and Conditions</a
+              >
+              <a href=""><i class="fas fa-angle-right me-2"></i> Sitemap</a>
+              <a href=""
+                ><i class="fas fa-angle-right me-2"></i> Cookie policy</a
+              >
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-6 col-xl-3">
+            <div class="footer-item">
+              <div class="row gy-3 gx-2 mb-4">
+                <div class="col-xl-6">
+                  <form>
+                    <div class="form-floating">
+                      <select class="form-select bg-dark border" id="select1">
+                        <option value="1">Arabic</option>
+                        <option value="2">German</option>
+                        <option value="3">Greek</option>
+                        <option value="3">New York</option>
+                      </select>
+                      <label for="select1">English</label>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <h4 class="text-white mb-3">Payments</h4>
+              <div class="footer-bank-card">
+                <a href="#" class="text-white me-2"
+                  ><i class="fab fa-cc-amex fa-2x"></i
+                ></a>
+                <a href="#" class="text-white me-2"
+                  ><i class="fab fa-cc-visa fa-2x"></i
+                ></a>
+                <a href="#" class="text-white me-2"
+                  ><i class="fas fa-credit-card fa-2x"></i
+                ></a>
+                <a href="#" class="text-white me-2"
+                  ><i class="fab fa-cc-mastercard fa-2x"></i
+                ></a>
+                <a href="#" class="text-white me-2"
+                  ><i class="fab fa-cc-paypal fa-2x"></i
+                ></a>
+                <a href="#" class="text-white"
+                  ><i class="fab fa-cc-discover fa-2x"></i
+                ></a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <!-- Footer End -->
 
+    <!-- Copyright Start -->
+    <div class="container-fluid copyright text-body py-4">
+      <div class="container">
+        <div class="row g-4 align-items-center">
+          <div class="col-md-8 text-center text-md-end mb-md-0">
+            <i class="fas fa-copyright me-2"></i
+            ><a class="text-white" href="#">Arabica Dunes</a>, All right
+            reserved.
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Copyright End -->
+
     <!-- Back to Top -->
-    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"
-      ><i class="fa fa-angle-double-up"></i
+    <a
+      href="#"
+      class="btn btn-primary btn-primary-outline-0 btn-md-square back-to-top"
+      ><i class="fa fa-arrow-up"></i
     ></a>
 
     <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="lib/tempusdominus/js/moment.min.js"></script>
-    <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
-    <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
-
-    <!-- Contact Javascript File -->
-    <script src="mail/jqBootstrapValidation.min.js"></script>
-    <script src="mail/contact.js"></script>
+    <script src="lib/lightbox/js/lightbox.min.js"></script>
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
