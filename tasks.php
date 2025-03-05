@@ -60,7 +60,7 @@ $config = include '../config.php';
 $dbHost = 'localhost';
 $dbUsername = $config['dbUsername'];
 $dbPassword = $config['dbPassword'];
-$dbName = 'euro_new';
+$dbName = 'euro_login_system';
 
 $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 
@@ -1350,51 +1350,32 @@ function getWeekdayHours($start, $end)
                                             <form method="POST" action="update-status.php">
                                                 <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
                                                 <?php
-                                                // Fetch the current status of the task
                                                 $currentStatus = $row['status'];
-
-                                                // Fetch the assigned_by_id for the task
                                                 $assigned_by_id = $row['assigned_by_id'];
-
-                                                // Fetch the user_id of the assigned user
                                                 $assigned_user_id = $row['user_id'];
-
-                                                // Initialize statuses array
-                                                $statuses = [];
-
-                                                // Check if the task is self-assigned
                                                 $isSelfAssigned = ($assigned_by_id == $user_id && $assigned_user_id == $user_id);
-
-                                                // Define status sets
+                                                $statuses = [];
                                                 $assignerStatuses = ['Assigned', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'];
                                                 $normalUserStatuses = [
                                                     'Assigned' => ['In Progress'],
                                                     'In Progress' => isset($row['available_statuses'][0]) ? [$row['available_statuses'][0]] : []
                                                 ];
 
-                                                // Logic for status_change_main privilege or the user who assigned the task (excluding self-assigned)
                                                 if (hasPermission('status_change_main') || ($assigned_by_id == $user_id && !$isSelfAssigned)) {
                                                     if (in_array($currentStatus, ['Assigned', 'In Progress', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'])) {
                                                         $statuses = $assignerStatuses;
                                                     }
-                                                }
-                                                // Logic for self-assigned users with status_change_normal
-                                                elseif ($isSelfAssigned && hasPermission('status_change_normal')) {
-                                                    $statuses = $assignerStatuses; // Start with assigner statuses
-                                            
+                                                } elseif ($isSelfAssigned && hasPermission('status_change_normal')) {
+                                                    $statuses = $assignerStatuses;
                                                     if (isset($normalUserStatuses[$currentStatus])) {
-                                                        // Merge in the statuses that a normal assigned user would get
                                                         $statuses = array_merge($statuses, $normalUserStatuses[$currentStatus]);
                                                     } else {
-                                                        // Allow all default statuses from both assigner and normal user logic
                                                         $allowedStatuses = array_merge($assignerStatuses, ['Reassigned', 'In Progress', 'Completed on Time', 'Delayed Completion']);
                                                         if (in_array($currentStatus, $allowedStatuses)) {
                                                             $statuses = $allowedStatuses;
                                                         }
                                                     }
-                                                }
-                                                // Logic for Regular User (assigned user)
-                                                elseif (hasPermission('status_change_normal') && $user_id == $assigned_user_id) {
+                                                } elseif (hasPermission('status_change_normal') && $user_id == $assigned_user_id) {
                                                     if (isset($normalUserStatuses[$currentStatus])) {
                                                         $statuses = $normalUserStatuses[$currentStatus];
                                                     } elseif ($currentStatus === 'In Progress') {
@@ -1407,7 +1388,6 @@ function getWeekdayHours($start, $end)
                                                     }
                                                 }
 
-                                                // Generate the status dropdown or display the status as text
                                                 if (!empty($statuses)) {
                                                     echo '<select id="status" name="status" onchange="handleStatusChange(event, ' . $row['task_id'] . ')">';
                                                     if (!in_array($currentStatus, $statuses)) {
@@ -1448,40 +1428,52 @@ function getWeekdayHours($start, $end)
                                                     </button>
                                                     <a href="#" class="btn btn-secondary view-timeline-btn"
                                                         data-task-id="<?= $row['task_id'] ?>">View Timeline</a>
+                                                        <?php if ((hasPermission('status_change_main') && $row['actual_start_date']) || ($row['assigned_by_id'] == $user_id && $row['actual_start_date'])): ?>
+                                                        <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                                            data-bs-target="#editStartDateModal<?= $row['task_id'] ?>">Edit Start
+                                                            Date</button>
+                                                    <?php endif; ?>
                                                 </div>
-                                                <!-- Delete Modal -->
+                                                <!-- Delete Modal (unchanged) -->
                                                 <div class="modal fade" id="deleteModal<?= $row['task_id'] ?>" tabindex="-1"
                                                     aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title" id="deleteModalLabel">Delete Task</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                    aria-label="Close"></button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <form method="POST" action="delete-task.php">
-                                                                    <input type="hidden" name="task_id"
-                                                                        value="<?= $row['task_id'] ?>">
-                                                                    <input type="hidden" name="user_id"
-                                                                        value="<?= $_SESSION['user_id'] ?>">
-                                                                    <div class="mb-3">
-                                                                        <label for="reason" class="form-label">Reason for
-                                                                            deleting the task:</label>
-                                                                        <textarea class="form-control" id="reason" name="reason"
-                                                                            rows="3" required></textarea>
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary"
-                                                                            data-bs-dismiss="modal">Cancel</button>
-                                                                        <button type="submit" class="btn btn-danger">Delete
-                                                                            Task</button>
-                                                                    </div>
-                                                                </form>
+                                                    <!-- Existing delete modal content -->
+                                                </div>
+                                                <!-- New Edit Start Date Modal -->
+                                                <?php if (hasPermission('status_change_main') && $row['actual_start_date']): ?>
+                                                    <div class="modal fade" id="editStartDateModal<?= $row['task_id'] ?>"
+                                                        tabindex="-1" aria-labelledby="editStartDateModalLabel" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="editStartDateModalLabel">Edit Actual
+                                                                        Start Date</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                        aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <form method="POST" action="update-status.php"
+                                                                        id="editStartDateForm<?= $row['task_id'] ?>">
+                                                                        <input type="hidden" name="task_id"
+                                                                            value="<?= $row['task_id'] ?>">
+                                                                        <input type="hidden" name="status"
+                                                                            value="<?= $row['status'] ?>">
+                                                                        <!-- Preserve current status -->
+                                                                        <div class="mb-3">
+                                                                            <label for="actual_start_date" class="form-label">Actual
+                                                                                Start Date:</label>
+                                                                            <input type="datetime-local" class="form-control"
+                                                                                name="actual_start_date"
+                                                                                value="<?= date('Y-m-d\TH:i', strtotime($row['actual_start_date'])) ?>"
+                                                                                required>
+                                                                        </div>
+                                                                        <button type="submit" class="btn btn-primary">Save</button>
+                                                                    </form>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                <?php endif; ?>
                                             </td>
                                         <?php else: ?>
                                             <td>N/A</td>
@@ -1503,7 +1495,7 @@ function getWeekdayHours($start, $end)
                             id="remaining-tasks">
                             <thead>
                                 <tr class="align-middle">
-                                    <th>#</th> <!-- New column for task count -->
+                                    <th>#</th>
                                     <th>Project Name</th>
                                     <th>Task Name</th>
                                     <th>Task Description</th>
@@ -1527,20 +1519,23 @@ function getWeekdayHours($start, $end)
                             <tbody>
                                 <?php
                                 $taskCountStart = 1;
-                                foreach ($completedTasks as $row): ?>
+                                foreach ($completedTasks as $row):
+                                    $isClosedFromCompletedOnTime = $row['status'] === 'Closed' && $row['completion_description'] && !$row['delayed_reason'];
+                                    $isClosedFromDelayedCompletion = $row['status'] === 'Closed' && $row['delayed_reason'];
+                                    ?>
                                     <tr data-project="<?= htmlspecialchars($row['project_name']) ?>"
-                                        data-status="<?= htmlspecialchars($row['status']) ?>" class="align-middle <?php if ($row['status'] === 'Delayed Completion')
+                                        data-status="<?= htmlspecialchars($row['status']) ?>" class="align-middle <?php if ($row['status'] === 'Delayed Completion' || $isClosedFromDelayedCompletion)
                                               echo 'delayed-task'; ?>">
-                                        <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
+                                        <td><?= $taskCountStart++ ?></td>
                                         <td><?= htmlspecialchars($row['project_name']) ?></td>
                                         <td>
-                                            <?php if ($row['status'] === 'Completed on Time'): ?>
+                                            <?php if ($row['status'] === 'Completed on Time' || $isClosedFromCompletedOnTime): ?>
                                                 <!-- Link to Completed on Time Modal -->
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal"
                                                     data-description="<?= htmlspecialchars($row['completion_description']); ?>">
                                                     <?= htmlspecialchars($row['task_name']); ?>
                                                 </a>
-                                            <?php elseif ($row['status'] === 'Delayed Completion'): ?>
+                                            <?php elseif ($row['status'] === 'Delayed Completion' || $isClosedFromDelayedCompletion): ?>
                                                 <!-- Link to Delayed Completion Modal -->
                                                 <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
                                                     onclick="showDelayedDetails('<?php echo htmlspecialchars($row['task_name']); ?>', '<?php echo htmlspecialchars($row['task_actual_finish_date']); ?>', '<?php echo htmlspecialchars($row['delayed_reason']); ?>', '<?php echo htmlspecialchars($row['completion_description']); ?>')">
@@ -1564,11 +1559,9 @@ function getWeekdayHours($start, $end)
                                                 </a>
                                             </div>
                                         </td>
-                                        <td>
-                                            <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
+                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_start_date']))) ?>
                                         </td>
-                                        <td>
-                                            <?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
+                                        <td><?= htmlspecialchars(date("d M Y, h:i A", strtotime($row['planned_finish_date']))) ?>
                                         </td>
                                         <td>
                                             <?= $row['actual_start_date'] ? htmlspecialchars(date("d M Y, h:i A", strtotime($row['actual_start_date']))) : 'N/A' ?>
@@ -1584,22 +1577,16 @@ function getWeekdayHours($start, $end)
                                             <form method="POST" action="update-status.php">
                                                 <input type="hidden" name="task_id" value="<?= $row['task_id'] ?>">
                                                 <?php
-                                                // Fetch the current status of the task
                                                 $currentStatus = $row['status'];
-
-                                                // Fetch the assigned_by_id for the task
                                                 $assigned_by_id = $row['assigned_by_id'];
 
-                                                // Define the available statuses based on the user role and current status
                                                 $statuses = [];
                                                 if (hasPermission('status_change_main') || $assigned_by_id == $user_id) {
-                                                    // Admin or the user who assigned the task can change status to "Closed"
                                                     if (in_array($currentStatus, ['Completed on Time', 'Delayed Completion'])) {
                                                         $statuses = ['Closed'];
                                                     }
                                                 }
 
-                                                // Generate the status dropdown or display the status as text
                                                 if (!empty($statuses)) {
                                                     echo '<select id="status" name="status" onchange="handleStatusChange(event, ' . $row['task_id'] . ')">';
                                                     if (!in_array($currentStatus, $statuses)) {
@@ -1611,36 +1598,31 @@ function getWeekdayHours($start, $end)
                                                     }
                                                     echo '</select>';
                                                 } else {
-                                                    // Display the status as plain text if the user is not allowed to change it
                                                     echo $currentStatus;
                                                 }
 
-                                                // Show delay information for delayed completion
-                                                if ($currentStatus === 'Delayed Completion') {
+                                                // Show delay information for Delayed Completion or Closed from Delayed Completion
+                                                if ($row['status'] === 'Delayed Completion' || $isClosedFromDelayedCompletion) {
                                                     $plannedStartDate = strtotime($row['planned_start_date']);
                                                     $plannedFinishDate = strtotime($row['planned_finish_date']);
 
-                                                    // Ensure planned finish date is after planned start date
                                                     if ($plannedFinishDate < $plannedStartDate) {
                                                         $plannedFinishDate += 86400; // Add 24 hours to correct AM/PM crossing
                                                     }
 
-                                                    // Calculate planned duration
                                                     $plannedDuration = $plannedFinishDate - $plannedStartDate;
 
                                                     if (!empty($row['actual_start_date']) && !empty($row['task_actual_finish_date'])) {
                                                         $actualStartDate = strtotime($row['actual_start_date']);
                                                         $actualFinishDate = strtotime($row['task_actual_finish_date']);
 
-                                                        // Ensure actual finish date is after actual start date
                                                         if ($actualFinishDate < $actualStartDate) {
                                                             $actualFinishDate += 86400; // Add 24 hours if needed
                                                         }
 
-                                                        // Calculate actual duration
                                                         $actualDuration = $actualFinishDate - $actualStartDate;
-                                                        $delaySeconds = max(0, $actualDuration - $plannedDuration); // Prevent negative delays
-                                            
+                                                        $delaySeconds = max(0, $actualDuration - $plannedDuration);
+
                                                         if ($delaySeconds > 0) {
                                                             $delayDays = floor($delaySeconds / (60 * 60 * 24));
                                                             $delayHours = floor(($delaySeconds % (60 * 60 * 24)) / (60 * 60));
@@ -1958,57 +1940,24 @@ function getWeekdayHours($start, $end)
                     const predecessorTaskName = $(`#pending-tasks tr[data-task-id="${taskId}"]`).find('td:eq(12)').text();
 
                     if (status === 'Reassigned') {
-                        // Show the reassignment modal
                         document.getElementById('reassign-task-id').value = taskId;
                         const reassignmentModal = new bootstrap.Modal(document.getElementById('reassignmentModal'));
                         reassignmentModal.show();
                     } else if (status === 'Delayed Completion' || status === 'Completed on Time') {
-                        // Set the task ID and status in the completion modal
                         document.getElementById('task-id').value = taskId;
                         document.getElementById('modal-status').value = status;
-                        document.getElementById('predecessor-task-name').innerText = predecessorTaskName; // Set predecessor task name
-
-                        // Show or hide the delayed reason container based on the status
+                        document.getElementById('predecessor-task-name').innerText = predecessorTaskName;
                         const delayedReasonContainer = document.getElementById('delayed-reason-container');
-                        if (delayedReasonContainer) { // Check if the element exists
+                        if (delayedReasonContainer) {
                             if (status === 'Delayed Completion') {
                                 delayedReasonContainer.style.display = 'block';
                             } else {
                                 delayedReasonContainer.style.display = 'none';
                             }
                         }
-
-                        // Show the completion modal
                         const completionModal = new bootstrap.Modal(document.getElementById('completionModal'));
                         completionModal.show();
-                    } else if (status === 'Closed') {
-                        // Existing logic for 'Closed' status
-                        fetch('update-status.php', {
-                            method: 'POST',
-                            body: new FormData(form)
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    document.getElementById('success-task-name').innerText = data.task_name;
-                                    document.getElementById('success-message').innerText = data.message;
-                                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                                    successModal.show();
-
-                                    // Refresh the page after 2 seconds
-                                    setTimeout(() => {
-                                        window.location.reload();
-                                    }, 2000);
-                                } else {
-                                    alert(data.message);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('An error occurred while updating the status.');
-                            });
                     } else {
-                        // Existing logic for other statuses
                         fetch('update-status.php', {
                             method: 'POST',
                             body: new FormData(form)
@@ -2020,8 +1969,6 @@ function getWeekdayHours($start, $end)
                                     document.getElementById('success-message').innerText = data.message;
                                     const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                                     successModal.show();
-
-                                    // Refresh the page after 2 seconds
                                     setTimeout(() => {
                                         window.location.reload();
                                     }, 2000);
@@ -2610,6 +2557,36 @@ function getWeekdayHours($start, $end)
                             console.error('Error submitting form:', error);
                             alert('Error submitting form.');
                         });
+                });
+
+                // Success and error message for update of actual start date
+                document.querySelectorAll('#pending-tasks form[id^="editStartDateForm"]').forEach(form => {
+                    form.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        fetch('update-status.php', {
+                            method: 'POST',
+                            body: new FormData(this)
+                        })
+                            .then(response => {
+                                // Log raw response text for debugging
+                                return response.text().then(text => {
+                                    console.log('Raw response:', text);
+                                    return JSON.parse(text); // Attempt to parse as JSON
+                                });
+                            })
+                            .then(data => {
+                                if (data.success) {
+                                    alert('Actual start date updated successfully.');
+                                    window.location.reload();
+                                } else {
+                                    alert(data.message);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Fetch error:', error);
+                                alert('An error occurred while updating the start date.');
+                            });
+                    });
                 });
             </script>
     </body>

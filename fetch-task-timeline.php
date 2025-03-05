@@ -3,7 +3,7 @@ require 'permissions.php';
 
 $taskId = $_GET['task_id'];
 
-$conn = new mysqli('localhost', $config['dbUsername'], $config['dbPassword'], 'euro_new');
+$conn = new mysqli('localhost', $config['dbUsername'], $config['dbPassword'], 'euro_login_system');
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }

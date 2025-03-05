@@ -7,7 +7,7 @@ require '../config.php';
 $dbHost = 'localhost';
 $dbUsername = $config['dbUsername'];
 $dbPassword = $config['dbPassword'];
-$dbName = 'euro_new';
+$dbName = 'euro_login_system';
 
 if (!isset($_SESSION['loggedin'])) {
     header("Location: portal-login.html");
