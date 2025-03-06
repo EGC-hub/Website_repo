@@ -68,6 +68,12 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Display and clear task creation success message
+if (isset($_SESSION['task_added_success'])) {
+    $message = $_SESSION['task_added_success'];
+    echo "<script>alert('$message');</script>";
+    unset($_SESSION['task_added_success']); // Clear the message after displaying it
+}
 
 // Prepare and execute the query to fetch the session token
 $checkStmt = $conn->prepare("SELECT session_token FROM users WHERE id = ?");
@@ -225,7 +231,6 @@ function sendTaskNotification($email, $username, $project_name, $project_type, $
 }
 
 // Handle form submission for adding a task
-// Handle form submission for adding a task
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
     $project_id = isset($_POST['project_id']) ? (int) $_POST['project_id'] : null;
     $task_name = trim($_POST['task_name']);
@@ -300,7 +305,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
         $stmt->bind_param($types, ...$params);
 
         if ($stmt->execute()) {
-            echo '<script>alert("Task added successfully.");</script>';
+            $task_id = $stmt->insert_id; // Get the newly created task ID
 
             // Fetch the assigned user's email and username
             $userQuery = $conn->prepare("SELECT username, email FROM users WHERE id = ?");
@@ -333,20 +338,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['task_name'])) {
                         $project_type,
                         $planned_start_date,
                         $planned_finish_date,
-                        $assigned_by_id, // Pass the assigned_by_id
-                        $conn // Pass the database connection
+                        $assigned_by_id,
+                        $conn
                     );
                 }
             }
 
             // Log the task creation in task_timeline
-            $task_id = $stmt->insert_id;
-            $stmt = $conn->prepare("
+            $timelineStmt = $conn->prepare("
                 INSERT INTO task_timeline (task_id, action, previous_status, new_status, changed_by_user_id)
                 VALUES (?, 'task_created', NULL, 'assigned', ?)
             ");
-            $stmt->bind_param("ii", $task_id, $assigned_by_id);
-            $stmt->execute();
+            $timelineStmt->bind_param("ii", $task_id, $assigned_by_id);
+            $timelineStmt->execute();
+            $timelineStmt->close();
+
+            // Close the statement
+            $stmt->close();
+
+            // Set session variable for success message
+            $_SESSION['task_added_success'] = "Task added successfully.";
+
+            // Redirect to tasks.php (no query parameters needed)
+            header("Location: tasks.php");
+            exit;
         } else {
             echo '<script>alert("Failed to add task.");</script>';
         }
@@ -400,7 +415,7 @@ if (hasPermission('view_all_tasks')) {
             tasks.recorded_timestamp DESC
     ";
 } elseif (hasPermission('view_department_tasks')) {
-    //Fetch tasks for users in the same department
+    // Fetch tasks for users in the same department
     $taskQuery = "
         SELECT 
             tasks.task_id,
@@ -416,13 +431,15 @@ if (hasPermission('view_all_tasks')) {
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
+            tasks.predecessor_task_id, -- Add predecessor_task_id
             task_transactions.delayed_reason,
             task_transactions.actual_finish_date AS transaction_actual_finish_date,
             tasks.completion_description,
             assigned_to_user.username AS assigned_to, 
             GROUP_CONCAT(DISTINCT assigned_to_department.name SEPARATOR ', ') AS assigned_to_department, 
             assigned_by_user.username AS assigned_by,
-            GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
+            GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department,
+            predecessor_task.task_name AS predecessor_task_name -- Add predecessor task name
         FROM tasks 
         LEFT JOIN task_transactions ON tasks.task_id = task_transactions.task_id
         JOIN users AS assigned_to_user ON tasks.user_id = assigned_to_user.id 
@@ -431,6 +448,7 @@ if (hasPermission('view_all_tasks')) {
         JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
+        LEFT JOIN tasks AS predecessor_task ON tasks.predecessor_task_id = predecessor_task.task_id -- Join predecessor task
         JOIN projects ON tasks.project_id = projects.id -- Join projects table
         WHERE assigned_to_ud.department_id IN (SELECT department_id FROM user_departments WHERE user_id = ?)
         GROUP BY tasks.task_id
@@ -443,7 +461,7 @@ if (hasPermission('view_all_tasks')) {
             tasks.recorded_timestamp DESC
     ";
 } elseif (hasPermission('view_own_tasks')) {
-    //Fetch only tasks assigned to the current user
+    // Fetch only tasks assigned to the current user
     $taskQuery = "
         SELECT 
             tasks.task_id,
@@ -459,16 +477,19 @@ if (hasPermission('view_all_tasks')) {
             tasks.recorded_timestamp,
             tasks.assigned_by_id,
             tasks.user_id,
+            tasks.predecessor_task_id, -- Add predecessor_task_id
             task_transactions.delayed_reason,
             task_transactions.actual_finish_date AS transaction_actual_finish_date,
             tasks.completion_description,
             assigned_by_user.username AS assigned_by,
-            GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department 
+            GROUP_CONCAT(DISTINCT assigned_by_department.name SEPARATOR ', ') AS assigned_by_department,
+            predecessor_task.task_name AS predecessor_task_name -- Add predecessor task name
         FROM tasks 
         LEFT JOIN task_transactions ON tasks.task_id = task_transactions.task_id
         JOIN users AS assigned_by_user ON tasks.assigned_by_id = assigned_by_user.id 
         JOIN user_departments AS assigned_by_ud ON assigned_by_user.id = assigned_by_ud.user_id
         JOIN departments AS assigned_by_department ON assigned_by_ud.department_id = assigned_by_department.id
+        LEFT JOIN tasks AS predecessor_task ON tasks.predecessor_task_id = predecessor_task.task_id -- Join predecessor task
         JOIN projects ON tasks.project_id = projects.id -- Join projects table
         WHERE tasks.user_id = ? 
         GROUP BY tasks.task_id
@@ -1307,7 +1328,9 @@ function getWeekdayHours($start, $end)
                                 <?php
                                 $taskCountStart = 1;
                                 foreach ($pendingStartedTasks as $row): ?>
-                                    <tr class="align-middle">
+                                    <tr class="align-middle"
+                                        data-task-id="<?= isset($row['task_id']) ? htmlspecialchars($row['task_id']) : '' ?>"
+                                        data-predecessor-task-id="<?= isset($row['predecessor_task_id']) ? htmlspecialchars($row['predecessor_task_id']) : '' ?>">
                                         <td><?= $taskCountStart++ ?></td> <!-- Display task count and increment -->
                                         <td><?= htmlspecialchars($row['project_name']) ?></td>
                                         <td>
@@ -1428,18 +1451,52 @@ function getWeekdayHours($start, $end)
                                                     </button>
                                                     <a href="#" class="btn btn-secondary view-timeline-btn"
                                                         data-task-id="<?= $row['task_id'] ?>">View Timeline</a>
-                                                        <?php if ((hasPermission('status_change_main') && $row['actual_start_date']) || ($row['assigned_by_id'] == $user_id && $row['actual_start_date'])): ?>
+                                                    <?php if ((hasPermission('status_change_main') && $row['actual_start_date']) || ($row['assigned_by_id'] == $user_id && $row['actual_start_date'])): ?>
                                                         <button type="button" class="btn btn-warning" data-bs-toggle="modal"
                                                             data-bs-target="#editStartDateModal<?= $row['task_id'] ?>">Edit Start
                                                             Date</button>
                                                     <?php endif; ?>
                                                 </div>
-                                                <!-- Delete Modal (unchanged) -->
+
+                                                <!-- Delete Modal -->
                                                 <div class="modal fade" id="deleteModal<?= $row['task_id'] ?>" tabindex="-1"
-                                                    aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                                    <!-- Existing delete modal content -->
+                                                    aria-labelledby="deleteModalLabel<?= $row['task_id'] ?>" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title"
+                                                                    id="deleteModalLabel<?= $row['task_id'] ?>">Delete Task</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                    aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>Are you sure you want to delete the task
+                                                                    "<strong><?= htmlspecialchars($row['task_name']) ?></strong>"?
+                                                                </p>
+                                                                <form id="deleteForm<?= $row['task_id'] ?>" method="POST"
+                                                                    action="delete-task.php">
+                                                                    <input type="hidden" name="task_id"
+                                                                        value="<?= $row['task_id'] ?>">
+                                                                    <div class="mb-3">
+                                                                        <label for="reason<?= $row['task_id'] ?>"
+                                                                            class="form-label">Reason for Deletion</label>
+                                                                        <textarea class="form-control"
+                                                                            id="reason<?= $row['task_id'] ?>" name="reason"
+                                                                            rows="3" required></textarea>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">Cancel</button>
+                                                                <button type="submit" class="btn btn-danger"
+                                                                    form="deleteForm<?= $row['task_id'] ?>">Delete</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <!-- New Edit Start Date Modal -->
+
+                                                <!-- Edit Start Date Modal (unchanged, kept for context) -->
                                                 <?php if (hasPermission('status_change_main') && $row['actual_start_date']): ?>
                                                     <div class="modal fade" id="editStartDateModal<?= $row['task_id'] ?>"
                                                         tabindex="-1" aria-labelledby="editStartDateModalLabel" aria-hidden="true">
@@ -1458,7 +1515,6 @@ function getWeekdayHours($start, $end)
                                                                             value="<?= $row['task_id'] ?>">
                                                                         <input type="hidden" name="status"
                                                                             value="<?= $row['status'] ?>">
-                                                                        <!-- Preserve current status -->
                                                                         <div class="mb-3">
                                                                             <label for="actual_start_date" class="form-label">Actual
                                                                                 Start Date:</label>
@@ -1700,9 +1756,13 @@ function getWeekdayHours($start, $end)
                                 <input type="hidden" id="modal-status" name="status">
                                 <!-- Hidden input for Actual Completion Date (automatically populated) -->
                                 <input type="hidden" id="actual-completion-date" name="actual_finish_date">
+                                <!-- Hidden input for Predecessor Task ID -->
+                                <input type="hidden" id="predecessor-task-id" name="predecessor_task_id">
 
-                                <!-- Display predecessor task name -->
-                                <p><strong>Predecessor Task:</strong> <span id="predecessor-task-name"></span></p>
+                                <!-- Display predecessor task name, hidden by default -->
+                                <p id="predecessor-task-section" style="display: none;">
+                                    <strong>Predecessor Task:</strong> <span id="predecessor-task-name"></span>
+                                </p>
 
                                 <!-- Completion Description -->
                                 <div class="mb-3">
@@ -1870,6 +1930,54 @@ function getWeekdayHours($start, $end)
                 </div>
             </div>
 
+            <!-- Modal for Closing Task Verification -->
+            <div class="modal fade" id="closeTaskModal" tabindex="-1" aria-labelledby="closeTaskModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form id="closeTaskForm" method="POST" onsubmit="handleCloseTaskForm(event)">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="closeTaskModalLabel">Verify Task Closure</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" id="close-task-id" name="task_id">
+                                <input type="hidden" id="close-status" name="status" value="Closed">
+
+                                <p><strong>Task Name:</strong> <span id="close-task-name"></span></p>
+                                <p><strong>Planned Start Date:</strong> <span id="close-planned-start"></span></p>
+                                <p><strong>Planned End Date:</strong> <span id="close-planned-end"></span></p>
+                                <p><strong>Actual Start Date:</strong> <span id="close-actual-start"></span></p>
+                                <p><strong>Actual End Date:</strong> <span id="close-actual-end"></span></p>
+                                <p><strong>Planned Duration:</strong> <span id="close-planned-duration"></span></p>
+                                <p><strong>Actual Duration:</strong> <span id="close-actual-duration"></span></p>
+                                <p id="close-delayed-reason-container" style="display: none;">
+                                    <strong>Delayed Reason:</strong> <span id="close-delayed-reason"></span>
+                                </p>
+
+                                <!-- Verification Option -->
+                                <div class="mb-3">
+                                    <label for="close-verification" class="form-label">Verify Completion Status:</label>
+                                    <select id="close-verification" name="verified_status" class="form-control"
+                                        required>
+                                        <option value="">Select an option</option>
+                                        <option value="Completed on Time">Completed on Time</option>
+                                        <option value="Delayed Completion">Delayed Completion</option>
+                                    </select>
+                                    <small class="form-text text-muted">If "Completed on Time" is selected and a delayed
+                                        reason exists, it will be removed.</small>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Confirm Closure</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <!-- Jquery -->
             <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 
@@ -1936,27 +2044,52 @@ function getWeekdayHours($start, $end)
                     const status = event.target.value;
                     const form = event.target.form;
 
-                    // Fetch the predecessor task name
-                    const predecessorTaskName = $(`#pending-tasks tr[data-task-id="${taskId}"]`).find('td:eq(12)').text();
+                    // Fetch the predecessor task ID from the table row
+                    const row = $(`#pending-tasks tr[data-task-id="${taskId}"], #remaining-tasks tr[data-task-id="${taskId}"]`);
+                    const predecessorTaskId = row.data('predecessor-task-id') || null;
+                    let predecessorTaskName = row.find('td:eq(13)').text().trim(); // Adjust column index if needed
+
+                    console.log("Task ID:", taskId);
+                    console.log("Predecessor Task ID:", predecessorTaskId);
+                    console.log("Predecessor Task Name (from table):", predecessorTaskName);
 
                     if (status === 'Reassigned') {
                         document.getElementById('reassign-task-id').value = taskId;
                         const reassignmentModal = new bootstrap.Modal(document.getElementById('reassignmentModal'));
                         reassignmentModal.show();
                     } else if (status === 'Delayed Completion' || status === 'Completed on Time') {
+                        // Existing logic for completion modal
                         document.getElementById('task-id').value = taskId;
                         document.getElementById('modal-status').value = status;
-                        document.getElementById('predecessor-task-name').innerText = predecessorTaskName;
+                        document.getElementById('predecessor-task-id').value = predecessorTaskId;
+
+                        if (predecessorTaskId && (!predecessorTaskName || predecessorTaskName === 'N/A')) {
+                            fetch(`fetch-predecessor-task-name.php?task_id=${predecessorTaskId}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    predecessorTaskName = data.task_name || 'N/A';
+                                    document.getElementById('predecessor-task-name').innerText = predecessorTaskName;
+                                    showPredecessorSection(predecessorTaskId, predecessorTaskName);
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching predecessor task name:', error);
+                                    document.getElementById('predecessor-task-name').innerText = 'N/A';
+                                    showPredecessorSection(predecessorTaskId, 'N/A');
+                                });
+                        } else {
+                            document.getElementById('predecessor-task-name').innerText = predecessorTaskName;
+                            showPredecessorSection(predecessorTaskId, predecessorTaskName);
+                        }
+
                         const delayedReasonContainer = document.getElementById('delayed-reason-container');
                         if (delayedReasonContainer) {
-                            if (status === 'Delayed Completion') {
-                                delayedReasonContainer.style.display = 'block';
-                            } else {
-                                delayedReasonContainer.style.display = 'none';
-                            }
+                            delayedReasonContainer.style.display = (status === 'Delayed Completion') ? 'block' : 'none';
                         }
                         const completionModal = new bootstrap.Modal(document.getElementById('completionModal'));
                         completionModal.show();
+                    } else if (status === 'Closed') {
+                        // Fetch task details and show the close task modal
+                        fetchTaskDetailsForClosure(taskId);
                     } else {
                         fetch('update-status.php', {
                             method: 'POST',
@@ -1983,6 +2116,92 @@ function getWeekdayHours($start, $end)
                     }
                 }
 
+                // Function to fetch task details and populate the close task modal
+                function fetchTaskDetailsForClosure(taskId) {
+                    fetch(`fetch-task-details.php?task_id=${taskId}`, {
+                        method: 'GET'
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Populate the modal with task details
+                                document.getElementById('close-task-id').value = taskId;
+                                document.getElementById('close-task-name').innerText = data.task_name;
+                                document.getElementById('close-planned-start').innerText = data.planned_start_date;
+                                document.getElementById('close-planned-end').innerText = data.planned_finish_date;
+                                document.getElementById('close-actual-start').innerText = data.actual_start_date || 'N/A';
+                                document.getElementById('close-actual-end').innerText = data.actual_finish_date || 'N/A';
+                                document.getElementById('close-planned-duration').innerText = data.planned_duration;
+                                document.getElementById('close-actual-duration').innerText = data.actual_duration || 'N/A';
+
+                                const delayedReasonContainer = document.getElementById('close-delayed-reason-container');
+                                const delayedReason = document.getElementById('close-delayed-reason');
+                                if (data.delayed_reason) {
+                                    delayedReason.innerText = data.delayed_reason;
+                                    delayedReasonContainer.style.display = 'block';
+                                } else {
+                                    delayedReasonContainer.style.display = 'none';
+                                }
+
+                                // Set default verification status
+                                document.getElementById('close-verification').value = data.current_status;
+
+                                // Show the modal
+                                const closeTaskModal = new bootstrap.Modal(document.getElementById('closeTaskModal'));
+                                closeTaskModal.show();
+                            } else {
+                                alert(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching task details:', error);
+                            alert('An error occurred while fetching task details.');
+                        });
+                }
+
+                // Handle the close task form submission
+                function handleCloseTaskForm(event) {
+                    event.preventDefault();
+
+                    const form = event.target;
+                    const formData = new FormData(form);
+
+                    fetch('update-status.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const closeTaskModal = bootstrap.Modal.getInstance(document.getElementById('closeTaskModal'));
+                                closeTaskModal.hide();
+
+                                document.getElementById('success-task-name').innerText = data.task_name;
+                                document.getElementById('success-message').innerText = data.message;
+                                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                                successModal.show();
+
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000);
+                            } else {
+                                alert(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while closing the task.');
+                        });
+                }
+
+                function showPredecessorSection(predecessorTaskId, predecessorTaskName) {
+                    const predecessorSection = document.getElementById('predecessor-task-section');
+                    if (predecessorTaskId && predecessorTaskName !== 'N/A') {
+                        predecessorSection.style.display = 'block';
+                    } else {
+                        predecessorSection.style.display = 'none';
+                    }
+                }
                 // Handle Reassignment Form Submission
                 function handleReassignmentForm(event) {
                     event.preventDefault(); // Prevent the default form submission
@@ -2335,7 +2554,7 @@ function getWeekdayHours($start, $end)
 
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
-                    // Select all delete buttons
+                    // Ensure all delete buttons trigger their modals correctly
                     const deleteButtons = document.querySelectorAll('.btn-danger[data-bs-toggle="modal"]');
                     deleteButtons.forEach(button => {
                         button.addEventListener('click', function () {
@@ -2344,13 +2563,14 @@ function getWeekdayHours($start, $end)
 
                             if (targetModal) {
                                 console.log(`Opening modal: ${targetModalId}`);
-                                // Modal opens automatically due to Bootstrap behavior
+                                const modal = new bootstrap.Modal(targetModal);
+                                modal.show(); // Explicitly show the modal
                             } else {
                                 console.error(`Modal not found: ${targetModalId}`);
                             }
                         });
                     });
-                }); 
+                });
             </script>
             <!-- To check if task desc is more than 2 lines -->
             <script>
