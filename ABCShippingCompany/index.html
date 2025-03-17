@@ -31,6 +31,29 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="css/style.css" rel="stylesheet" />
+
+    <style>
+      .service-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .service-card a {
+        display: inline-block;
+        padding-bottom: 2px;
+        border-bottom: 2px solid white;
+      }
+    </style>
   </head>
 
   <body>
@@ -224,80 +247,114 @@
     <!-- Brief History End -->
 
     <!-- Services Start -->
-    <div class="container-fluid pt-5 bg-secondary">
+    <div class="container-fluid pt-5 bg-light">
       <div class="container">
-        <div class="text-center pb-2">
+        <div class="text-center pb-5">
           <h6 class="text-primary text-uppercase font-weight-bold">
             Our Services
           </h6>
-          <h1 class="mb-4">Services</h1>
+          <h1 class="text-dark mb-0">Services</h1>
         </div>
-        <div class="row pb-3">
-          <div class="col-lg-3 col-md-6 text-center mb-5">
-            <div
-              class="d-flex align-items-center justify-content-center bg-primary mb-4 p-4"
-            >
-              <i class="fa fa-2x fa-tools text-dark pr-3"></i>
-              <h6 class="text-white font-weight-medium m-0">
+        <div class="row">
+          <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="service-card bg-primary text-center p-4 h-100">
+              <i class="fas fa-tools fa-3x text-dark mb-3"></i>
+              <h5 class="text-white font-weight-bold mb-3">
                 Technical Management
-              </h6>
+              </h5>
+              <p class="text-white mb-3">
+                Expert management to ensure vessels remain in optimal condition
+                while meeting safety and environmental regulations.
+              </p>
+              <a
+                href="our_services.html"
+                class="text-white text-decoration-none font-weight-bold"
+                >Read More</a
+              >
             </div>
-            <p>
-              Expert technical management to ensure vessels remain in optimal
-              condition while meeting safety and environmental regulations.
-            </p>
-            <a class="border-bottom text-decoration-none" href="our_services.html"
-              >Read More</a
-            >
           </div>
-          <div class="col-lg-3 col-md-6 text-center mb-5">
-            <div
-              class="d-flex align-items-center justify-content-center bg-primary mb-4 p-4"
-            >
-              <i class="fa fa-2x fa-users text-dark pr-3"></i>
-              <h6 class="text-white font-weight-medium m-0">Crew Management</h6>
+          <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="service-card bg-primary text-center p-4 h-100">
+              <i class="fas fa-users fa-3x text-dark mb-3"></i>
+              <h5 class="text-white font-weight-bold mb-3">Crew Management</h5>
+              <p class="text-white mb-3">
+                Comprehensive crew management ensuring vessels are operated by
+                skilled and compliant seafarers.
+              </p>
+              <a
+                href="our_services.html"
+                class="text-white text-decoration-none font-weight-bold"
+                >Read More</a
+              >
             </div>
-            <p>
-              Comprehensive crew management ensuring vessels are operated by
-              skilled and compliant seafarers.
-            </p>
-            <a class="border-bottom text-decoration-none" href="our_services.html"
-              >Read More</a
-            >
           </div>
-          <div class="col-lg-3 col-md-6 text-center mb-5">
-            <div
-              class="d-flex align-items-center justify-content-center bg-primary mb-4 p-4"
-            >
-              <i class="fa fa-2x fa-ship text-dark pr-3"></i>
-              <h6 class="text-white font-weight-medium m-0">
+          <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="service-card bg-primary text-center p-4 h-100">
+              <i class="fas fa-ship fa-3x text-dark mb-3"></i>
+              <h5 class="text-white font-weight-bold mb-3">
                 Operational Management
-              </h6>
+              </h5>
+              <p class="text-white mb-3">
+                Optimized voyage planning, procurement, and risk management for
+                efficient and safe operations.
+              </p>
+              <a
+                href="our_services.html"
+                class="text-white text-decoration-none font-weight-bold"
+                >Read More</a
+              >
             </div>
-            <p>
-              Optimized voyage planning, procurement, and risk management for
-              efficient and safe operations.
-            </p>
-            <a class="border-bottom text-decoration-none" href="our_services.html"
-              >Read More</a
-            >
           </div>
-          <div class="col-lg-3 col-md-6 text-center mb-5">
-            <div
-              class="d-flex align-items-center justify-content-center bg-primary mb-4 p-4"
-            >
-              <i class="fa fa-2x fa-water text-dark pr-3"></i>
-              <h6 class="text-white font-weight-medium m-0">
+          <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="service-card bg-primary text-center p-4 h-100">
+              <i class="fas fa-water fa-3x text-dark mb-3"></i>
+              <h5 class="text-white font-weight-bold mb-3">
                 Offshore Vessel Management
-              </h6>
+              </h5>
+              <p class="text-white mb-3">
+                Specialized management for offshore supply vessels, ensuring
+                seamless and safe operations.
+              </p>
+              <a
+                href="our_services.html"
+                class="text-white text-decoration-none font-weight-bold"
+                >Read More</a
+              >
             </div>
-            <p>
-              Specialized management for offshore supply vessels, ensuring
-              seamless and safe operations.
-            </p>
-            <a class="border-bottom text-decoration-none" href="our_services.html"
-              >Read More</a
-            >
+          </div>
+          <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="service-card bg-primary text-center p-4 h-100">
+              <i class="fas fa-anchor fa-3x text-dark mb-3"></i>
+              <h5 class="text-white font-weight-bold mb-3">
+                Dry Docking Services
+              </h5>
+              <p class="text-white mb-3">
+                Expert management of dry-docking for vessels of any tonnage,
+                minimizing downtime and optimizing costs.
+              </p>
+              <a
+                href="our_services.html"
+                class="text-white text-decoration-none font-weight-bold"
+                >Read More</a
+              >
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="service-card bg-primary text-center p-4 h-100">
+              <i class="fas fa-search fa-3x text-dark mb-3"></i>
+              <h5 class="text-white font-weight-bold mb-3">
+                Audits, Inspections, Marine Consultancy & Ship Repair Services
+              </h5>
+              <p class="text-white mb-3">
+                Comprehensive audits, inspections, consultancy, and repair
+                services to ensure compliance and operational excellence.
+              </p>
+              <a
+                href="our_services.html"
+                class="text-white text-decoration-none font-weight-bold"
+                >Read More</a
+              >
+            </div>
           </div>
         </div>
       </div>

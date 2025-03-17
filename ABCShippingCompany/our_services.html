@@ -34,6 +34,29 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="css/style.css" rel="stylesheet" />
+
+    <style>
+      .image-container {
+        flex: 1 1 45%; /* Allows images to grow/shrink within 45% of container width */
+        max-width: 45%; /* Ensures images don't exceed 45% of the container */
+        overflow: hidden; /* Prevents content overflow */
+      }
+
+      .image-container img {
+        width: 100%; /* Makes the image fill the container */
+        height: auto; /* Maintains the aspect ratio */
+        object-fit: cover; /* Ensures the image covers the area without distortion */
+        border-radius: 5px; /* Optional: Adds rounded corners for a polished look */
+      }
+
+      @media (max-width: 768px) {
+        .image-container {
+          flex: 1 1 90%; /* Stacks images on smaller screens, taking full width */
+          max-width: 90%;
+          margin-bottom: 15px; /* Adds space between stacked images */
+        }
+      }
+    </style>
   </head>
 
   <body>
@@ -116,9 +139,11 @@
     >
       <div
         class="container text-center py-5"
-        style="position: relative; z-index: 1; height: 500px;"
+        style="position: relative; z-index: 1; height: 500px"
       >
-        <h1 class="text-white display-3 mb-5" style="margin-top: 150px;">Our Services</h1>
+        <h1 class="text-white display-3 mb-5" style="margin-top: 150px">
+          Our Services
+        </h1>
         <div class="d-inline-flex align-items-center text-white mb-4">
           <p class="m-0"><a class="text-white" href="index.html">Home</a></p>
           <i class="fa fa-circle px-3"></i>
@@ -258,7 +283,7 @@
           <div class="col-lg-6">
             <img
               class="img-fluid w-100"
-              src="img/6.jpg"
+              src="img/crew management photo 1.png"
               alt="Crew Management"
             />
           </div>
@@ -393,7 +418,7 @@
           <div class="col-lg-6">
             <img
               class="img-fluid w-100"
-              src="img/1.jpg"
+              src="img/Offshore vessel management.jpg"
               alt="Offshore Vessel Management"
             />
           </div>
@@ -436,6 +461,218 @@
       </div>
     </div>
     <!-- Offshore Vessel Management End -->
+
+    <!-- Dry Docking Services Start -->
+    <div class="container-fluid py-5">
+      <div class="container">
+        <div class="text-center pb-2">
+          <h6 class="text-primary text-uppercase font-weight-bold">
+            Dry Docking Services
+          </h6>
+          <h1 class="mb-4">Dry Docking Management</h1>
+        </div>
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <img
+              class="img-fluid w-100"
+              src="img/Drydocking services.JPG"
+              alt="Dry Docking Services"
+            />
+          </div>
+          <div class="col-lg-6">
+            <p class="mb-4">
+              Our technical team fully manages the planning, preparation, and
+              execution of dry-docking for vessels of any tonnage, whether
+              scheduled or unscheduled. Dry docking is one of the most
+              significant expenses for ship owners throughout a vessel's
+              lifetime. Without proper operation, controls, and expert
+              management, costs can escalate rapidly, and dock time can overrun,
+              impacting upcoming operational expenses.
+            </p>
+            <p class="mb-4">
+              With an experienced team, we ensure the entire repair job is
+              completed within the approved budget and timeframe, minimizing
+              vessel downtime and enabling a swift return to regular operations.
+              Our proven track record in successful dry docking and last-minute
+              repairs demonstrates the effectiveness of our "hands-on" approach,
+              optimizing overall expenses.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Dry Docking Services End -->
+
+    <!-- Audits and Inspections Start -->
+    <div class="container-fluid bg-secondary py-5">
+      <div class="container">
+        <div class="text-center pb-2">
+          <h6 class="text-primary text-uppercase font-weight-bold">
+            Audits & Inspections
+          </h6>
+          <h1 class="mb-4">
+            Audits, Inspections, Marine Consultancy & Ship Repair Services
+          </h1>
+        </div>
+        <div class="text-center mb-4 d-flex justify-content-center">
+          <div class="image-container mx-2">
+            <img
+              class="img-fluid"
+              style="max-width: 100%; height: 300px"
+              src="img/Ship Repair Sevices.JPG"
+              alt="Ship Inspection"
+            />
+          </div>
+          <div class="image-container mx-2">
+            <img
+              class="img-fluid"
+              style="max-width: 100%; height: 300px"
+              src="img/ship audit.png"
+              alt="Ship Repair"
+            />
+          </div>
+        </div>
+        <div class="text-center mb-4">
+          <p class="mb-0">
+            We provide a wide range of audit, inspection, consultancy, and ship
+            repair services on behalf of shipowners, operators, potential
+            purchasers, financial institutions, and investors. Our expertise
+            ensures compliance, safety, and operational readiness across all
+            vessel types.
+          </p>
+        </div>
+        <div class="row align-items-start">
+          <div class="col-lg-6 pr-lg-4">
+            <h6 class="font-weight-bold">Audits, Inspections, and Surveys</h6>
+            <ul class="list-inline">
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>Pre-vetting
+                  Inspections/ Preparing Vessel for Oil Majors like ExxonMobil,
+                  Shell, ENOC, etc.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i
+                  >Pre-Purchase Inspection
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>ISM Audit,
+                  ISPS Audit & MLC Internal Audit
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i
+                  >Navigational Audit
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>Technical
+                  Audits both onboard & shore office
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>Preparation
+                  of Manuals/Documentation for ISM, ISPS and Navigation Audits
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>On Board
+                  Bunker Quantity Survey
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i
+                  >On-Hire/OFF-Hire Survey
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>Draft
+                  Survey for Cargo Loading & Discharging
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>Damage
+                  Survey on behalf of Hull & Machinery
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div class="col-lg-6 pl-lg-4 position-relative">
+            <h6 class="font-weight-bold">
+              Ship Repair Services (Through Partners)
+            </h6>
+            <ul class="list-inline">
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>Fabrication
+                  and Piping Repair Works
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>Complete
+                  Overhauling & Repairs of Main Engine, Aux Engine, Pumps,
+                  Purifiers
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>Automation
+                  and Electrical Repair Works including Boiler, Cargo Pumps,
+                  etc.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>Riding Crew
+                  for Repair Works
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>Hydraulic
+                  Repair Works on Cranes, Winches, Valves
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i
+                  >Re-engineering and Making of Components/Parts
+                </p>
+              </li>
+              <li>
+                <p>
+                  <i class="far fa-dot-circle text-primary mr-3"></i>Tank
+                  Cleaning and Spill Cleaning
+                </p>
+              </li>
+            </ul>
+            <div
+              style="
+                position: absolute;
+                top: 0;
+                left: -1px;
+                width: 1px;
+                height: 100%;
+                background-color: #ddd;
+              "
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Audits and Inspections End -->
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white mt-5 py-5 px-sm-3 px-md-5">
