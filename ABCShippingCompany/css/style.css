@@ -34,6 +34,7 @@
   --breakpoint-xl: 1200px;
   --font-family-sans-serif: "Poppins", sans-serif;
   --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --new: #0057a3;
 }
 
 *,
@@ -6091,6 +6092,10 @@ a.close.disabled {
 
 .align-text-top {
   vertical-align: text-top !important;
+}
+
+.bg-new {
+  background-color: #0057a3 !important;
 }
 
 .bg-primary {
