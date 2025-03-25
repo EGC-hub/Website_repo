@@ -36,7 +36,7 @@ $config = include $configPath;
 $dbHost = 'localhost';
 $dbUsername = $config['dbUsername'];
 $dbPassword = $config['dbPassword'];
-$dbName = 'new';
+$dbName = 'euro_login_system';
 
 $dsn = "mysql:host=$dbHost;dbname=$dbName;charset=utf8";
 
