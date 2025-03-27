@@ -1598,7 +1598,7 @@ function getWeekdayHours($start, $end)
                             <input type="file" class="form-control" id="attachment" name="attachment"
                                 accept=".pdf,.jpg,.jpeg,.png">
                             <small class="form-text text-muted">Max file size: 5MB. Allowed types: PDF, JPG,
-                                PNG.</small>
+                                PNG, PPT, PPTX, TXT, XLS, XLSX.</small>
                         </div>
                     </div>
                     <div class="modal-footer">
