@@ -85,6 +85,37 @@ try {
     $predecessor_task_id = $task['predecessor_task_id'];
     $actual_start_date = $task['actual_start_date'];
 
+    function getWeekdayHours($start, $end)
+    {
+        if ($start >= $end) {
+            return 0; // Invalid range
+        }
+
+        $weekdayHours = 0;
+        $current = $start;
+
+        while ($current < $end) {
+            $dayOfWeek = date('N', $current);
+            if ($dayOfWeek <= 5) { // Monday to Friday
+                $startOfDay = strtotime('today', $current);
+                $endOfDay = strtotime('tomorrow', $current) - 1;
+
+                // Determine the start and end times for this day
+                $dayStart = max($start, $startOfDay);
+                $dayEnd = min($end, $endOfDay);
+
+                // Calculate hours for this day
+                $hours = ($dayEnd - $dayStart) / 3600;
+                if ($hours > 0) {
+                    $weekdayHours += $hours;
+                }
+            }
+            $current = strtotime('+1 day', $current);
+        }
+
+        return $weekdayHours;
+    }
+
     $assignerStatuses = ['Assigned', 'Hold', 'Cancelled', 'Reinstated', 'Reassigned'];
     $normalUserStatuses = ['Assigned' => ['In Progress'], 'In Progress' => ['Completed on Time', 'Delayed Completion']];
     $allowedStatuses = array_merge($assignerStatuses, ['Reassigned', 'In Progress', 'Completed on Time', 'Delayed Completion', 'Closed']);
@@ -138,9 +169,10 @@ try {
         if (!$completion_description) {
             throw new Exception('Completion description is required for completed statuses.');
         }
-        // Use the form-submitted actual_finish_date or current time
-        $actual_finish_date = $_POST['actual_finish_date'] ?? $currentTime;
-        $actualDurationHours = calculateActualDuration($actual_start_date, $actual_finish_date);
+        // Use actual_start_date from database and current time for finish date
+        $actualStartDate = strtotime($actual_start_date);
+        $actualFinishDate = time(); // Current time, matching tasks.php logic for in-progress/completing tasks
+        $actualDurationHours = getWeekdayHours($actualStartDate, $actualFinishDate); // Use the same function as tasks.php
         $forceProceed = isset($_POST['force_proceed']) && $_POST['force_proceed'] === 'true';
         if ($actualDurationHours < 1 && !$forceProceed) {
             ob_end_clean();
@@ -152,6 +184,8 @@ try {
             ]);
             exit;
         }
+        // Set actual_finish_date to current time for the update
+        $actual_finish_date = date('Y-m-d H:i:s', $actualFinishDate);
     }
 
     // Handle file upload
