@@ -1,5 +1,4 @@
 <?php
-// Disable error display to prevent HTML output
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 ini_set('log_errors', 1);
@@ -28,7 +27,7 @@ $currentTime = date('Y-m-d H:i:s');
 $configPath = realpath(__DIR__ . '/../config.php');
 if (!file_exists($configPath)) {
     ob_end_clean();
-    echo json_encode(['success' => false, 'message' => 'Config file not found.']);
+    echo json_encode(['success' => false, 'message' => 'Config file not found at: ' . $configPath]);
     exit;
 }
 $config = include $configPath;
@@ -36,7 +35,7 @@ $config = include $configPath;
 $dbHost = 'localhost';
 $dbUsername = $config['dbUsername'];
 $dbPassword = $config['dbPassword'];
-$dbName = 'euro_login_system';
+$dbName = 'new';
 
 $dsn = "mysql:host=$dbHost;dbname=$dbName;charset=utf8";
 
@@ -51,10 +50,8 @@ try {
 
 include 'permissions.php';
 
-function calculateActualDuration($start, $end)
-{
-    if (!$start || !$end || $start >= $end)
-        return 0;
+function calculateActualDuration($start, $end) {
+    if (!$start || !$end || $start >= $end) return 0;
     return (strtotime($end) - strtotime($start)) / 3600;
 }
 
@@ -104,8 +101,7 @@ try {
         if (isset($normalUserStatuses[$current_status])) {
             $statuses = array_merge($statuses, $normalUserStatuses[$current_status]);
         } else {
-            if (in_array($current_status, $allowedStatuses))
-                $statuses = $allowedStatuses;
+            if (in_array($current_status, $allowedStatuses)) $statuses = $allowedStatuses;
         }
     } elseif (hasPermission('status_change_normal') && $user_id === $assigned_user_id) {
         if (isset($normalUserStatuses[$current_status])) {
@@ -147,20 +143,28 @@ try {
 
     // Handle file upload
     $attachmentPath = null;
+    $transactionStarted = false; // Track if transaction is active
     if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] !== UPLOAD_ERR_NO_FILE) {
         $file = $_FILES['attachment'];
         $allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
         $maxSize = 5 * 1024 * 1024; // 5MB
         $uploadDir = __DIR__ . '/uploads/';
 
-        if (!is_dir($uploadDir) || !is_writable($uploadDir)) {
-            throw new Exception('Upload directory is not writable.');
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
         }
+        if (!is_writable($uploadDir)) {
+            throw new Exception('Upload directory is not writable: ' . $uploadDir);
+        }
+
         if (!in_array($file['type'], $allowedTypes)) {
-            throw new Exception('Invalid file type. Only PDF, JPG, and PNG are allowed.');
+            throw new Exception('Invalid file type: ' . $file['type'] . '. Only PDF, JPG, and PNG are allowed.');
         }
         if ($file['size'] > $maxSize) {
-            throw new Exception('File size exceeds 5MB limit.');
+            throw new Exception('File size exceeds 5MB limit: ' . $file['size']);
+        }
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            throw new Exception('File upload error code: ' . $file['error']);
         }
 
         $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
@@ -168,17 +172,23 @@ try {
         $attachmentPath = $uploadDir . $filename;
 
         if (!move_uploaded_file($file['tmp_name'], $attachmentPath)) {
-            throw new Exception('Failed to upload file.');
+            throw new Exception('Failed to move uploaded file to: ' . $attachmentPath);
         }
 
+        $pdo->beginTransaction();
+        $transactionStarted = true;
         $stmt = $pdo->prepare("INSERT INTO task_attachments (task_id, filename, filepath, uploaded_at, status_at_upload, uploaded_by_user_id) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([$task_id, $filename, $attachmentPath, $currentTime, $new_status, $user_id]);
     }
 
     // Perform task update
-    $pdo->beginTransaction();
+    if (!$transactionStarted && $new_status !== $current_status) {
+        $pdo->beginTransaction();
+        $transactionStarted = true;
+    }
+
     if ($new_status === $current_status) {
-        // No status change, but allow attachment
+        // No status change, but attachment was handled above
     } elseif ($new_status === 'In Progress') {
         $sql = "UPDATE tasks SET status = ?, actual_start_date = COALESCE(actual_start_date, ?) WHERE task_id = ?";
         $stmt = $pdo->prepare($sql);
@@ -225,15 +235,21 @@ try {
         $stmt->execute([$task_id, $current_status, $new_status, $user_id]);
     }
 
-    $pdo->commit();
+    if ($transactionStarted) {
+        $pdo->commit();
+    }
     ob_end_clean();
     echo json_encode(['success' => true, 'message' => 'Status updated successfully.', 'task_name' => $task_name]);
 } catch (Exception $e) {
-    $pdo->rollBack();
+    if (isset($transactionStarted) && $transactionStarted) {
+        $pdo->rollBack();
+    }
     ob_end_clean();
-    echo json_encode(['success' => false, 'message' => 'An error occurred: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
 } catch (Throwable $e) {
-    $pdo->rollBack();
+    if (isset($transactionStarted) && $transactionStarted) {
+        $pdo->rollBack();
+    }
     ob_end_clean();
     echo json_encode(['success' => false, 'message' => 'Unexpected error: ' . $e->getMessage()]);
 }

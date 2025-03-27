@@ -1427,7 +1427,7 @@ function getWeekdayHours($start, $end)
                                                 data-description="<?= htmlspecialchars($row['completion_description']) ?>"><?= htmlspecialchars($row['task_name']) ?></a>
                                         <?php elseif ($row['status'] === 'Delayed Completion' || $isClosedFromDelayedCompletion): ?>
                                             <a href="#" data-bs-toggle="modal" data-bs-target="#delayedCompletionModal"
-                                                onclick="showDelayedDetails('<?= htmlspecialchars($row['task_name']) ?>', '<?= htmlspecialchars($row['task_actual_finish_date']) ?>', '<?= htmlspecialchars($row['delayed_reason']) ?>', '<?= htmlspecialchars($row['completion_description']) ?>')"><?= htmlspecialchars($row['task_name']) ?></a>
+                                                onclick="showDelayedDetails('<?= htmlspecialchars($row['task_name'] ?? '') ?>', '<?= htmlspecialchars($row['task_actual_finish_date'] ?? '') ?>', '<?= htmlspecialchars($row['delayed_reason'] ?? '') ?>', '<?= htmlspecialchars($row['completion_description'] ?? '') ?>')"><?= htmlspecialchars($row['task_name'] ?? '') ?></a>
                                         <?php else: ?>
                                             <?= htmlspecialchars($row['task_name']) ?>
                                         <?php endif; ?>
