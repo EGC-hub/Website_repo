@@ -1930,7 +1930,7 @@ function getWeekdayHours($start, $end)
                 .then(response => {
                     if (!response.ok) {
                         return response.text().then(text => {
-                            throw new Error('Server error: ' + text);
+                            throw new Error('Server error (HTTP ' + response.status + '): ' + text);
                         });
                     }
                     return response.json();
@@ -1942,6 +1942,38 @@ function getWeekdayHours($start, $end)
                         document.getElementById('success-message').innerText = data.message;
                         new bootstrap.Modal(document.getElementById('successModal')).show();
                         setTimeout(() => window.location.reload(), 2000);
+                    } else if (data.confirm_duration) {
+                        // Prompt user to confirm short duration
+                        if (confirm(data.message)) {
+                            // Resubmit the form if user confirms
+                            fetch('update-status.php', {
+                                method: 'POST',
+                                body: formData
+                            })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        return response.text().then(text => {
+                                            throw new Error('Server error (HTTP ' + response.status + '): ' + text);
+                                        });
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.success) {
+                                        bootstrap.Modal.getInstance(document.getElementById('completionModal')).hide();
+                                        document.getElementById('success-task-name').innerText = data.task_name;
+                                        document.getElementById('success-message').innerText = data.message;
+                                        new bootstrap.Modal(document.getElementById('successModal')).show();
+                                        setTimeout(() => window.location.reload(), 2000);
+                                    } else {
+                                        alert(data.message);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Fetch error on confirmation:', error);
+                                    alert('Failed to update status: ' + error.message);
+                                });
+                        }
                     } else {
                         alert(data.message);
                     }

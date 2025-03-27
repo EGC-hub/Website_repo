@@ -50,8 +50,10 @@ try {
 
 include 'permissions.php';
 
-function calculateActualDuration($start, $end) {
-    if (!$start || !$end || $start >= $end) return 0;
+function calculateActualDuration($start, $end)
+{
+    if (!$start || !$end || $start >= $end)
+        return 0;
     return (strtotime($end) - strtotime($start)) / 3600;
 }
 
@@ -101,7 +103,8 @@ try {
         if (isset($normalUserStatuses[$current_status])) {
             $statuses = array_merge($statuses, $normalUserStatuses[$current_status]);
         } else {
-            if (in_array($current_status, $allowedStatuses)) $statuses = $allowedStatuses;
+            if (in_array($current_status, $allowedStatuses))
+                $statuses = $allowedStatuses;
         }
     } elseif (hasPermission('status_change_normal') && $user_id === $assigned_user_id) {
         if (isset($normalUserStatuses[$current_status])) {
@@ -137,7 +140,15 @@ try {
         }
         $actualDurationHours = calculateActualDuration($actual_start_date, $actual_finish_date);
         if ($actualDurationHours < 1) {
-            throw new Exception('Error: Actual duration must be at least 1 hour for completion.');
+            // Instead of throwing an exception, return a confirmation prompt flag
+            ob_end_clean();
+            echo json_encode([
+                'success' => false,
+                'confirm_duration' => true,
+                'message' => 'The actual duration is less than 1 hour (' . round($actualDurationHours, 2) . ' hours). Are you sure you want to proceed?',
+                'task_name' => $task_name
+            ]);
+            exit;
         }
     }
 
