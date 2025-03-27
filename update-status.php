@@ -138,9 +138,11 @@ try {
         if (!$completion_description) {
             throw new Exception('Completion description is required for completed statuses.');
         }
+        // Use the form-provided actual_finish_date, not the old database value
+        $actual_finish_date = $_POST['actual_finish_date'] ?? $currentTime; // Ensure this is set
         $actualDurationHours = calculateActualDuration($actual_start_date, $actual_finish_date);
-        if ($actualDurationHours < 1) {
-            // Instead of throwing an exception, return a confirmation prompt flag
+        $forceProceed = isset($_POST['force_proceed']) && $_POST['force_proceed'] === 'true';
+        if ($actualDurationHours < 1 && !$forceProceed) {
             ob_end_clean();
             echo json_encode([
                 'success' => false,

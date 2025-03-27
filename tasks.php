@@ -1919,9 +1919,11 @@ function getWeekdayHours($start, $end)
 
         function handleCompletionForm(event) {
             event.preventDefault();
-            document.getElementById('actual-completion-date').value = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            const actualFinishDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            document.getElementById('actual-completion-date').value = actualFinishDate;
+            console.log('Actual Finish Date:', actualFinishDate); // Debug log
             const form = event.target;
-            const formData = new FormData(form); // Use FormData to include file uploads
+            const formData = new FormData(form);
 
             fetch('update-status.php', {
                 method: 'POST',
@@ -1943,9 +1945,8 @@ function getWeekdayHours($start, $end)
                         new bootstrap.Modal(document.getElementById('successModal')).show();
                         setTimeout(() => window.location.reload(), 2000);
                     } else if (data.confirm_duration) {
-                        // Prompt user to confirm short duration
                         if (confirm(data.message)) {
-                            // Resubmit the form if user confirms
+                            formData.append('force_proceed', 'true');
                             fetch('update-status.php', {
                                 method: 'POST',
                                 body: formData
