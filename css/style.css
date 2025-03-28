@@ -3410,29 +3410,27 @@ sl-carousel-item img {
   width: auto;
   max-width: 500px;
   margin: 20px auto;
-  display: flex; /* Enable flexbox for centering */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
 }
 
-/* Specific styling for the landscape video popup */
+
 #my-video-3 {
-  max-width: 800px; /* Adjust this based on your preference */
+  max-width: 800px; 
 }
 
-/* Ensure the video fits properly */
 #my-video-3 video {
   max-width: 100%;
-  max-height: 500px; /* Match the height you set in HTML */
+  max-height: 500px; 
   width: auto;
   height: auto;
 }
 
-/* Override Magnific Popup's default close button styling */
 .white-popup .mfp-close {
-  top: -20px; /* Move it down into the popup */
-  right: 10px; /* Move it closer to the right edge */
-  z-index: 1046; /* Keep it above other elements */
+  top: -20px; 
+  right: 10px; 
+  z-index: 1046; 
 }
 
 .cc2 {
