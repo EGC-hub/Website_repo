@@ -1,8 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
 // Include PHPMailer files
 require './PHPMailer-master/src/Exception.php';
@@ -18,7 +14,7 @@ $config = include '../config.php';
 $dbHost = 'localhost';
 $dbUsername = $config['dbUsername'];
 $dbPassword = $config['dbPassword'];
-$dbName = 'euro_login_system';
+$dbName = 'new';
 
 $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 
@@ -31,17 +27,18 @@ $userTimezone = isset($_COOKIE['user_timezone']) ? $_COOKIE['user_timezone'] : '
 date_default_timezone_set($userTimezone);
 
 // Function to validate password complexity
-function validatePassword($password) {
-    return preg_match('@[A-Z]@', $password) && 
-           preg_match('@\d@', $password) && 
-           preg_match('@[^\w]@', $password) && 
-           strlen($password) >= 8;
+function validatePassword($password)
+{
+    return preg_match('@[A-Z]@', $password) &&
+        preg_match('@\d@', $password) &&
+        preg_match('@[^\w]@', $password) &&
+        strlen($password) >= 8;
 }
 
 // Handle username submission for OTP
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && !isset($_POST['otp'])) {
     $username = trim($_POST['username']);
-    
+
     $stmt = $conn->prepare("SELECT email FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -103,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['username']) && !isset(
 elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['otp'])) {
     $otp = trim($_POST['otp']);
     $username = $_SESSION['reset_username'] ?? '';
-    
+
     if (empty($username)) {
         $errorMsg = "Session expired. Please start the reset process again.";
     } else {
@@ -164,18 +161,100 @@ elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['otp'])) {
 $conn->close();
 ?>
 
-<!-- HTML remains unchanged -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password</title>
     <link rel="icon" type="image/png" sizes="56x56" href="images/logo/logo-2.1.ico" />
     <style>
-        /* Existing CSS remains unchanged */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #002c5f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005bb5;
+        }
+
+        .message {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .error {
+            color: #d9534f;
+        }
+
+        .success {
+            color: #5cb85c;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .back-link a {
+            color: #002c5f;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
+
 <body>
     <div class="form-container">
         <h2>Reset Password</h2>
@@ -193,14 +272,16 @@ $conn->close();
                     <label for="new_password">New Password</label>
                     <input type="password" id="new_password" name="new_password" placeholder="Enter new password" required>
                     <label for="confirm_password">Confirm Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm new password" required>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm new password"
+                        required>
                     <input type="hidden" name="otp" value="<?= htmlspecialchars($otp ?? '') ?>">
                     <button type="submit">Reset Password</button>
                 </form>
             <?php else: ?>
                 <form method="post">
                     <label for="otp">Enter OTP</label>
-                    <input type="text" id="otp" name="otp" placeholder="Enter 6-digit OTP" required maxlength="6" pattern="\d{6}">
+                    <input type="text" id="otp" name="otp" placeholder="Enter 6-digit OTP" required maxlength="6"
+                        pattern="\d{6}">
                     <button type="submit">Verify OTP</button>
                 </form>
             <?php endif; ?>
@@ -230,4 +311,5 @@ $conn->close();
         });
     </script>
 </body>
+
 </html>
