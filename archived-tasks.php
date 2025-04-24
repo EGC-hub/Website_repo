@@ -49,6 +49,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+$conn->query("SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''))");
+
 $checkStmt = $conn->prepare("SELECT session_token FROM users WHERE id = ?");
 $checkStmt->bind_param("i", $user_id);
 $checkStmt->execute();
