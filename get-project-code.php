@@ -15,7 +15,7 @@ if ($user_id === null) {
 }
 
 $config = include '../config.php';
-$conn = new mysqli('localhost', $config['dbUsername'], $config['dbPassword'], 'new');
+$conn = new mysqli('localhost', $config['dbUsername'], $config['dbPassword'], 'euro_login_system');
 if ($conn->connect_error) {
     echo json_encode(['success' => false, 'message' => 'Database connection failed']);
     exit;
