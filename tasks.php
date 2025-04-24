@@ -101,7 +101,7 @@ $userQuery = $conn->prepare("
     JOIN departments d ON ud.department_id = d.id
     JOIN roles r ON r.id = ?
     WHERE u.id = ?
-    GROUP BY u.id
+    GROUP BY u.id, u.username, u.email, r.name
 ");
 $userQuery->bind_param("ii", $selected_role_id, $user_id);
 $userQuery->execute();
